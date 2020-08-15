@@ -6,6 +6,7 @@ This project implements a small, but _complete_ solution using the Spring framew
 - secured webservice endpoints
 - unit tests
 - integration tests
+- Swagger online documentation and test UI
 - sonarqube
 - Eureka, Zuul, Ribbon, Hystrix with fault tolerance
 - components running in docker containers
@@ -43,7 +44,11 @@ Go to http://localhost:3000 for Grafana. Login with admin/admin.
 
 ## KNOW-HOW tags:
 Find the tags in the source code to see how it was made.
-```
-#know-how:access-spring-managed-beans-from-outside
-TBD
-```
+
+| Tag | Description |
+| ------ | ------ |
+| #know-how:access-spring-managed-beans-from-outside | How can we access beans managed within the application context from outside of the context |
+| #know-how:custom-authentication-provider |  |
+| #know-how:simple-httpsecurity-builder | The WebSecurityConfigurerAdapter is a real pain in the ... We have SimpleHttpSecurityBuilder to simplify the security configuration. |
+| #know-how:custom-rest-error-response | In case of any exception in the server side we want to provide a useful HTTP body in Json form. This can be converted back to an Exception on the client side. |
+
