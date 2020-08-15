@@ -1,0 +1,132 @@
+/*
+ * Copyright 2020-2020 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    id 'org.springframework.boot' version '2.3.2.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'application'
+    id 'jacoco'
+	id "com.github.ManifestClasspath" version "0.1.0-RELEASE"
+}
+apply from: '../gradle/common.gradle'
+apply from: '../gradle/docker.gradle'
+
+
+repositories {
+    jcenter()
+    mavenCentral()
+    flatDir {
+        dirs '../gradle/localrepo'
+    }
+}
+
+
+ext {
+	set('springCloudVersion', "Hoxton.SR6")
+}
+
+
+application {
+    mainClassName = 'hu.perit.template.eureka.Application'
+    // Some JVM options already set in common.gradle
+    applicationDefaultJvmArgs += ['-Xmx1g', '-Xms32m']
+}
+
+
+sourceCompatibility = 11
+
+dependencies {
+	compile project(':spvitamin-core')
+	compile project(':spvitamin-spring-general')
+	compile project(':spvitamin-spring-server')
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    integtestCompileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    integtestAnnotationProcessor 'org.projectlombok:lombok'
+
+    // Spring Boot
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // Eureka
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
+
+    // Zuul
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-zuul'
+
+    // Ribbon
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-ribbon'
+
+    // Spring Retry
+    //implementation 'org.springframework.retry:spring-retry'
+
+    // JJWT
+    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+
+    // JAXB (JDK > 8 miatt)
+    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime'
+
+    // javax.validation
+    implementation group: 'javax.validation', name: 'validation-api'
+    implementation group: 'org.hibernate', name: 'hibernate-validator', version: '6.1.5.Final'
+
+    // Test framework
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    // Swagger
+    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '2.9.2'
+
+    // apache.commons
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+
+    // Log4J
+    implementation('log4j:log4j:1.2.17')
+
+    // Micrometer Prometheus plugin
+    implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.5.3'
+}
+
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+
+test {
+    useJUnitPlatform()
+}
+integtest {
+    useJUnitPlatform()
+}
+
+dockerImage() {
+	dependsOn 'dockerBackendImage'
+}
