@@ -1,0 +1,67 @@
+global:
+  scrape_interval:     5s # By default, scrape targets every 15 seconds.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds.
+
+  # Attach these extra labels to all timeseries collected by this Prometheus instance.
+  external_labels:
+    monitor: 'template-project'
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+
+    #####################################################################################                 
+  - job_name: 'prometheus'
+    #####################################################################################                 
+    static_configs:
+      - targets: ['prometheus:9090']
+
+
+    #####################################################################################                 
+  - job_name: 'discovery'
+    #####################################################################################                 
+    metrics_path: '/actuator/prometheus'
+    scheme: 'https'
+    static_configs:
+      - targets: ['discovery:8400']
+    tls_config:
+        insecure_skip_verify: true
+
+
+    #####################################################################################                 
+  - job_name: 'auth-service'
+    #####################################################################################                 
+    metrics_path: '/actuator/prometheus'
+    scheme: 'https'
+    static_configs:
+      - targets: ['auth-service:8410']
+    tls_config:
+        insecure_skip_verify: true
+
+
+    #####################################################################################                 
+  - job_name: 'scalable-service'
+    #####################################################################################                 
+    metrics_path: '/actuator/prometheus'
+    scheme: 'https'
+    static_configs:
+      - targets: ['scalable-service-1:8420', 'scalable-service-2:8430', 'scalable-service-3:8440']
+    tls_config:
+        insecure_skip_verify: true
+
+      
+    #####################################################################################                 
+  - job_name: 'nodeexporter'
+    #####################################################################################                 
+    static_configs:
+      - targets: ['nodeexporter:9100']
+
+  
+    #####################################################################################                 
+  - job_name: 'cadvisor'
+    #####################################################################################                 
+    static_configs:
+      - targets: ['cadvisor:8080']
