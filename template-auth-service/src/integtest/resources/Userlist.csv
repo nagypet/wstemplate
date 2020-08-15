@@ -1,0 +1,4 @@
+userName;password;displayName;active;address;email;nextLoginChangePwd;phone;roles
+nagy_peter;alma;Nagy Péter;true;8765 Szilva, Alma utca 12.;nagy.peter.home@gmail.com;false;30/9215098;ROLE_ADMIN
+kovacs_janos;korte;Kovács János;false;1234 Vértesszőlős, Heimann u. 1;kovi@almamail.hu;false;20/1234567;ROLE_PUBLIC
+szioka;50almafa;Nem mondom meg;true;3456 Eger, Vincze Béla u. 1;a@b.c;true;70/9876543;ROLE_ADMIN, ROLE_PUBLIC
