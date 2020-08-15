@@ -1,0 +1,27 @@
+/*
+ * Copyright header
+ * The ultimate spring based webservice template project.
+ * Author Peter Nagy <nagy.peter.home@gmail.com>
+ */
+
+.my-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+.my-header {
+  flex-shrink: 0;
+}
+
+.my-content{
+  flex-grow: 1;
+  overflow: auto;
+  min-height: 2em;
+}
+
+.my-footer{
+  flex-shrink: 0;
+}

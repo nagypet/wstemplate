@@ -1,0 +1,33 @@
+<!--
+  ~ Copyright header
+  ~ The ultimate spring based webservice template project.
+  ~ Author Peter Nagy <nagy.peter.home@gmail.com>
+  -->
+
+<div class="row justify-content-center">
+  <aside style="width: 400px">
+    <div class="card">
+      <div class="card-header">Log in</div>
+      <article class="card-body">
+        <form autocomplete="off" spellcheck="false" (keyup)="onKeyPress($event)">
+          <div class="form-group">
+            <input class="form-control" placeholder="User name" #usernameInput>
+          </div> <!-- form-group// -->
+          <div class="form-group">
+            <input class="form-control" placeholder="Password" type="password" #passwordInput>
+          </div> <!-- form-group// -->
+          <!--<div class="form-group">-->
+          <div class="row">
+            <div class="col-sm-6" style="margin: 0 0 10px 0">
+              <button type="button" class="btn btn-primary btn-block" (click)="onLogin()">Login</button>
+            </div>
+            <div class="col-sm-6">
+              <button type="button" class="btn btn-outline-secondary btn-block" (click)="onCancel()">Cancel</button>
+            </div>
+          </div>
+          <!--</div> <!-- form-group// -->
+        </form>
+      </article>
+    </div> <!-- card.// -->
+  </aside>
+</div>

@@ -1,0 +1,43 @@
+<!--
+  ~ Copyright header
+  ~ The ultimate spring based webservice template project.
+  ~ Author Peter Nagy <nagy.peter.home@gmail.com>
+  -->
+
+<div>
+  <div *ngIf="globalService.areSettingsAvailable() === true">
+
+    <h2>Server settings</h2>
+    <table class="table table-sm table-striped">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let setting of settings">
+          <th scope="row">{{setting.name}}</th>
+          <td *ngIf="setting.link === true"><a href="{{setting.value}}" target="_blank">{{setting.value}}</a></td>
+          <td *ngIf="setting.link !== true">{{setting.value}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <hr>
+
+    <button *ngIf="globalService.isLoggedIn() === true" type="button" class="btn btn-outline-primary" (click)="onShutdown()" ngbTooltip="Shuts down the service" placement="right">Shutdown</button>
+    <button *ngIf="globalService.isLoggedIn() !== true" disabled type="button" class="btn btn-outline-primary" (click)="onShutdown()">Shutdown</button>
+
+    <ngb-alert *ngIf="shutdownIsInProgress === true" style="margin: 10px 0 0 0" [dismissible]="false">Shutting down the service...</ngb-alert>
+
+  </div>
+
+  <div class="row" *ngIf="globalService.areSettingsAvailable() !== true">
+    <div class="col-sm-12">
+      <div style="padding: 15px 0 0 0">
+        <p>Please log in!</p>
+      </div>
+    </div>
+  </div>
+
+</div>

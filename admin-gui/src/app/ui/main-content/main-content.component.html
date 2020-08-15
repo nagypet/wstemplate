@@ -1,0 +1,23 @@
+<!--
+  ~ Copyright header
+  ~ The ultimate spring based webservice template project.
+  ~ Author Peter Nagy <nagy.peter.home@gmail.com>
+  -->
+
+<ngb-tabset>
+  <ngb-tab title="Settings">
+    <ng-template ngbTabContent>
+      <app-settings></app-settings>
+    </ng-template>
+  </ngb-tab>
+  <ngb-tab title="Keystore">
+    <ng-template ngbTabContent>
+      <app-certificates [KeystoreType]="'keystore'"></app-certificates>
+    </ng-template>
+  </ngb-tab>
+  <ngb-tab title="Truststore">
+    <ng-template ngbTabContent>
+      <app-certificates [KeystoreType]="'truststore'"></app-certificates>
+    </ng-template>
+  </ngb-tab>
+</ngb-tabset>
