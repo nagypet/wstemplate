@@ -23,7 +23,7 @@ There are 4 main components of the system:
 - get the sources
 - cd to the root folder and
 ```
-gradlew dist dockerImage
+gradlew dist dockerImage --parallel
 ```
 - then cd to docker-compose\dev\ and
 ```
