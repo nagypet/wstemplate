@@ -17,7 +17,7 @@ This project implements a small, but _complete_ solution using the Spring framew
 There are 4 main components of the system:
 - template-auth-service: an authorization and user management service with Jwt authentication
 - template-eureka: service discovery, API gateway and load balancer
-- template-scalable-service: 3 instances of the service is installed to achieve scalability and high availability
+- template-scalable-service: 3 instances of the service is installed to achieve scalability and high availability. The services are running within a single private docker network. In a real-world scenario we would use separated docker hosts with an overlay network, but this is only a small change in the docker-compose.yml file.
 - performance-tester: to generate a simulated load for the system
 
 ## Build and run
@@ -51,4 +51,5 @@ Find the tags in the source code to see how it was made.
 | #know-how:custom-authentication-provider |  |
 | #know-how:simple-httpsecurity-builder | The WebSecurityConfigurerAdapter is a real pain in the ... We have SimpleHttpSecurityBuilder to simplify the security configuration. |
 | #know-how:custom-rest-error-response | In case of any exception in the server side we want to provide a useful HTTP body in Json form. This can be converted back to an Exception on the client side. |
-
+| #know-how:hibernate-configuration | How to configure hibernate in the most flexible way? |
+| #know-how:jpa-auditing | How to configure custom auditing features to track creation/modification of entities? |
