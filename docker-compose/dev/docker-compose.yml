@@ -1,0 +1,230 @@
+#docker compose for local development
+
+version: '3.6'
+
+networks:
+    back-tier-net:
+        driver: bridge
+    db-net:
+        driver: bridge
+    monitoring:
+        driver: bridge
+
+
+services: 
+    
+    #####################################################################################                 
+    discovery:
+    #####################################################################################                 
+        container_name: discovery
+        image: template-eureka
+        environment:
+            #agentlib for remote debugging
+            - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+            - TEMPLATE_EUREKA_OPTS=-Dspring.profiles.active=default,dev,discovery
+            - EUREKA_ENVIRONMENT_PROFILE=dev
+        ports:
+            - '8400:8400'
+            - '5500:5005'
+
+        networks: 
+            - back-tier-net
+            - monitoring
+        hostname: 'discovery'
+  
+  
+    #####################################################################################                 
+    postgres:
+    #####################################################################################                 
+        container_name: postgres
+        image: postgres:10.13-alpine
+        environment:
+            - POSTGRES_PASSWORD=sa
+        ports:
+            - "5432:5432"
+        volumes:
+            - db_volume:/var/lib/postgresql/data
+            #- ${local_mounted_folder_path}/postgres:/var/lib/postgresql/data
+        networks: 
+            - back-tier-net
+            - db-net
+
+
+    #####################################################################################                 
+    pgadmin:
+    #####################################################################################                 
+        container_name: pgadmin
+        image: dpage/pgadmin4
+        environment:
+            - PGADMIN_DEFAULT_EMAIL=postgres
+            - PGADMIN_DEFAULT_PASSWORD=sa
+        ports:
+            - "5400:80"
+        volumes:
+            - ${local_mounted_folder_path}/pgadmin:/var/lib/pgadmin
+        networks: 
+            - db-net
+        logging:
+            driver: none  
+      
+  
+    #####################################################################################                 
+    auth-service:
+    #####################################################################################                 
+        container_name: auth-service
+        image: template-auth-service
+        environment:
+              - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka
+              - TEMPLATE_AUTH_SERVICE_OPTS=-Dspring.profiles.active=default,dev,discovery,devpgdb
+        ports:
+            - "8410:8410"
+        networks: 
+            - back-tier-net
+            - monitoring
+        depends_on:
+            - discovery  
+            - postgres
+        hostname: 'auth-service'
+
+
+    #####################################################################################                 
+    scalable-service-1:
+    #####################################################################################                 
+        container_name: scalable-service-1
+        image: template-scalable-service
+        environment:
+            - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -DHOSTNAME=scalable-service-1 -DPORT=8420
+            - TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=default,dev,discovery
+        ports:
+            - "8420:8420"
+        networks: 
+            - back-tier-net
+            - monitoring
+        depends_on:
+            - discovery  
+            - auth-service
+        hostname: 'scalable-service-1'
+
+
+    #####################################################################################                 
+    scalable-service-2:
+    #####################################################################################                 
+        container_name: scalable-service-2
+        image: template-scalable-service
+        environment:
+            - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -DHOSTNAME=scalable-service-2 -DPORT=8430
+            - TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=default,dev,discovery
+        ports:
+            - "8430:8430"
+        networks: 
+            - back-tier-net
+            - monitoring
+        depends_on:
+            - discovery  
+            - auth-service
+        hostname: 'scalable-service-2'
+
+
+    #####################################################################################                 
+    scalable-service-3:
+    #####################################################################################                 
+        container_name: scalable-service-3
+        image: template-scalable-service
+        environment:
+            - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -DHOSTNAME=scalable-service-3 -DPORT=8440
+            - TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=default,dev,discovery
+        ports:
+            - "8440:8440"
+        networks: 
+            - back-tier-net
+            - monitoring
+        depends_on:
+            - discovery  
+            - auth-service
+        hostname: 'scalable-service-3'
+
+
+    #####################################################################################                 
+    prometheus:
+    #####################################################################################                 
+        container_name: prometheus
+        image: prometheus
+        volumes:
+            - ${local_mounted_folder_path}/prometheus/data:/prometheus
+        command: 
+            - '--config.file=/etc/prometheus/prometheus.yml'
+            - '--storage.tsdb.path=/prometheus'
+            - '--web.console.libraries=/etc/prometheus/console_libraries'
+            - '--web.console.templates=/etc/prometheus/consoles'
+            - '--storage.tsdb.retention.time=200h'
+            - '--web.enable-lifecycle'
+        ports:
+            - '9090:9090'
+        networks: 
+            - monitoring
+        labels:
+            hu.perit.template.cluster: "monitoring"
+
+
+    #####################################################################################                 
+    nodeexporter:
+    #####################################################################################                 
+        image: prom/node-exporter:v0.18.1
+        container_name: nodeexporter
+        volumes:
+            - /proc:/host/proc:ro
+            - /sys:/host/sys:ro
+            - /:/rootfs:ro
+        command:
+            - '--path.procfs=/host/proc'
+            - '--path.rootfs=/rootfs'
+            - '--path.sysfs=/host/sys'
+            - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+        restart: unless-stopped
+        ports:
+            - '9100:9100'
+        networks: 
+            - monitoring
+        labels:
+            hu.perit.template.cluster: "monitoring"
+
+
+    #####################################################################################                 
+    cadvisor:
+    #####################################################################################                 
+        image: gcr.io/google-containers/cadvisor:v0.36.0
+        container_name: cadvisor
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:rw
+            - /sys:/sys:ro
+            - /var/lib/docker:/var/lib/docker:ro
+            - /cgroup:/cgroup:ro #doesn't work on MacOS only for Linux
+        restart: unless-stopped
+        ports:
+            - '8080:8080'
+        networks: 
+            - monitoring
+        labels:
+            hu.perit.template.cluster: "monitoring"
+
+
+    #####################################################################################                 
+    grafana:
+    #####################################################################################                 
+        container_name: grafana
+        image: grafana
+        volumes:
+            - ${local_mounted_folder_path}/grafana:/var/lib/grafana
+        ports:
+            - '3000:3000'
+        networks: 
+            - monitoring
+        depends_on:
+            - prometheus
+        labels:
+            hu.perit.template.cluster: "monitoring"
+
+  
+volumes:
+    db_volume:
