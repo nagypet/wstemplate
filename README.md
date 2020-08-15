@@ -42,7 +42,7 @@ Start the performance-tester in a command-line. The executables are located in p
 Go to http://localhost:3000 for Grafana. Login with admin/admin.
 
 ## KNOW-HOW tags:
-The followind table contains a summary of the individual know-how items. Find the tags in the source code to see how it was made.
+Find the tags in the source code to see how it was made.
 ```
 #know-how:access-spring-managed-beans-from-outside
 TBD
