@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * #know-how:custom-rest-error-response
+ *
  * ServerException has two roles:
  * 1.) A checked exception can be wrapped in it. You can still use the method instanceOf() to check if the wrapped
  *     exception is of a given type.

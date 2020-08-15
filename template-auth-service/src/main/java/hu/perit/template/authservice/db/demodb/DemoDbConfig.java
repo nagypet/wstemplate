@@ -41,6 +41,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * #know-how:hibernate-configuration
+ * #know-how:jpa-auditing
+ *
  * @author Peter Nagy
  */
 
@@ -106,6 +109,11 @@ public class DemoDbConfig
         return new JpaTransactionManager(entityManagerFactory);
     }
 
+    /**
+     * #know-how:jpa-auditing
+     *
+     * @return
+     */
     @Bean
     public AuditorAware<Long> auditorProvider() {
         return new SpringSecurityAuditorAware();

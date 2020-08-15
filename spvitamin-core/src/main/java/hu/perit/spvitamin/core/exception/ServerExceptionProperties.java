@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * #know-how:custom-rest-error-response
  *
  * Whenever an exception is thrown, this data object will be exposed via any REST interface from server to client.
  * This conversion is necessary, because an object of type Throwable cannot be deserialized from Json.

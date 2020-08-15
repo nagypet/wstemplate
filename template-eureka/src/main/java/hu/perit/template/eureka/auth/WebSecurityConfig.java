@@ -30,6 +30,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
+ * #know-how:simple-httpsecurity-builder
+ *
  * @author Peter Nagy
  */
 

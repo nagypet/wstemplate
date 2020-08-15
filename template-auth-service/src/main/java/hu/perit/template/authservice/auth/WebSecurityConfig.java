@@ -35,6 +35,8 @@ import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.util.StringUtils;
 
 /**
+ * #know-how:simple-httpsecurity-builder
+ *
  * @author Peter Nagy
  */
 

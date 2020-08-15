@@ -32,6 +32,8 @@ import org.springframework.web.context.request.WebRequest;
 import java.io.IOException;
 
 /**
+ * #know-how:custom-rest-error-response
+ *
  * @author Peter Nagy
  */
 

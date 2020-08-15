@@ -35,6 +35,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 /**
+ * #know-how:simple-httpsecurity-builder
+ *
  * @author Peter Nagy
  */
 

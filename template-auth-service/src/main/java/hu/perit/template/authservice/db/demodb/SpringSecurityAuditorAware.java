@@ -23,6 +23,8 @@ import org.springframework.data.domain.AuditorAware;
 import java.util.Optional;
 
 /**
+ * #know-how:jpa-auditing
+ *
  * @author Peter Nagy
  */
 

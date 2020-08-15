@@ -35,6 +35,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * #know-how:jpa-auditing
+ *
  * @author Peter Nagy
  */
 

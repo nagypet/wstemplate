@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * #know-how:custom-rest-error-response
  *
  *{
  *     "timestamp": "2020-07-23 12:47:01",
