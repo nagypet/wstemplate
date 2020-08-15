@@ -1,5 +1,49 @@
 # wstemplate
 
-KNOW-HOW tags:
-=================================================================================================
+This project implements a small, but _complete_ solution using the Spring framework and a microservice architecture for demonstration purposes. What makes this solution complete?
+- scalability and high availability with redundant services
+- https communication
+- secured webservice endpoints
+- unit tests
+- integration tests
+- sonarqube
+- Eureka, Zuul, Ribbon, Hystrix with fault tolerance
+- components running in docker containers
+- monitoring with Prometheus/Grafana using cAdvisor and Node-exporter
+
+## Architecture
+
+There are 4 main components of the system:
+- template-auth-service: an authorization and user management service with Jwt authentication
+- template-eureka: service discovery, API gateway and load balancer
+- template-scalable-service: 3 instances of the service is installed to achieve scalability and high availability
+- performance-tester: to generate a simulated load for the system
+
+## Build and run
+- get the sources
+- cd to the root folder and
+```
+gradlew dist dockerImage
+```
+- then cd to docker-compose\dev\ and
+```
+coU postgres pgadmin
+```
+When the containers are up and running, go to http://localhost:5400 for pgadmin. 
+- login with postgres/sa
+- create a new connection. Parameters: host: postgres, port: 5432, username: postgres, password: sa
+- create a new database with the name 'testdb'. 
+- run the script in db\scripts.sql
+- start the remaining services with `coU --all`
+
+Start the performance-tester in a command-line. The executables are located in performance-tester\build\install\performance-tester\bin\.
+
+## Monitoring
+Go to http://localhost:3000 for Grafana. Login with admin/admin.
+
+## KNOW-HOW tags:
+The followind table contains a summary of the individual know-how items. Find the tags in the source code to see how it was made.
+```
 #know-how:access-spring-managed-beans-from-outside
+TBD
+```
