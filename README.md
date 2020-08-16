@@ -69,6 +69,7 @@ Find the tags in the source code to see how it was made.
 | #know-how:jpa-auditing | How to configure custom auditing features to track creation/modification of entities? |
 | [#know-how:disable-ssl-certificate-validation](#disable-ssl-certificate-validation) | How to completely disable SSL certificate validation in the development environment? |
 | [#know-how:custom-zuul-error-filter](#custom-zuul-error-filter) | Custom Zuul error filter |
+| [#know-how:gc-timer](#gc-timer) | Forced garbage collection |
 
 ### <a name="custom-rest-error-response"></a> #know-how:custom-rest-error-response
 I am a big fan of propagating as many information in an exception thrown on the server side as possible. It would be great if we could catch exceptions on the client side in the same way as on the server side. There are two major problems with is:
@@ -250,3 +251,5 @@ Implementing our `CustomZuulErrorFilter` we will have a better response, like th
     }
 }
 ```
+### <a name="gc-timer"></a> #know-how:gc-timer
+Calling `System.gc()` is generally not recommended. But my applications have smaller memory footprint when calling gc() periodically. I have setup a scheduled job for every minute, and see what happened:
