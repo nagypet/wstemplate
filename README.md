@@ -22,6 +22,20 @@ There are 4 main components of the system:
 
 ## Build and run
 - get the sources
+
+### Frontend
+- Install Node.js
+```
+npm install -g @angular/cli
+npm update
+build.bat
+```
+Maybe you will need to update your local ng CLI:
+```
+npm install --save-dev @angular/cli@latest
+```
+
+### Backends
 - cd to the root folder and
 ```
 gradlew dist dockerImage --parallel
