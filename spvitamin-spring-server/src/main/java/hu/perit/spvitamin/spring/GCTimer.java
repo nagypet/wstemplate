@@ -20,6 +20,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
+ * #know-how:gc-timer
+ *
  * @author Peter Nagy
  */
 
