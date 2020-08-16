@@ -52,7 +52,7 @@ dependencies {
 	compile project(':spvitamin-core')
 	compile project(':spvitamin-spring-general')
 	compile project(':spvitamin-spring-server')
-	compile project(':spvitamin-data')
+	compile project(':spvitamin-spring-data')
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'

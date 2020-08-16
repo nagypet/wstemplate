@@ -15,7 +15,7 @@ pluginManagement {
 include 'spvitamin-core'
 include 'spvitamin-spring-general'
 include 'spvitamin-spring-server'
-include 'spvitamin-data'
+include 'spvitamin-spring-data'
 include 'pwdtool'
 include 'template-auth-service'
 include 'template-eureka'

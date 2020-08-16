@@ -37,7 +37,7 @@ project(':spvitamin-spring-general').projectDir = new File('../spvitamin-spring-
 include 'spvitamin-spring-server'
 project(':spvitamin-spring-server').projectDir = new File('../spvitamin-spring-server')
 
-include 'spvitamin-data'
-project(':spvitamin-data').projectDir = new File('../spvitamin-data')
+include 'spvitamin-spring-data'
+project(':spvitamin-spring-data').projectDir = new File('../spvitamin-spring-data')
 
 rootProject.name = 'template-auth-service'
