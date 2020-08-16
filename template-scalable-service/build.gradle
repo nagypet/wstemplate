@@ -42,7 +42,7 @@ ext {
 application {
     mainClassName = 'hu.perit.template.scalableservice.Application'
     // Some JVM options already set in common.gradle
-    applicationDefaultJvmArgs += ['-Xmx1g', '-Xms32m']
+    applicationDefaultJvmArgs += ['-Xmx512m', '-Xms32m']
 }
 
 
