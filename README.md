@@ -67,6 +67,7 @@ Find the tags in the source code to see how it was made.
 | [#know-how:custom-rest-error-response](#custom-rest-error-response) | In case of any exception in the server side we want to provide a useful HTTP body in Json form. This can be converted back to an Exception on the client side. |
 | #know-how:hibernate-configuration | How to configure hibernate in the most flexible way? |
 | #know-how:jpa-auditing | How to configure custom auditing features to track creation/modification of entities? |
+| [#know-how:disable-ssl-certificate-validation](#disable-ssl-certificate-validation) | How to completely disable SSL certificate validation in the development environment? |
 
 ### <a name="custom-rest-error-response"></a> #know-how:custom-rest-error-response
 I am a big fan of propagating as many information in an exception thrown on the server side as possible. It would be great if we could catch exceptions on the client side in the same way as on the server side. There are two major problems with is:
@@ -102,3 +103,40 @@ There is a wrapper class `ExceptionWrapper` which can be created out of a `Throw
     }
 ```
 The method `causedBy` is more advanced than `instanceof` because the first returns true if the exception itself is an instance of the parameter, or the parameter is anywhere in the cause chain.
+
+### <a name="disable-ssl-certificate-validation"></a> #know-how:disable-ssl-certificate-validation
+In a development environment often we do not have a signed certificate. We generate a self-signed one, just for encryption and do not want a validation. As long as only Feign or RestTemplate is in use for building a HTTP request, we can easily customize both of them to ignore certificate validation. But if many spring cloud services are in use, like Eureka, Ribbon, Zuul, etc., each and every of them have an own way of creating the request. We simply do not have as many time to switch off validation at all the components we have. So we need a general solution which grabs the problem at a lower layer: at the layer of `java.security.Provider`. We can easiliy implement a `NullSecurityProvider`, which points to our own factory methods to instantiate a `NullTrustManager`.
+```java
+public class NullSecurityProvider extends java.security.Provider {
+
+    public NullSecurityProvider(String name, String versionStr, String info) {
+        super(name, versionStr, info);
+
+        put("TrustManagerFactory.PKIX", "hu.perit.spvitamin.spring.security.NullTrustManagerFactory$SimpleFactory");
+        put("TrustManagerFactory.SunX509", "hu.perit.spvitamin.spring.security.NullTrustManagerFactory$SimpleFactory");
+    }
+}
+```
+For convenience we can implement `NullSecurityProviderConfigurer` and have a config key in our application.properties to easiliy allow or disable certificate validation.
+```java
+@Component
+@Log4j
+public class NullSecurityProviderConfigurer {
+
+    private final ServerProperties serverProperties;
+
+    public NullSecurityProviderConfigurer(ServerProperties serverProperties) {
+        this.serverProperties = serverProperties;
+    }
+
+    @PostConstruct
+    void init() {
+        if (this.serverProperties.getSsl() != null && this.serverProperties.getSsl().isIgnoreCertificateValidation()) {
+            Provider nullSecurityProvider = new NullSecurityProvider("NullSecurityProvider", "1.0", "Skipping SSL certificate validation");
+            Security.insertProviderAt(nullSecurityProvider, 1);
+
+            log.warn("NullSecurityProvider installed!");
+        }
+    }
+}
+```
