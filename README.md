@@ -256,7 +256,7 @@ Implementing our `CustomZuulErrorFilter` we will have a better response, like th
 }
 ```
 ### <a name="gc-timer"></a> #know-how:gc-timer
-Calling `System.gc()` is generally not recommended. But my applications have smaller memory footprint when calling gc() periodically. I have setup a scheduled job for every minute, and see what happened:
+Calling `System.gc()` is generally not recommended. But my applications have smaller memory footprint when calling gc() periodically. I have setup a scheduled job for calling gc() once in a minute, and see what happened:
 | JVM Total | G1 Eden Space |
 | ------ | ------ |
 | ![image](https://github.com/nagypet/wstemplate/blob/master/docs/images/jvm_total_memory.jpg) | ![image](https://github.com/nagypet/wstemplate/blob/master/docs/images/g1_eden_space.jpg) |
