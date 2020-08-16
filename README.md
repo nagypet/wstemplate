@@ -55,6 +55,7 @@ Start the performance-tester in a command-line. The executables are located in p
 
 ## Monitoring
 Go to http://localhost:3000 for Grafana. Login with admin/admin.
+![image](https://github.com/nagypet/wstemplate/blob/master/docs/images/grafana.jpg)
 
 ## Know-how tags:
 Find the tags in the source code to see how it was made.
