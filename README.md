@@ -68,6 +68,7 @@ Find the tags in the source code to see how it was made.
 | #know-how:hibernate-configuration | How to configure hibernate in the most flexible way? |
 | #know-how:jpa-auditing | How to configure custom auditing features to track creation/modification of entities? |
 | [#know-how:disable-ssl-certificate-validation](#disable-ssl-certificate-validation) | How to completely disable SSL certificate validation in the development environment? |
+| [#know-how:custom-zuul-error-filter](#custom-zuul-error-filter) | Custom Zuul error filter |
 
 ### <a name="custom-rest-error-response"></a> #know-how:custom-rest-error-response
 I am a big fan of propagating as many information in an exception thrown on the server side as possible. It would be great if we could catch exceptions on the client side in the same way as on the server side. There are two major problems with is:
@@ -136,6 +137,115 @@ public class NullSecurityProviderConfigurer {
             Security.insertProviderAt(nullSecurityProvider, 1);
 
             log.warn("NullSecurityProvider installed!");
+        }
+    }
+}
+```
+### <a name="custom-zuul-error-filter"></a> #know-how:custom-zuul-error-filter
+Having Zuul in our classpath we can easily implement an API gateway, to have a single access point for our microservice components. Without any further configuration we only receive the following response from the gateway, in case of an internal failure, which might be completely correct, but a little more information would be nice.
+```
+{
+    "timestamp": "2020-08-16 09:39:58",
+    "status": 500,
+    "error": "Internal Server Error",
+    "message": ""
+}
+```
+Implementing our `CustomZuulErrorFilter` we will have a better response, like this:
+```
+{
+    "timestamp": "2020-08-16 09:32:12.273",
+    "status": 500,
+    "error": "Internal Server Error",
+    "path": "/authenticate",
+    "exception": {
+        "message": "Filter threw Exception",
+        "exceptionClass": "com.netflix.zuul.exception.ZuulException",
+        "superClasses": [
+            "com.netflix.zuul.exception.ZuulException",
+            "java.lang.Exception",
+            "java.lang.Throwable",
+            "java.lang.Object"
+        ],
+        "stackTrace": [
+            {
+                "classLoaderName": "app",
+                "moduleName": null,
+                "moduleVersion": null,
+                "methodName": "processZuulFilter",
+                "fileName": "FilterProcessor.java",
+                "lineNumber": 227,
+                "className": "com.netflix.zuul.FilterProcessor",
+                "nativeMethod": false
+            }
+        ],
+        "cause": {
+            "message": "com.netflix.zuul.exception.ZuulException: Forwarding error",
+            "exceptionClass": "org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException",
+            "superClasses": [
+                "org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException",
+                "java.lang.RuntimeException",
+                "java.lang.Exception",
+                "java.lang.Throwable",
+                "java.lang.Object"
+            ],
+            "stackTrace": [
+                {
+                    "classLoaderName": "app",
+                    "moduleName": null,
+                    "moduleVersion": null,
+                    "methodName": "run",
+                    "fileName": "RibbonRoutingFilter.java",
+                    "lineNumber": 124,
+                    "className": "org.springframework.cloud.netflix.zuul.filters.route.RibbonRoutingFilter",
+                    "nativeMethod": false
+                }
+            ],
+            "cause": {
+                "message": "Forwarding error",
+                "exceptionClass": "com.netflix.zuul.exception.ZuulException",
+                "superClasses": [
+                    "com.netflix.zuul.exception.ZuulException",
+                    "java.lang.Exception",
+                    "java.lang.Throwable",
+                    "java.lang.Object"
+                ],
+                "stackTrace": [
+                    {
+                        "classLoaderName": "app",
+                        "moduleName": null,
+                        "moduleVersion": null,
+                        "methodName": "handleException",
+                        "fileName": "RibbonRoutingFilter.java",
+                        "lineNumber": 198,
+                        "className": "org.springframework.cloud.netflix.zuul.filters.route.RibbonRoutingFilter",
+                        "nativeMethod": false
+                    }
+                ],
+                "cause": {
+                    "message": "Load balancer does not have available server for client: template-auth-service",
+                    "exceptionClass": "com.netflix.client.ClientException",
+                    "superClasses": [
+                        "com.netflix.client.ClientException",
+                        "java.lang.Exception",
+                        "java.lang.Throwable",
+                        "java.lang.Object"
+                    ],
+                    "stackTrace": [
+                        {
+                            "classLoaderName": "app",
+                            "moduleName": null,
+                            "moduleVersion": null,
+                            "methodName": "getServerFromLoadBalancer",
+                            "fileName": "LoadBalancerContext.java",
+                            "lineNumber": 483,
+                            "className": "com.netflix.loadbalancer.LoadBalancerContext",
+                            "nativeMethod": false
+                        }
+                    ],
+                    "cause": null
+                }
+            }
         }
     }
 }
