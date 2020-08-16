@@ -56,7 +56,7 @@ Start the performance-tester in a command-line. The executables are located in p
 ## Monitoring
 Go to http://localhost:3000 for Grafana. Login with admin/admin.
 
-## KNOW-HOW tags:
+## Know-how tags:
 Find the tags in the source code to see how it was made.
 
 | Tag | Description |
@@ -64,6 +64,41 @@ Find the tags in the source code to see how it was made.
 | #know-how:access-spring-managed-beans-from-outside | How can we access beans managed within the application context from outside of the context |
 | #know-how:custom-authentication-provider |  |
 | #know-how:simple-httpsecurity-builder | The WebSecurityConfigurerAdapter is a real pain in the ... We have SimpleHttpSecurityBuilder to simplify the security configuration. |
-| #know-how:custom-rest-error-response | In case of any exception in the server side we want to provide a useful HTTP body in Json form. This can be converted back to an Exception on the client side. |
+| [#know-how:custom-rest-error-response](#custom-rest-error-response) | In case of any exception in the server side we want to provide a useful HTTP body in Json form. This can be converted back to an Exception on the client side. |
 | #know-how:hibernate-configuration | How to configure hibernate in the most flexible way? |
 | #know-how:jpa-auditing | How to configure custom auditing features to track creation/modification of entities? |
+
+### <a name="custom-rest-error-response"></a> #know-how:custom-rest-error-response
+I am a big fan of propagating as many information in an exception thrown on the server side as possible. It would be great if we could catch exceptions on the client side in the same way as on the server side. There are two major problems with is:
+- Exceptions cannot be deserialized from Json
+- On the client side exception classes might not be known. As an example, imagine, the server throws a SqlServerException, but we do not include any Sql-Server dependency on the client side, still we want to ba able to catch SqlServerException in the client.
+
+To overcome those two issues I have implemented `ServerExceptionProperties`. This pease of information will we sent over webservice boundaries; it contains each information of the original exception and therefore can be turned back to the proper exception on the client side. If the original exception class is not available on the client side, an instance of `ServerException` will be thrown. If you only want to log the exception, our `ServerException` behaves like the original exception. The method `toString()` provides the very same output as the original exception.
+
+```java
+public interface ServerExceptionInterface {
+    String getClassName();
+    boolean instanceOf(Class anExceptionClass);
+    boolean instanceOf(String anExceptionClassName);
+    List<String> getSuperClassNames();
+    Annotation[] getAnnotations();
+}
+```
+
+There is a wrapper class `ExceptionWrapper` which can be created out of a `Throwable`. No matter if the `Throwable` was a `ServerException` or a regular exception, the wrapper handles both types identically.
+```java
+    @Override
+    public boolean isFatalException(Throwable ex) {
+        ExceptionWrapper exception = ExceptionWrapper.of(ex);
+
+        if (exception.causedBy("org.apache.http.conn.ConnectTimeoutException")
+                || exception.causedBy("org.apache.http.NoHttpResponseException")
+                || exception.causedBy("org.apache.http.conn.HttpHostConnectException")
+        ) {
+            return false;
+        }
+
+        return true;
+    }
+```
+The method `causedBy` is more advanced than `instanceof` because the first returns true if the exception itself is an instance of the parameter, or the parameter is anywhere in the cause chain.
