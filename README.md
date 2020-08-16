@@ -12,6 +12,8 @@ This project implements a small, but _complete_ solution using the Spring framew
 - components running in docker containers
 - monitoring with Prometheus/Grafana using cAdvisor and Node-exporter
 
+The project can be used as a basis for POC projects as a fully dockerized microservice environment.
+
 ## Architecture
 
 There are 4 main components of the system:
