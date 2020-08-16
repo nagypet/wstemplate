@@ -16,6 +16,12 @@
 
 package hu.perit.spvitamin.spring.security;
 
+/**
+ * #know-how:disable-ssl-certificate-validation
+ *
+ * @author Peter Nagy
+ */
+
 public class NullSecurityProvider extends java.security.Provider {
 
     public NullSecurityProvider(String name, String versionStr, String info) {

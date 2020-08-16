@@ -23,6 +23,12 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 
+/**
+ * #know-how:disable-ssl-certificate-validation
+ *
+ * @author Peter Nagy
+ */
+
 abstract class NullTrustManagerFactory extends TrustManagerFactorySpi {
 
     private NullTrustManager trustManager = null;

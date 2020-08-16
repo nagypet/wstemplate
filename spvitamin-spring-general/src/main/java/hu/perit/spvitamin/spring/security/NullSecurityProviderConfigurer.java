@@ -24,6 +24,12 @@ import javax.annotation.PostConstruct;
 import java.security.Provider;
 import java.security.Security;
 
+/**
+ * #know-how:disable-ssl-certificate-validation
+ *
+ * @author Peter Nagy
+ */
+
 @Component
 @Log4j
 public class NullSecurityProviderConfigurer {
