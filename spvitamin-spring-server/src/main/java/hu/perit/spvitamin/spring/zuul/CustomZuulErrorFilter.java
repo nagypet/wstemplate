@@ -34,6 +34,12 @@ import java.io.PrintWriter;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
+/**
+ * #know-how:custom-zuul-error-filter
+ *
+ * @author Peter Nagy
+ */
+
 @Component
 @Log4j
 public class CustomZuulErrorFilter extends ZuulFilter {
