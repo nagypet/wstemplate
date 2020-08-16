@@ -16,8 +16,8 @@ import {GlobalService} from '../global.service';
 })
 export class LoginComponent implements OnInit
 {
-  @ViewChild('usernameInput') usernameInput: ElementRef;
-  @ViewChild('passwordInput') passwordInput: ElementRef;
+  @ViewChild('usernameInput', { static: true }) usernameInput: ElementRef;
+  @ViewChild('passwordInput', { static: true }) passwordInput: ElementRef;
 
   constructor(
     private router: Router, private route: ActivatedRoute,
