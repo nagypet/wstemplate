@@ -25,33 +25,43 @@ import hu.perit.spvitamin.spring.config.LdapProperties;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Log4j
 @Getter
+@Component
 public class LdapAuthenticationProviderConfigurer
 {
-    public static void configure(AuthenticationManagerBuilder auth, LdapProperties ldapProperties)
+    private final LdapProperties ldapProperties;
+
+    public LdapAuthenticationProviderConfigurer(LdapProperties ldapProperties) {
+        this.ldapProperties = ldapProperties;
+    }
+
+    public void configure(AuthenticationManagerBuilder auth)
     {
-        for (Map.Entry<String, LdapProperties.SingleLdapProperties> entry : ldapProperties.getLdaps().entrySet()) {
+        for (Map.Entry<String, LdapProperties.SingleLdapProperties> entry : this.ldapProperties.getLdaps().entrySet()) {
 
             LdapProperties.SingleLdapProperties singleLdapProperties = entry.getValue();
 
-            LdapAuthenticationProvider provider = createProvider(
-                    entry.getKey(),
-                    singleLdapProperties.getUrl(),
-                    singleLdapProperties.getDomain(),
-                    singleLdapProperties.getFilter(),
-                    singleLdapProperties.isUserprincipalWithDomain(),
-                    singleLdapProperties.getRootDN());
+            if (singleLdapProperties.isEnabled()) {
+                LdapAuthenticationProvider provider = this.createProvider(
+                        entry.getKey(),
+                        singleLdapProperties.getUrl(),
+                        singleLdapProperties.getDomain(),
+                        singleLdapProperties.getFilter(),
+                        singleLdapProperties.isUserprincipalWithDomain(),
+                        singleLdapProperties.getRootDN());
 
-            auth.authenticationProvider(provider);
+                auth.authenticationProvider(provider);
+            }
         }
     }
 
 
-    private static LdapAuthenticationProvider createProvider(String name, String url, String domain, String filter, Boolean withDomain, String rootDN)
+    private LdapAuthenticationProvider createProvider(String name, String url, String domain, String filter, Boolean withDomain, String rootDN)
     {
         log.debug(String.format("'%s' url: '%s', rootDN: '%s', filter: '%s', domain: '%s', with domain: '%b'", name, url, rootDN, filter, domain, withDomain));
 

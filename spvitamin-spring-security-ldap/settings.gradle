@@ -28,4 +28,7 @@ pluginManagement {
   }
 }
 
+include 'spvitamin-spring-security'
+project(':spvitamin-spring-security').projectDir = new File('../spvitamin-spring-security')
+
 rootProject.name = 'spvitamin-spring-security-ldap'
