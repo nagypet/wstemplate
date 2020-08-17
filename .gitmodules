@@ -1,0 +1,3 @@
+[submodule "spvitamin"]
+	path = spvitamin
+	url = https://github.com/nagypet/spvitamin.git
