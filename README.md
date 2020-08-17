@@ -39,6 +39,7 @@ npm install --save-dev @angular/cli@latest
 ```
 
 ### Backends
+- Configure your AD parameter in template-auth-service\src\main\dist\bin\config\application-dev.properties or set ldaps.ad1.enabled=false if you do not have access to an AD.
 - cd to the root folder and
 ```
 gradlew dist dockerImage --parallel
