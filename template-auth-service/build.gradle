@@ -52,6 +52,7 @@ dependencies {
 	compile project(':spvitamin-core')
 	compile project(':spvitamin-spring-general')
 	compile project(':spvitamin-spring-server')
+    compile project(':spvitamin-spring-security')
     compile project(':spvitamin-spring-security-ldap')
 	compile project(':spvitamin-spring-data')
 

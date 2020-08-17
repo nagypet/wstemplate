@@ -16,7 +16,7 @@
 
 package hu.perit.template.authservice.auth;
 
-import hu.perit.spvitamin.spring.auth.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.template.authservice.db.demodb.table.UserEntity;
 import hu.perit.template.authservice.services.UserService;
 import lombok.extern.log4j.Log4j;

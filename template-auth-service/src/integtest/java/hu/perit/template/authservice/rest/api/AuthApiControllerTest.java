@@ -16,8 +16,8 @@
 
 package hu.perit.template.authservice.rest.api;
 
-import hu.perit.spvitamin.spring.auth.AuthenticatedUser;
 import hu.perit.spvitamin.spring.auth.jwt.JwtTokenProvider;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.template.authservice.auth.Role;
 import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
 import io.jsonwebtoken.Claims;

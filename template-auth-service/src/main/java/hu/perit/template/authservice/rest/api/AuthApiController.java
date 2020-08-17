@@ -17,12 +17,12 @@
 package hu.perit.template.authservice.rest.api;
 
 import hu.perit.spvitamin.core.took.Took;
-import hu.perit.spvitamin.spring.auth.AuthenticatedUser;
 import hu.perit.spvitamin.spring.auth.AuthorizationService;
 import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
 import hu.perit.spvitamin.spring.auth.jwt.JwtTokenProvider;
 import hu.perit.spvitamin.spring.auth.jwt.TokenClaims;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.template.authservice.config.Constants;
 import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
 import lombok.extern.log4j.Log4j;

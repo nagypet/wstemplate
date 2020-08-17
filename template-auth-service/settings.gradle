@@ -37,6 +37,9 @@ project(':spvitamin-spring-general').projectDir = new File('../spvitamin-spring-
 include 'spvitamin-spring-server'
 project(':spvitamin-spring-server').projectDir = new File('../spvitamin-spring-server')
 
+include 'spvitamin-spring-security'
+project(':spvitamin-spring-security').projectDir = new File('../spvitamin-spring-security')
+
 include 'spvitamin-spring-security-ldap'
 project(':spvitamin-spring-security-ldap').projectDir = new File('../spvitamin-spring-security-ldap')
 

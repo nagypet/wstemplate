@@ -17,12 +17,12 @@
 package hu.perit.template.authservice.services;
 
 import hu.perit.spvitamin.core.exception.ExceptionWrapper;
-import hu.perit.spvitamin.spring.auth.AuthenticatedUser;
 import hu.perit.spvitamin.spring.exception.CannotProcessException;
 import hu.perit.spvitamin.spring.exception.InvalidInputException;
 import hu.perit.spvitamin.spring.exception.ResourceAlreadyExistsException;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.rest.model.*;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.template.authservice.config.Constants;
 import hu.perit.template.authservice.db.demodb.repo.RoleRepo;
 import hu.perit.template.authservice.db.demodb.repo.UserRepo;

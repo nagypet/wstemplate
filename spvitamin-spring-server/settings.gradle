@@ -34,4 +34,7 @@ project(':spvitamin-core').projectDir = new File('../spvitamin-core')
 include 'spvitamin-spring-general'
 project(':spvitamin-spring-general').projectDir = new File('../spvitamin-spring-general')
 
+include 'spvitamin-spring-security'
+project(':spvitamin-spring-security').projectDir = new File('../spvitamin-spring-security')
+
 rootProject.name = 'spvitamin-spring-server'

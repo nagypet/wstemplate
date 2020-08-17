@@ -18,11 +18,11 @@ package hu.perit.template.scalableservice.rest.api;
 
 import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
 import hu.perit.spvitamin.core.took.Took;
-import hu.perit.spvitamin.spring.auth.AuthenticatedUser;
 import hu.perit.spvitamin.spring.auth.AuthorizationService;
 import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.template.scalableservice.config.Constants;
 import lombok.extern.log4j.Log4j;
 import org.springframework.web.bind.annotation.RestController;

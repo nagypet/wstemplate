@@ -18,9 +18,7 @@ package hu.perit.template.authservice.auth;
 
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
 import hu.perit.spvitamin.spring.auth.SimpleHttpSecurityBuilder;
-import hu.perit.spvitamin.spring.config.LdapProperties;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
-import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.security.ldap.LdapAuthenticationProviderConfigurer;
@@ -55,9 +53,11 @@ public class WebSecurityConfig {
     public static class Order1 extends WebSecurityConfigurerAdapter {
 
         private final DbAuthenticationProvider dbAuthenticationProvider;
+        private final LdapAuthenticationProviderConfigurer ldapAuthenticationProviderConfigurer;
 
-        public Order1(DbAuthenticationProvider dbAuthenticationProvider) {
+        public Order1(DbAuthenticationProvider dbAuthenticationProvider, LdapAuthenticationProviderConfigurer ldapAuthenticationProviderConfigurer) {
             this.dbAuthenticationProvider = dbAuthenticationProvider;
+            this.ldapAuthenticationProviderConfigurer = ldapAuthenticationProviderConfigurer;
         }
 
         /**
@@ -84,8 +84,7 @@ public class WebSecurityConfig {
             }
 
             // Ldap
-            LdapProperties ldapProperties = SpringContext.getBean(LdapProperties.class);
-            LdapAuthenticationProviderConfigurer.configure(auth, ldapProperties);
+            this.ldapAuthenticationProviderConfigurer.configure(auth);
 
             // Here we have to add the DbAuthenticationProvider
             auth.authenticationProvider(this.dbAuthenticationProvider);

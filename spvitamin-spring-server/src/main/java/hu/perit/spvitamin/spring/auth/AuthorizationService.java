@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.auth;
 import hu.perit.spvitamin.spring.exception.AuthorizationException;
 import hu.perit.spvitamin.spring.rest.model.AbstractAuthorizationToken;
 import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;

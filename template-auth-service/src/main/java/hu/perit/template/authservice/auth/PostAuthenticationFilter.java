@@ -16,10 +16,11 @@
 
 package hu.perit.template.authservice.auth;
 
-import hu.perit.spvitamin.spring.auth.AuthenticatedUser;
 import hu.perit.spvitamin.spring.auth.AuthorizationService;
 import hu.perit.spvitamin.spring.auth.filter.FilterAuthenticationException;
 import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.ldap.AdGroupRoleMapper;
 import hu.perit.template.authservice.services.UserService;
 import lombok.extern.log4j.Log4j;
 import org.springframework.security.core.AuthenticationException;
@@ -51,11 +52,14 @@ public class PostAuthenticationFilter extends OncePerRequestFilter {
 
             if (authenticatedUser.getUserId() < 0) {
                 // authenticated from external source
-                UserService userService = SpringContext.getBean(UserService.class);
-                authenticatedUser.setUserId(userService.createAtLogin(authenticatedUser));
+                AdGroupRoleMapper roleMapper = SpringContext.getBean(AdGroupRoleMapper.class);
+                AuthenticatedUser mappedUser = roleMapper.mapGrantedAuthorities(authenticatedUser);
 
-                // set in the security context
-                authorizationService.setAuthenticatedUser(authenticatedUser);
+                UserService userService = SpringContext.getBean(UserService.class);
+                mappedUser.setUserId(userService.createAtLogin(mappedUser));
+
+                // store in the security context
+                authorizationService.setAuthenticatedUser(mappedUser);
             }
             filterChain.doFilter(request, response);
         }
