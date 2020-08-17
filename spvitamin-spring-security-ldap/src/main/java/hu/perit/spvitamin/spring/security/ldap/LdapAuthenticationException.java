@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.exception;
+package hu.perit.spvitamin.spring.security.ldap;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 /**
  * @author Peter Nagy
  */
-
 
 @ResponseStatus(value = HttpStatus.UNAUTHORIZED, code = HttpStatus.UNAUTHORIZED)
 public class LdapAuthenticationException extends AuthenticationException {

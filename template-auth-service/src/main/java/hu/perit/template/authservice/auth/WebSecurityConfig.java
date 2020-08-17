@@ -18,9 +18,12 @@ package hu.perit.template.authservice.auth;
 
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
 import hu.perit.spvitamin.spring.auth.SimpleHttpSecurityBuilder;
+import hu.perit.spvitamin.spring.config.LdapProperties;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
+import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
+import hu.perit.spvitamin.spring.security.ldap.LdapAuthenticationProviderConfigurer;
 import hu.perit.template.authservice.rest.api.UserApi;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +82,10 @@ public class WebSecurityConfig {
             else {
                 log.warn("admin user is disabled!");
             }
+
+            // Ldap
+            LdapProperties ldapProperties = SpringContext.getBean(LdapProperties.class);
+            LdapAuthenticationProviderConfigurer.configure(auth, ldapProperties);
 
             // Here we have to add the DbAuthenticationProvider
             auth.authenticationProvider(this.dbAuthenticationProvider);

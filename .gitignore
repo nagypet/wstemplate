@@ -29,3 +29,4 @@ build
 out
 polc
 distributions
+application-dev_private.properties

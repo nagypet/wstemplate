@@ -15,6 +15,7 @@ pluginManagement {
 include 'spvitamin-core'
 include 'spvitamin-spring-general'
 include 'spvitamin-spring-server'
+include 'spvitamin-spring-security-ldap'
 include 'spvitamin-spring-data'
 include 'pwdtool'
 include 'template-auth-service'

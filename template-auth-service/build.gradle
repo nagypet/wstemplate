@@ -52,6 +52,7 @@ dependencies {
 	compile project(':spvitamin-core')
 	compile project(':spvitamin-spring-general')
 	compile project(':spvitamin-spring-server')
+    compile project(':spvitamin-spring-security-ldap')
 	compile project(':spvitamin-spring-data')
 
     // Lombok
@@ -65,6 +66,7 @@ dependencies {
     // Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-ldap'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
