@@ -24,7 +24,12 @@ There are 4 main components of the system:
 - performance-tester: to generate a simulated load for the system
 
 ## Build and run
-- get the sources
+- Get the sources. Please note that the spvitamin library is stored in a git submodule, so you have to update this in a separate step:
+```
+git clone https://github.com/nagypet/wstemplate.git
+cd wstemplate
+git submodule update --init
+```
 
 ### Frontend
 - Install Node.js
