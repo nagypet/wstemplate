@@ -15,8 +15,32 @@ pluginManagement {
 include 'spvitamin-core'
 project(':spvitamin-core').projectDir = new File('spvitamin/spvitamin-core')
 
+include 'spvitamin-spring-admin'
+project(':spvitamin-spring-admin').projectDir = new File('spvitamin/spvitamin-spring-admin')
+
+include 'spvitamin-spring-admin-api'
+project(':spvitamin-spring-admin-api').projectDir = new File('spvitamin/spvitamin-spring-admin-api')
+
+include 'spvitamin-spring-cloud-eureka'
+project(':spvitamin-spring-cloud-eureka').projectDir = new File('spvitamin/spvitamin-spring-cloud-eureka')
+
+include 'spvitamin-spring-cloud-feign'
+project(':spvitamin-spring-cloud-feign').projectDir = new File('spvitamin/spvitamin-spring-cloud-feign')
+
+include 'spvitamin-spring-cloud-ribbon'
+project(':spvitamin-spring-cloud-ribbon').projectDir = new File('spvitamin/spvitamin-spring-cloud-ribbon')
+
+include 'spvitamin-spring-cloud-zuul'
+project(':spvitamin-spring-cloud-zuul').projectDir = new File('spvitamin/spvitamin-spring-cloud-zuul')
+
+include 'spvitamin-spring-data'
+project(':spvitamin-spring-data').projectDir = new File('spvitamin/spvitamin-spring-data')
+
 include 'spvitamin-spring-general'
 project(':spvitamin-spring-general').projectDir = new File('spvitamin/spvitamin-spring-general')
+
+include 'spvitamin-spring-logging'
+project(':spvitamin-spring-logging').projectDir = new File('spvitamin/spvitamin-spring-logging')
 
 include 'spvitamin-spring-security'
 project(':spvitamin-spring-security').projectDir = new File('spvitamin/spvitamin-spring-security')
@@ -27,13 +51,11 @@ project(':spvitamin-spring-security-ldap').projectDir = new File('spvitamin/spvi
 include 'spvitamin-spring-server'
 project(':spvitamin-spring-server').projectDir = new File('spvitamin/spvitamin-spring-server')
 
-include 'spvitamin-spring-data'
-project(':spvitamin-spring-data').projectDir = new File('spvitamin/spvitamin-spring-data')
-
 include 'pwdtool'
 project(':pwdtool').projectDir = new File('spvitamin/pwdtool')
 
 include 'template-auth-service'
+include 'template-auth-api'
 include 'template-eureka'
 include 'template-scalable-service'
 include 'prometheus'

@@ -19,6 +19,7 @@ package hu.perit.template.scalableservice.rest.api;
 import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
 import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.auth.AuthorizationService;
+import hu.perit.spvitamin.spring.auth.SecurityContextUtil;
 import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
@@ -51,8 +52,8 @@ public class AuthApiController extends AbstractInterfaceLogger implements AuthAp
         this.traceIn(processID, authenticatedUser.getUsername(), this.getMyMethodName(), 1);
 
         try (Took took = new Took(processID)) {
-            if (this.authorizationService.getToken() instanceof AuthorizationToken) {
-                AuthorizationToken token = (AuthorizationToken) this.authorizationService.getToken();
+            if (SecurityContextUtil.getToken() instanceof AuthorizationToken) {
+                AuthorizationToken token = (AuthorizationToken) SecurityContextUtil.getToken();
                 this.traceOut(processID, authenticatedUser.getUsername(), this.getMyMethodName(), 1);
                 return token;
             }

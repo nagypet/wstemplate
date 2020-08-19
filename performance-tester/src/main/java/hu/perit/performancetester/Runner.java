@@ -6,7 +6,7 @@ import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.batchprocessing.BatchJob;
 import hu.perit.spvitamin.core.batchprocessing.BatchProcessor;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
-import hu.perit.spvitamin.spring.rest.client.TemplateAuthClient;
+import hu.perit.spvitamin.spring.rest.client.AuthClient;
 import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
 import lombok.extern.log4j.Log4j;
 import org.springframework.boot.CommandLineRunner;
@@ -78,9 +78,9 @@ public class Runner extends BatchProcessor implements CommandLineRunner {
 
 
     private AuthorizationToken getAuthorizationToken() {
-        TemplateAuthClient authClient = SimpleFeignClientBuilder.newInstance()
+        AuthClient authClient = SimpleFeignClientBuilder.newInstance()
                 .requestInterceptor(new BasicAuthRequestInterceptor("admin", "admin"))
-                .build(TemplateAuthClient.class, testerProperties.getAuthServiceUrl());
+                .build(AuthClient.class, testerProperties.getAuthServiceUrl());
 
         return authClient.authenticate(null);
     }

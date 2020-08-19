@@ -18,6 +18,7 @@ package hu.perit.template.authservice.rest.session;
 
 import hu.perit.spvitamin.spring.rest.model.*;
 import hu.perit.template.authservice.rest.api.UserApi;
+import hu.perit.template.authservice.rest.model.*;
 import hu.perit.template.authservice.services.UserService;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 

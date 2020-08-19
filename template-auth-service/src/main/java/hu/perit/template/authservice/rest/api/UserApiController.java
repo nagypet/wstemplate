@@ -23,6 +23,7 @@ import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
 import hu.perit.spvitamin.spring.rest.model.*;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.template.authservice.config.Constants;
+import hu.perit.template.authservice.rest.model.*;
 import hu.perit.template.authservice.rest.session.UserSession;
 import hu.perit.template.authservice.services.UserService;
 import lombok.extern.log4j.Log4j;

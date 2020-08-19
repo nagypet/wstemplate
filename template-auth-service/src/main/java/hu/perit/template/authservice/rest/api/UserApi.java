@@ -16,9 +16,9 @@
 
 package hu.perit.template.authservice.rest.api;
 
-import hu.perit.spvitamin.spring.config.Constants;
 import hu.perit.spvitamin.spring.logging.EventLogId;
 import hu.perit.spvitamin.spring.rest.model.*;
+import hu.perit.template.authservice.rest.model.*;
 import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
