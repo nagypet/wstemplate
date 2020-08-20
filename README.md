@@ -82,11 +82,11 @@ Find the tags in the source code to see how it was made.
 | [#know-how:gc-timer](#gc-timer) | Forced garbage collection |
 
 ### <a name="custom-rest-error-response"></a> #know-how:custom-rest-error-response
-I am a big fan of propagating as many information in an exception thrown on the server side as possible. It would be great if we could catch exceptions on the client side in the same way as on the server side. There are two major problems with is:
+I am a big fan of propagating as much information as possible in an exception thrown on the server side. It would be great if we could catch exceptions on the client side in the same way as on the server side. There are two major problems with is:
 - Exceptions cannot be deserialized from Json
-- On the client side exception classes might not be known. As an example, imagine, the server throws a SqlServerException, but we do not include any Sql-Server dependency on the client side, still we want to ba able to catch SqlServerException in the client.
+- On the client side exception classes might not be known. As an example, imagine, the server throws a SqlServerException, but we do not include any Sql-Server dependency on the client side, still we want to be able to catch SqlServerException in the client.
 
-To overcome those two issues I have implemented `ServerExceptionProperties`. This pease of information will we sent over webservice boundaries; it contains each information of the original exception and therefore can be turned back to the proper exception on the client side. If the original exception class is not available on the client side, an instance of `ServerException` will be thrown. If you only want to log the exception, our `ServerException` behaves like the original exception. The method `toString()` provides the very same output as the original exception.
+To overcome those two issues I have implemented `ServerExceptionProperties`. This peace of information will be sent over the webservice boundaries; it contains each information of the original exception and therefore can be turned back to the proper exception on the client side. If the original exception class is not available on the client side, an instance of `ServerException` will be thrown. If you only want to log the exception, our `ServerException` behaves like the original exception. The method `toString()` provides the very same output as the original exception.
 
 ```java
 public interface ServerExceptionInterface {
