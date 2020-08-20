@@ -1,1 +1,1 @@
-robocopy %~dp0 x:\Development\github\wstemplate /MIR /XD node_modules
+robocopy %~dp0 x:\Development\github\wstemplate /MIR /XD node_modules .gradle .idea
