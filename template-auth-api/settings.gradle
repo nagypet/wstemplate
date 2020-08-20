@@ -28,7 +28,8 @@ pluginManagement {
   }
 }
 
-include 'spvitamin-spring-admin-api'
-project(':spvitamin-spring-admin-api').projectDir = new File('../spvitamin/spvitamin-spring-admin-api')
+
+apply from: '../gradle/include-project-dependencies.gradle'
+
 
 rootProject.name = 'template-auth-api'
