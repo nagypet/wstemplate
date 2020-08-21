@@ -216,7 +216,7 @@ public class UserService {
         Optional<UserEntity> byId = this.userRepo.findById(userId);
         if (byId.isPresent()) {
             UserEntity userEntity = byId.get();
-            if (userEntity.getExternal()) {
+            if (Boolean.TRUE.equals(userEntity.getExternal())) {
                 throw new CannotProcessException("External user cannot be deleted!");
             }
 
@@ -277,7 +277,7 @@ public class UserService {
         Optional<UserEntity> byId = this.userRepo.findById(userId);
         if (byId.isPresent()) {
             UserEntity userEntity = byId.get();
-            if (userEntity.getExternal()) {
+            if (Boolean.TRUE.equals(userEntity.getExternal())) {
                 throw new CannotProcessException("External user cannot be updated!");
             }
 
@@ -315,7 +315,7 @@ public class UserService {
         Optional<UserEntity> byId = this.userRepo.findById(userId);
         if (byId.isPresent()) {
             UserEntity userEntity = byId.get();
-            if (userEntity.getExternal()) {
+            if (Boolean.TRUE.equals(userEntity.getExternal())) {
                 throw new CannotProcessException("External user cannot be updated!");
             }
 
