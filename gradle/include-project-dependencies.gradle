@@ -28,10 +28,12 @@ class ProjectConfigurer {
 	
 	
 	void doIt() {
+		long startTime = System.currentTimeMillis()
 		println "Included projects:"
-		this.discoverProjects()
+		this.discoverProjects(this.rootDir.getParentFile())
 		Set<String> deps = this.getDependendentProjects(this.rootDir)
-		this.includeDependentProjects(deps)
+		this.includeDependentProjects(deps)		
+		println String.format("Dependency check took %d ms", System.currentTimeMillis() - startTime)
 	}
 
 
@@ -39,19 +41,30 @@ class ProjectConfigurer {
 	 * Recursively searches folders starting with '../' containing a build.gradle file.
 	 * @return
 	 */
-	private void discoverProjects() {
-		this.rootDir.getParentFile().eachDirRecurse(){ dir ->
-			dir.eachFileMatch({it == 'build.gradle'}, { 
-				this.projectMap.put(dir.name, dir)
-			})
+	private void discoverProjects(File root) {
+		root.eachDir(){ dir ->
+			if (this.isDirRelevant(dir)) {
+				if (new File(dir, 'build.gradle').exists() && !dir.name.equals("spvitamin")) {
+					this.projectMap.put(dir.name, dir)
+				}
+				else {
+					this.discoverProjects(dir)
+				}
+			}
 		}
 	}
 
 
+	private boolean isDirRelevant(File dir) {
+		return !(dir.name.equals("admin-gui") || dir.name.equals(".git") || dir.name.equals(".gradle") || dir.name.equals("build") || dir.name.equals("out"))
+	}
+	
+
 	private Set<String> getDependendentProjects(File root) {
 		def deps = [] as Set
-		root.eachFileMatch({it == 'build.gradle'}, {
-			it.eachLine {line ->
+		File buildGradleFile = new File(root, "build.gradle")
+		if (buildGradleFile.exists()) {
+			buildGradleFile.eachLine {line ->
 				if (line =~ /compile\s*project/) {
 					def matcher = line =~ /:[a-z-A-Z0-9]*/
 					if (matcher.size() == 1) {
@@ -61,7 +74,7 @@ class ProjectConfigurer {
 					}
 				}
 			}
-		})
+		}
 		return deps
 	}
 
