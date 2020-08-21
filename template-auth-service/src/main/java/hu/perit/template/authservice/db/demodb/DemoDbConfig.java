@@ -16,9 +16,9 @@
 
 package hu.perit.template.authservice.db.demodb;
 
+import hu.perit.spvitamin.data.config.DatasourceCollectionProperties;
 import hu.perit.spvitamin.data.dynamicdatasource.ConnectionParam;
 import hu.perit.spvitamin.data.dynamicdatasource.DynamicDataSource;
-import hu.perit.template.authservice.config.AppDatasources;
 import lombok.extern.log4j.Log4j;
 import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -65,8 +65,8 @@ public class DemoDbConfig
 
     private final ConnectionParam connectionParam;
 
-    public DemoDbConfig(AppDatasources dbProperties) {
-        this.connectionParam = new ConnectionParam(dbProperties.getDemoDb());
+    public DemoDbConfig(DatasourceCollectionProperties dbProperties) {
+        this.connectionParam = new ConnectionParam(dbProperties.getDatasource().get(PERSISTENCE_UNIT));
     }
 
 
@@ -75,7 +75,7 @@ public class DemoDbConfig
     @DependsOn("springContext")
     public DataSource dataSource()
     {
-        log.debug("dataSource()");
+        log.debug(String.format("creating DataSource for '%s'", PERSISTENCE_UNIT));
 
         // False bug report: Use try-with-resources or close this "DynamicDataSource" in a "finally" clause
         DynamicDataSource ds = new DynamicDataSource(); // NOSONAR
