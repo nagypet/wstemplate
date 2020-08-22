@@ -43,8 +43,7 @@ services:
         ports:
             - "5432:5432"
         volumes:
-            - db_volume:/var/lib/postgresql/data
-            #- ${local_mounted_folder_path}/postgres:/var/lib/postgresql/data
+            - postgres:/var/lib/postgresql/data
         networks: 
             - back-tier-net
             - db-net
@@ -61,11 +60,11 @@ services:
         ports:
             - "5400:80"
         volumes:
-            - ${local_mounted_folder_path}/pgadmin:/var/lib/pgadmin
+            - pgadmin:/var/lib/pgadmin
         networks: 
             - db-net
-        logging:
-            driver: none  
+        #logging:
+        #    driver: none  
       
   
     #####################################################################################                 
@@ -150,7 +149,7 @@ services:
         container_name: prometheus
         image: prometheus
         volumes:
-            - ${local_mounted_folder_path}/prometheus/data:/prometheus
+            - prometheus:/prometheus/data
         command: 
             - '--config.file=/etc/prometheus/prometheus.yml'
             - '--storage.tsdb.path=/prometheus'
@@ -215,7 +214,7 @@ services:
         container_name: grafana
         image: grafana
         volumes:
-            - ${local_mounted_folder_path}/grafana:/var/lib/grafana
+            - grafana:/var/lib/grafana
         ports:
             - '3000:3000'
         networks: 
@@ -227,4 +226,7 @@ services:
 
   
 volumes:
-    db_volume:
+    postgres:
+    pgadmin:
+    prometheus:
+    grafana:
