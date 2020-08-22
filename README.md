@@ -24,6 +24,13 @@ There are 4 main components of the system:
 - performance-tester: to generate a simulated load for the system
 
 ## Build and run
+### Prerequisits
+Install AdoptOpenJDK 11
+```
+wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo apt-key add -
+sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
+sudo apt install adoptopenjdk-11-hotspot
+```
 - Get the sources. Please note that the spvitamin library is stored in a git submodule, so you have to update this in a separate step:
 ```
 git clone https://github.com/nagypet/wstemplate.git
