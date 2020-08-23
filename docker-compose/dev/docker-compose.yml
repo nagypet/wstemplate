@@ -149,7 +149,7 @@ services:
         container_name: prometheus
         image: prometheus
         volumes:
-            - prometheus:/prometheus/data
+            - prometheus:/prometheus
         command: 
             - '--config.file=/etc/prometheus/prometheus.yml'
             - '--storage.tsdb.path=/prometheus'
