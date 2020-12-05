@@ -16,6 +16,20 @@
 
 package hu.perit.template.authservice.integration;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+
 import feign.auth.BasicAuthRequestInterceptor;
 import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
@@ -24,21 +38,12 @@ import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.exception.CannotProcessException;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
 import hu.perit.template.authservice.rest.client.TemplateAuthClient;
-import hu.perit.template.authservice.rest.model.*;
-import lombok.extern.log4j.Log4j;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import hu.perit.template.authservice.rest.model.CreateUserParams;
+import hu.perit.template.authservice.rest.model.ResponseUri;
+import hu.perit.template.authservice.rest.model.UpdateUserParams;
+import hu.perit.template.authservice.rest.model.UserDTO;
+import hu.perit.template.authservice.rest.model.UserDTOFiltered;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This integration test is only intended to test if endpoints can be called and the returned values can be read.
@@ -50,7 +55,7 @@ import java.util.stream.Collectors;
 
 @ActiveProfiles({"default", "integtest"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Log4j
+@Slf4j
 public class UserApiIntegrationTest {
 
     @Autowired

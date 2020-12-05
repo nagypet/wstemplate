@@ -16,27 +16,32 @@
 
 package hu.perit.template.authservice.integration;
 
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-import com.opencsv.RFC4180Parser;
-import com.opencsv.RFC4180ParserBuilder;
-import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
-import lombok.extern.log4j.Log4j;
-import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Spliterator;
 import java.util.function.Consumer;
+
+import org.springframework.stereotype.Component;
+
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.RFC4180Parser;
+import com.opencsv.RFC4180ParserBuilder;
+
+import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
 
 /**
  * @author Peter Nagy
  */
 
 @Component
-@Log4j
 public class InputUserList implements Iterable<Map<String, String>> {
 
     private static final String USERLIST_CSV = "Userlist.csv";

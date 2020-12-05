@@ -53,14 +53,15 @@ services:
     pgadmin:
     #####################################################################################                 
         container_name: pgadmin
-        image: dpage/pgadmin4
-        environment:
-            - PGADMIN_DEFAULT_EMAIL=postgres
-            - PGADMIN_DEFAULT_PASSWORD=sa
+        #image: dpage/pgadmin4
+        image: thajeztah/pgadmin4
+        #environment:
+        #    - PGADMIN_DEFAULT_EMAIL=postgres
+        #    - PGADMIN_DEFAULT_PASSWORD=sa
         ports:
-            - "5400:80"
+            - "5400:5050"
         volumes:
-            - pgadmin:/var/lib/pgadmin
+            - pgadmin:/var/lib/pgadmin:rw
         networks: 
             - db-net
         #logging:

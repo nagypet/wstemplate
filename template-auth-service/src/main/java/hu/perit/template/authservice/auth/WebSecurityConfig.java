@@ -16,14 +16,6 @@
 
 package hu.perit.template.authservice.auth;
 
-import hu.perit.spvitamin.core.crypto.CryptoUtil;
-import hu.perit.spvitamin.spring.auth.SimpleHttpSecurityBuilder;
-import hu.perit.spvitamin.spring.config.SecurityProperties;
-import hu.perit.spvitamin.spring.config.SysConfig;
-import hu.perit.spvitamin.spring.rest.api.AuthApi;
-import hu.perit.spvitamin.spring.security.ldap.LdapAuthenticationProviderConfigurer;
-import hu.perit.template.authservice.rest.api.UserApi;
-import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -35,6 +27,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.util.StringUtils;
 
+import hu.perit.spvitamin.core.crypto.CryptoUtil;
+import hu.perit.spvitamin.spring.auth.SimpleHttpSecurityBuilder;
+import hu.perit.spvitamin.spring.config.SecurityProperties;
+import hu.perit.spvitamin.spring.config.SysConfig;
+import hu.perit.spvitamin.spring.rest.api.AuthApi;
+import hu.perit.spvitamin.spring.security.ldap.LdapAuthenticationProviderConfigurer;
+import hu.perit.template.authservice.rest.api.UserApi;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * #know-how:simple-httpsecurity-builder
  *
@@ -42,7 +43,7 @@ import org.springframework.util.StringUtils;
  */
 
 @EnableWebSecurity
-@Log4j
+@Slf4j
 public class WebSecurityConfig {
 
     /*

@@ -16,11 +16,8 @@
 
 package hu.perit.template.authservice.exceptionhandler;
 
-import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.exception.ExceptionWrapper;
-import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
-import hu.perit.spvitamin.spring.exceptionhandler.RestResponseEntityExceptionHandler;
-import lombok.extern.log4j.Log4j;
+import java.io.IOException;
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -29,7 +26,11 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
-import java.io.IOException;
+import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.core.exception.ExceptionWrapper;
+import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
+import hu.perit.spvitamin.spring.exceptionhandler.RestResponseEntityExceptionHandler;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
@@ -37,7 +38,7 @@ import java.io.IOException;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
-@Log4j
+@Slf4j
 public class ApplicationSpecificRestExceptionHandler extends RestResponseEntityExceptionHandler
 {
     @ExceptionHandler({Exception.class})

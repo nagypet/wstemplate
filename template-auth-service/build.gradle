@@ -112,8 +112,10 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
 
-    // Log4J
-    implementation('log4j:log4j:1.2.17')
+    // Slf4J
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    //implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'    
+    //implementation('log4j:log4j:1.2.17')
 
     // ModelMapper
     implementation group: 'org.modelmapper.extensions', name: 'modelmapper-spring', version: '2.3.5'

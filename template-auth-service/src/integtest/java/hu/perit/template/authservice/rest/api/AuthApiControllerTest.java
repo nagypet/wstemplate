@@ -16,12 +16,8 @@
 
 package hu.perit.template.authservice.rest.api;
 
-import hu.perit.spvitamin.spring.auth.jwt.JwtTokenProvider;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.template.authservice.auth.Role;
-import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
-import io.jsonwebtoken.Claims;
-import lombok.extern.log4j.Log4j;
+import java.util.List;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +28,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
+import hu.perit.spvitamin.spring.auth.jwt.JwtTokenProvider;
+import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.template.authservice.auth.Role;
+import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
@@ -40,7 +41,7 @@ import java.util.List;
 
 @ActiveProfiles({"default", "integtest"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Log4j
+@Slf4j
 class AuthApiControllerTest {
 
     @Autowired

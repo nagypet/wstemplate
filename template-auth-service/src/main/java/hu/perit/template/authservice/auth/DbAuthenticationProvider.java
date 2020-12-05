@@ -16,10 +16,8 @@
 
 package hu.perit.template.authservice.auth;
 
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.template.authservice.db.demodb.table.UserEntity;
-import hu.perit.template.authservice.services.UserService;
-import lombok.extern.log4j.Log4j;
+import java.util.stream.Collectors;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,7 +27,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.stream.Collectors;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.template.authservice.db.demodb.table.UserEntity;
+import hu.perit.template.authservice.services.UserService;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * #know-how:custom-authentication-provider
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
  */
 
 @Service
-@Log4j
+@Slf4j
 public class DbAuthenticationProvider implements AuthenticationProvider {
 
     private final ApplicationContext applicationContext;

@@ -16,6 +16,12 @@
 
 package hu.perit.template.authservice.integration;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.test.context.ActiveProfiles;
+
 import feign.auth.BasicAuthRequestInterceptor;
 import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
@@ -24,12 +30,7 @@ import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
 import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
 import hu.perit.template.authservice.rest.client.TemplateAuthClient;
-import lombok.extern.log4j.Log4j;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.test.context.ActiveProfiles;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
@@ -37,7 +38,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles({"default", "integtest"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@Log4j
+@Slf4j
 class AuthApiIntegrationTest {
 
     @Test

@@ -16,10 +16,12 @@
 
 package hu.perit.template.authservice.db.demodb;
 
-import hu.perit.spvitamin.data.config.DatasourceCollectionProperties;
-import hu.perit.spvitamin.data.dynamicdatasource.ConnectionParam;
-import hu.perit.spvitamin.data.dynamicdatasource.DynamicDataSource;
-import lombok.extern.log4j.Log4j;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+
 import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -35,10 +37,10 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
+import hu.perit.spvitamin.data.config.DatasourceCollectionProperties;
+import hu.perit.spvitamin.data.dynamicdatasource.ConnectionParam;
+import hu.perit.spvitamin.data.dynamicdatasource.DynamicDataSource;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * #know-how:hibernate-configuration
@@ -53,7 +55,7 @@ import java.util.Map;
         entityManagerFactoryRef = DemoDbConfig.ENTITY_MANAGER_FACTORY,
         transactionManagerRef = DemoDbConfig.TRANSACTION_MANAGER)
 @EnableJpaAuditing(auditorAwareRef = "auditorProvider")
-@Log4j
+@Slf4j
 public class DemoDbConfig
 {
     static final String PACKAGES = "hu.perit.template.authservice.db.demodb";

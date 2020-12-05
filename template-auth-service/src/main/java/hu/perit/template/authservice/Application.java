@@ -16,13 +16,13 @@
 
 package hu.perit.template.authservice;
 
-import hu.perit.spvitamin.spring.environment.EnvironmentPostProcessor;
-import lombok.extern.log4j.Log4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
+
+import hu.perit.spvitamin.spring.environment.EnvironmentPostProcessor;
 
 /**
  * @author Peter Nagy
@@ -32,7 +32,6 @@ import org.springframework.context.annotation.Profile;
 @SpringBootApplication
 @EnableEurekaClient
 @ComponentScan(basePackages = {"hu.perit.spvitamin", "hu.perit.template.authservice"})
-@Log4j
 public class Application {
 
     public static void main(String[] args) { // NOSONAR

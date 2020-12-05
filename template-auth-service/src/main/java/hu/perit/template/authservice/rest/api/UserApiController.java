@@ -16,32 +16,38 @@
 
 package hu.perit.template.authservice.rest.api;
 
-import com.google.common.reflect.AbstractInvocationHandler;
-import hu.perit.spvitamin.core.took.Took;
-import hu.perit.spvitamin.spring.auth.AuthorizationService;
-import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
-import hu.perit.spvitamin.spring.rest.model.*;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.template.authservice.config.Constants;
-import hu.perit.template.authservice.rest.model.*;
-import hu.perit.template.authservice.rest.session.UserSession;
-import hu.perit.template.authservice.services.UserService;
-import lombok.extern.log4j.Log4j;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.springframework.web.bind.annotation.RestController;
+
+import com.google.common.reflect.AbstractInvocationHandler;
+
+import hu.perit.spvitamin.core.took.Took;
+import hu.perit.spvitamin.spring.auth.AuthorizationService;
+import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.template.authservice.config.Constants;
+import hu.perit.template.authservice.rest.model.CreateUserParams;
+import hu.perit.template.authservice.rest.model.ResponseUri;
+import hu.perit.template.authservice.rest.model.RoleSet;
+import hu.perit.template.authservice.rest.model.UpdateUserParams;
+import hu.perit.template.authservice.rest.model.UserDTO;
+import hu.perit.template.authservice.rest.model.UserDTOFiltered;
+import hu.perit.template.authservice.rest.session.UserSession;
+import hu.perit.template.authservice.services.UserService;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
 @RestController
-@Log4j
 public class UserApiController implements UserApi {
 
     private final UserApi proxy;
@@ -120,7 +126,7 @@ public class UserApiController implements UserApi {
      * ============== PROXY Implementation =============================================================================
      */
 
-    @Log4j
+    @Slf4j
     private static class ProxyImpl extends AbstractInvocationHandler {
         private final UserService userService;
         private final AuthorizationService authorizationService;
@@ -158,7 +164,7 @@ public class UserApiController implements UserApi {
             }
         }
 
-        @Log4j
+        @Slf4j
         private static class Logger extends AbstractInterfaceLogger {
 
             Logger(HttpServletRequest httpRequest) {
