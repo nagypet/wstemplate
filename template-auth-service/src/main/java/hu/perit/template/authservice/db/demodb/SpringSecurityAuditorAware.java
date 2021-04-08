@@ -16,8 +16,9 @@
 
 package hu.perit.template.authservice.db.demodb;
 
-import hu.perit.spvitamin.spring.auth.AuthorizationService;
 import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
+
 import org.springframework.data.domain.AuditorAware;
 
 import java.util.Optional;

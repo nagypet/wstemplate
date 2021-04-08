@@ -28,10 +28,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import hu.perit.spvitamin.spring.auth.AuthorizationService;
 import hu.perit.spvitamin.spring.auth.filter.FilterAuthenticationException;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import hu.perit.spvitamin.spring.security.ldap.AdGroupRoleMapper;
 import hu.perit.template.authservice.services.UserService;
 import lombok.extern.slf4j.Slf4j;

@@ -37,9 +37,9 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import hu.perit.spvitamin.data.config.DatasourceCollectionProperties;
-import hu.perit.spvitamin.data.dynamicdatasource.ConnectionParam;
-import hu.perit.spvitamin.data.dynamicdatasource.DynamicDataSource;
+import hu.perit.spvitamin.spring.data.config.DatasourceCollectionProperties;
+import hu.perit.spvitamin.spring.data.dynamicdatasource.ConnectionParam;
+import hu.perit.spvitamin.spring.data.dynamicdatasource.DynamicDataSource;
 import lombok.extern.slf4j.Slf4j;
 
 /**

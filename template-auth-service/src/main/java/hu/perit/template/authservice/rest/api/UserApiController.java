@@ -29,9 +29,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.reflect.AbstractInvocationHandler;
 
 import hu.perit.spvitamin.core.took.Took;
-import hu.perit.spvitamin.spring.auth.AuthorizationService;
 import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import hu.perit.template.authservice.config.Constants;
 import hu.perit.template.authservice.rest.model.CreateUserParams;
 import hu.perit.template.authservice.rest.model.ResponseUri;
