@@ -27,7 +27,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
-import hu.perit.spvitamin.spring.security.auth.provider.authservice.AuthServiceAuthenticationProviderWithRestTemplate;
+import hu.perit.spvitamin.spring.security.auth.authservice.provider.AuthServiceAuthenticationProviderWithRestTemplate;
 import hu.perit.template.scalableservice.rest.api.ServiceApi;
 import lombok.extern.log4j.Log4j;
 
