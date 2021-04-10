@@ -28,9 +28,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ActiveProfiles;
 
-import hu.perit.spvitamin.spring.auth.jwt.JwtTokenProvider;
-import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
+import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import hu.perit.template.authservice.auth.Role;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
@@ -42,10 +42,10 @@ import lombok.extern.slf4j.Slf4j;
 @ActiveProfiles({"default", "integtest"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Slf4j
-class AuthApiControllerTest {
+class AuthControllerTest {
 
     @Autowired
-    private AuthApiController authApiController;
+    private AuthController authApiController;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;

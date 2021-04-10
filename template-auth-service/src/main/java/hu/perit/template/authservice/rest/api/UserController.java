@@ -48,15 +48,15 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @RestController
-public class UserApiController implements UserApi {
+public class UserController implements UserApi {
 
     private final UserApi proxy;
 
-    public UserApiController(UserService userService, HttpServletRequest httpRequest, AuthorizationService authorizationService) {
+    public UserController(UserService userService, HttpServletRequest httpRequest, AuthorizationService authorizationService) {
         this.proxy = (UserApi) Proxy.newProxyInstance(
                 UserApi.class.getClassLoader(),
                 new Class[]{UserApi.class},
-                new UserApiController.ProxyImpl(userService, authorizationService, httpRequest));
+                new UserController.ProxyImpl(userService, authorizationService, httpRequest));
     }
 
     /*

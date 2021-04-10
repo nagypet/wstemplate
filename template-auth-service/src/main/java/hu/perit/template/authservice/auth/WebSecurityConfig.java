@@ -28,10 +28,10 @@ import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.util.StringUtils;
 
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
-import hu.perit.spvitamin.spring.auth.SimpleHttpSecurityBuilder;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
+import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
 import hu.perit.spvitamin.spring.security.ldap.LdapAuthenticationProviderConfigurer;
 import hu.perit.template.authservice.rest.api.UserApi;
 import lombok.extern.slf4j.Slf4j;

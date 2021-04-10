@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package hu.perit.template.scalableservice.rest.api;
+package hu.perit.template.eureka.rest.api;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.web.bind.annotation.RestController;
 
 import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
 import hu.perit.spvitamin.core.took.Took;
+import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.auth.SecurityContextUtil;
 import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
-import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
-import hu.perit.template.scalableservice.config.Constants;
+import hu.perit.template.eureka.config.Constants;
 import lombok.extern.log4j.Log4j;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Peter Nagy
@@ -36,11 +37,11 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @Log4j
-public class AuthApiController extends AbstractInterfaceLogger implements AuthApi {
+public class AuthController extends AbstractInterfaceLogger implements AuthApi {
 
     private final AuthorizationService authorizationService;
 
-    public AuthApiController(AuthorizationService authorizationService, HttpServletRequest httpRequest) {
+    public AuthController(AuthorizationService authorizationService, HttpServletRequest httpRequest) {
         super(httpRequest);
         this.authorizationService = authorizationService;
     }

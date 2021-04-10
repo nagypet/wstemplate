@@ -25,10 +25,10 @@ import org.springframework.test.context.ActiveProfiles;
 import feign.auth.BasicAuthRequestInterceptor;
 import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.crypto.CryptoUtil;
+import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
-import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
 import hu.perit.template.authservice.rest.client.TemplateAuthClient;
 import lombok.extern.slf4j.Slf4j;
 

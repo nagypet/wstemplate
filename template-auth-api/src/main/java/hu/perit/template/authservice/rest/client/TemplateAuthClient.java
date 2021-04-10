@@ -16,14 +16,20 @@
 
 package hu.perit.template.authservice.rest.client;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.RequestBody;
+
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import hu.perit.spvitamin.spring.rest.model.*;
-import hu.perit.template.authservice.rest.model.*;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.List;
+import hu.perit.spvitamin.spring.auth.AuthorizationToken;
+import hu.perit.template.authservice.rest.model.CreateUserParams;
+import hu.perit.template.authservice.rest.model.ResponseUri;
+import hu.perit.template.authservice.rest.model.RoleSet;
+import hu.perit.template.authservice.rest.model.UpdateUserParams;
+import hu.perit.template.authservice.rest.model.UserDTO;
+import hu.perit.template.authservice.rest.model.UserDTOFiltered;
 
 /**
  * @author Peter Nagy

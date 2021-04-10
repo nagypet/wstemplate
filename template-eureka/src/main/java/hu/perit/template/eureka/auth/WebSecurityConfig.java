@@ -16,10 +16,6 @@
 
 package hu.perit.template.eureka.auth;
 
-import hu.perit.spvitamin.spring.auth.SimpleHttpSecurityBuilder;
-import hu.perit.spvitamin.spring.auth.provider.authservice.AuthServiceAuthenticationProviderWithRestTemplate;
-import hu.perit.spvitamin.spring.rest.api.AuthApi;
-import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -28,6 +24,11 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+import hu.perit.spvitamin.spring.rest.api.AuthApi;
+import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
+import hu.perit.spvitamin.spring.security.auth.provider.authservice.AuthServiceAuthenticationProviderWithRestTemplate;
+import lombok.extern.log4j.Log4j;
 
 /**
  * #know-how:simple-httpsecurity-builder

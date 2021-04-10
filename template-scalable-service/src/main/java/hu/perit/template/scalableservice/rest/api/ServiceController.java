@@ -41,12 +41,12 @@ import java.lang.reflect.Proxy;
 
 @RestController
 @Log4j
-public class ServiceApiController implements ServiceApi {
+public class ServiceController implements ServiceApi {
 
     private final ServiceApi proxy;
     private final MetricsService metricsService;
 
-    public ServiceApiController(
+    public ServiceController(
             ServiceSessionHolder serviceSessionHolder,
             AuthorizationService authorizationService,
             MetricsService metricsService,
@@ -54,7 +54,7 @@ public class ServiceApiController implements ServiceApi {
         proxy = (ServiceApi) Proxy.newProxyInstance(
                 ServiceApi.class.getClassLoader(),
                 new Class[]{ServiceApi.class},
-                new ServiceApiController.ProxyImpl(httpRequest, serviceSessionHolder, authorizationService, metricsService));
+                new ServiceController.ProxyImpl(httpRequest, serviceSessionHolder, authorizationService, metricsService));
 
         this.metricsService = metricsService;
     }

@@ -1,20 +1,21 @@
 package hu.perit.performancetester;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+
 import feign.auth.BasicAuthRequestInterceptor;
 import hu.perit.performancetester.config.TesterProperties;
 import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.batchprocessing.BatchJob;
 import hu.perit.spvitamin.core.batchprocessing.BatchProcessor;
+import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
 import hu.perit.spvitamin.spring.rest.client.AuthClient;
-import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
 import lombok.extern.log4j.Log4j;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Peter Nagy

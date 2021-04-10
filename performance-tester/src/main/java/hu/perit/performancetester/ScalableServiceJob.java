@@ -1,15 +1,15 @@
 package hu.perit.performancetester;
 
+import java.util.UUID;
+
 import hu.perit.performancetester.config.TesterProperties;
 import hu.perit.spvitamin.core.batchprocessing.BatchJob;
 import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.core.took.Took;
+import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.feignclients.JwtAuthRequestInterceptor;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
-import hu.perit.spvitamin.spring.rest.model.AuthorizationToken;
-
-import java.util.UUID;
 
 public class ScalableServiceJob extends BatchJob {
 
