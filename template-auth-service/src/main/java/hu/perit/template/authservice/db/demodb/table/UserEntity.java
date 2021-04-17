@@ -113,9 +113,9 @@ public class UserEntity {
     private LocalDateTime createdAt;
 
     @LastModifiedBy
-    @Column(name = "updatedbyid", nullable = false, updatable = false)
+    @Column(name = "updatedbyid", nullable = false, updatable = true)
     private Long updatedById;
-    @Column(name = "updatedat", nullable = false, updatable = false)
+    @Column(name = "updatedat", nullable = false, updatable = true)
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
