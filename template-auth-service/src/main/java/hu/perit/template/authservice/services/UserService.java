@@ -16,6 +16,23 @@
 
 package hu.perit.template.authservice.services;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.persistence.LockModeType;
+
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.exception.ConstraintViolationException;
+import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationContext;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.spring.exception.CannotProcessException;
 import hu.perit.spvitamin.spring.exception.InvalidInputException;
@@ -27,22 +44,11 @@ import hu.perit.template.authservice.db.demodb.repo.RoleRepo;
 import hu.perit.template.authservice.db.demodb.repo.UserRepo;
 import hu.perit.template.authservice.db.demodb.table.RoleEntity;
 import hu.perit.template.authservice.db.demodb.table.UserEntity;
-import hu.perit.template.authservice.rest.model.*;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.exception.ConstraintViolationException;
-import org.modelmapper.ModelMapper;
-import org.springframework.context.ApplicationContext;
-import org.springframework.data.jpa.repository.Lock;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import javax.persistence.LockModeType;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import hu.perit.template.authservice.rest.model.CreateUserParams;
+import hu.perit.template.authservice.rest.model.RoleSet;
+import hu.perit.template.authservice.rest.model.UpdateUserParams;
+import hu.perit.template.authservice.rest.model.UserDTO;
+import hu.perit.template.authservice.rest.model.UserDTOFiltered;
 
 /**
  * Manages CRUD operations. All the concurrency issues are handled by the persistence layer.
@@ -51,13 +57,15 @@ import java.util.stream.Collectors;
  */
 
 @Service
-public class UserService {
+public class UserService
+{
 
     private final ApplicationContext applicationContext;
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
 
-    public UserService(ApplicationContext applicationContext, UserRepo userRepo, RoleRepo roleRepo) {
+    public UserService(ApplicationContext applicationContext, UserRepo userRepo, RoleRepo roleRepo)
+    {
         this.applicationContext = applicationContext;
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
@@ -66,7 +74,8 @@ public class UserService {
     /*
      * ============== getAll ===========================================================================================
      */
-    public List<UserDTOFiltered> getAll() {
+    public List<UserDTOFiltered> getAll()
+    {
         List<UserEntity> all = this.userRepo.findAll();
 
         ModelMapper modelMapper = new ModelMapper();
@@ -77,13 +86,16 @@ public class UserService {
     /*
      * ============== getUserDTOById ===================================================================================
      */
-    public UserDTO getUserDTOById(long userId) {
+    public UserDTO getUserDTOById(long userId) throws ResourceNotFoundException
+    {
         Optional<UserEntity> byId = this.userRepo.findById(userId);
-        if (byId.isPresent()) {
+        if (byId.isPresent())
+        {
             ModelMapper modelMapper = new ModelMapper();
             return modelMapper.map(byId.get(), UserDTO.class);
         }
-        else {
+        else
+        {
             throw new ResourceNotFoundException(String.format("No user found by userId: %d", userId));
         }
     }
@@ -92,24 +104,29 @@ public class UserService {
     /*
      * ============== create ===========================================================================================
      */
-    public long create(CreateUserParams createUserParams) {
+    public long create(CreateUserParams createUserParams)
+    {
         return this.create(createUserParams, false);
     }
 
 
-    public long create(CreateUserParams createUserParams, Boolean external) {
-        try {
+    public long create(CreateUserParams createUserParams, Boolean external)
+    {
+        try
+        {
             ModelMapper modelMapper = new ModelMapper();
             UserEntity userEntity = modelMapper.map(createUserParams, UserEntity.class);
 
             // Encrypting password
             PasswordEncoder passwordEncoder = this.applicationContext.getBean(PasswordEncoder.class);
-            if (StringUtils.isNotBlank(createUserParams.getPassword())) {
+            if (StringUtils.isNotBlank(createUserParams.getPassword()))
+            {
                 userEntity.setEncryptedPassword(passwordEncoder.encode(createUserParams.getPassword()));
             }
 
             // Roles
-            if (createUserParams.getRoles() != null) {
+            if (createUserParams.getRoles() != null)
+            {
                 Set<RoleEntity> roles = this.getRoleEntitiesByRoleNames(createUserParams.getRoles());
                 userEntity.setRoleEntities(roles);
             }
@@ -122,13 +139,19 @@ public class UserService {
 
             return newUser.getUserId();
         }
-        catch (RuntimeException ex) {
+        catch (RuntimeException ex)
+        {
             ExceptionWrapper exception = ExceptionWrapper.of(ex);
-            if (exception.causedBy(ConstraintViolationException.class)) {
+            if (exception.causedBy(ConstraintViolationException.class))
+            {
                 Optional<Throwable> fromCauseChain = exception.getFromCauseChain(ConstraintViolationException.class);
-                if (fromCauseChain.isPresent()) {
-                    if (((ConstraintViolationException) fromCauseChain.get()).getConstraintName().equalsIgnoreCase(Constants.INDEXNAME_USERNAME)) {
-                        throw new ResourceAlreadyExistsException(String.format("A user with username '%s' already exists!", createUserParams.getUserName()), ex);
+                if (fromCauseChain.isPresent())
+                {
+                    if (((ConstraintViolationException) fromCauseChain.get()).getConstraintName().equalsIgnoreCase(
+                        Constants.INDEXNAME_USERNAME))
+                    {
+                        throw new ResourceAlreadyExistsException(
+                            String.format("A user with username '%s' already exists!", createUserParams.getUserName()), ex);
                     }
                 }
             }
@@ -137,7 +160,8 @@ public class UserService {
     }
 
 
-    private boolean resultSetContainsRole(Set<RoleEntity> roles, String role) {
+    private boolean resultSetContainsRole(Set<RoleEntity> roles, String role)
+    {
         return roles.stream().anyMatch(i -> i.getRole().equalsIgnoreCase(role));
     }
 
@@ -145,24 +169,26 @@ public class UserService {
     /*
      * ============== createAtLogin ====================================================================================
      */
-    public long createAtLogin(AuthenticatedUser authenticatedUser) {
-        if (authenticatedUser.getUserId() >= 0) {
+    public long createAtLogin(AuthenticatedUser authenticatedUser)
+    {
+        if (authenticatedUser.getUserId() >= 0)
+        {
             return authenticatedUser.getUserId();
         }
-        else {
+        else
+        {
             long userId = this.getUserIdByName(authenticatedUser.getUsername());
-            if (userId >= 0) {
+            if (userId >= 0)
+            {
                 return userId;
             }
-            else {
+            else
+            {
                 // The user is not yet saved in our internal user db => lets save it
-                CreateUserParams createUserParams = CreateUserParams.builder()
-                        .userName(authenticatedUser.getUsername())
-                        .displayName(authenticatedUser.getUsername())
-                        .active(true)
-                        .roles(authenticatedUser.getAuthorities().stream().map(i -> ((GrantedAuthority) i).getAuthority()).collect(Collectors.toSet()))
-                        .nextLoginChangePwd(false)
-                        .build();
+                CreateUserParams createUserParams = CreateUserParams.builder().userName(authenticatedUser.getUsername()).displayName(
+                    authenticatedUser.getUsername()).active(true).roles(
+                        authenticatedUser.getAuthorities().stream().map(i -> ((GrantedAuthority) i).getAuthority()).collect(
+                            Collectors.toSet())).nextLoginChangePwd(false).build();
                 long newUserId = this.create(createUserParams, true);
                 this.updateLoginTime(newUserId);
                 return newUserId;
@@ -175,14 +201,17 @@ public class UserService {
      * ============== update ===========================================================================================
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public void update(long userId, UpdateUserParams updateUserParams) {
+    public void update(long userId, UpdateUserParams updateUserParams) throws ResourceNotFoundException
+    {
         Optional<UserEntity> byId = this.userRepo.findById(userId);
-        if (byId.isPresent()) {
+        if (byId.isPresent())
+        {
             ModelMapper modelMapper = new ModelMapper();
             modelMapper.getConfiguration().setSkipNullEnabled(true);
 
             UserEntity userEntity = byId.get();
-            if (userEntity.getExternal()) {
+            if (userEntity.getExternal())
+            {
                 throw new CannotProcessException("External user cannot be updated!");
             }
 
@@ -190,12 +219,14 @@ public class UserService {
 
             // Encrypting passwords
             PasswordEncoder passwordEncoder = this.applicationContext.getBean(PasswordEncoder.class);
-            if (StringUtils.isNotBlank(updateUserParams.getPassword())) {
+            if (StringUtils.isNotBlank(updateUserParams.getPassword()))
+            {
                 userEntity.setEncryptedPassword(passwordEncoder.encode(updateUserParams.getPassword()));
             }
 
             // Roles
-            if (updateUserParams.getRoles() != null) {
+            if (updateUserParams.getRoles() != null)
+            {
                 Set<RoleEntity> roles = this.getRoleEntitiesByRoleNames(updateUserParams.getRoles());
                 userEntity.setRoleEntities(roles);
             }
@@ -203,7 +234,8 @@ public class UserService {
             // Saving the user
             this.userRepo.save(userEntity);
         }
-        else {
+        else
+        {
             throw new ResourceNotFoundException(String.format("No user found by userId: %d", userId));
         }
     }
@@ -212,17 +244,21 @@ public class UserService {
     /*
      * ============== delete ===========================================================================================
      */
-    public void delete(long userId) {
+    public void delete(long userId) throws ResourceNotFoundException
+    {
         Optional<UserEntity> byId = this.userRepo.findById(userId);
-        if (byId.isPresent()) {
+        if (byId.isPresent())
+        {
             UserEntity userEntity = byId.get();
-            if (Boolean.TRUE.equals(userEntity.getExternal())) {
+            if (Boolean.TRUE.equals(userEntity.getExternal()))
+            {
                 throw new CannotProcessException("External user cannot be deleted!");
             }
 
             this.userRepo.deleteById(userId);
         }
-        else {
+        else
+        {
             throw new ResourceNotFoundException(String.format("No user found by userId: %d", userId));
         }
     }
@@ -231,31 +267,39 @@ public class UserService {
     /*
      * ============== getUserEntity ====================================================================================
      */
-    public UserEntity getUserEntity(String userName, boolean filterInternal) {
+    public UserEntity getUserEntity(String userName, boolean filterInternal) throws ResourceNotFoundException
+    {
         Optional<UserEntity> byUserName = this.userRepo.findByUserName(userName);
-        if (byUserName.isPresent() && internalFilter(filterInternal, byUserName.get().getExternal())) {
+        if (byUserName.isPresent() && internalFilter(filterInternal, byUserName.get().getExternal()))
+        {
             return byUserName.get();
         }
-        else {
+        else
+        {
             throw new ResourceNotFoundException(String.format("User '%s' not found", userName));
         }
     }
 
 
-    private static boolean internalFilter(boolean filterInternal, boolean entityIsExternal) {
-        if (!filterInternal) return true;
+    private static boolean internalFilter(boolean filterInternal, boolean entityIsExternal)
+    {
+        if (!filterInternal)
+            return true;
         return !entityIsExternal;
     }
 
     /*
      * ============== getUserIdByName ==================================================================================
      */
-    public long getUserIdByName(String userName) {
+    public long getUserIdByName(String userName)
+    {
         Optional<UserEntity> byUserName = this.userRepo.findByUserName(userName);
-        if (byUserName.isPresent()) {
+        if (byUserName.isPresent())
+        {
             return byUserName.get().getUserId();
         }
-        else {
+        else
+        {
             return -1;
         }
     }
@@ -264,7 +308,8 @@ public class UserService {
     /*
      * ============== updateLoginTime ==================================================================================
      */
-    public void updateLoginTime(long userId) {
+    public void updateLoginTime(long userId)
+    {
         this.userRepo.updateLastLoginTime(userId, LocalDateTime.now());
     }
 
@@ -273,32 +318,39 @@ public class UserService {
      * ============== addRole ==========================================================================================
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public void addRole(Long userId, RoleSet roleSet) {
+    public void addRole(Long userId, RoleSet roleSet) throws ResourceNotFoundException
+    {
         Optional<UserEntity> byId = this.userRepo.findById(userId);
-        if (byId.isPresent()) {
+        if (byId.isPresent())
+        {
             UserEntity userEntity = byId.get();
-            if (Boolean.TRUE.equals(userEntity.getExternal())) {
+            if (Boolean.TRUE.equals(userEntity.getExternal()))
+            {
                 throw new CannotProcessException("External user cannot be updated!");
             }
 
             // Roles
-            if (roleSet.getRoles() != null) {
+            if (roleSet.getRoles() != null)
+            {
                 Set<RoleEntity> roleEntitiesToSet = this.getRoleEntitiesByRoleNames(roleSet.getRoles());
                 userEntity.getRoleEntities().addAll(roleEntitiesToSet);
 
                 this.userRepo.save(userEntity);
             }
         }
-        else {
+        else
+        {
             throw new ResourceNotFoundException(String.format("No user found by userId: %d", userId));
         }
     }
 
 
-    private Set<RoleEntity> getRoleEntitiesByRoleNames(Set<String> roleNames) {
+    private Set<RoleEntity> getRoleEntitiesByRoleNames(Set<String> roleNames)
+    {
         Set<RoleEntity> roleEntities = this.roleRepo.findByRoleIn(roleNames);
         // Check each role found
-        if (roleEntities.size() != roleNames.size()) {
+        if (roleEntities.size() != roleNames.size())
+        {
             String invalidRoles = roleNames.stream().filter(i -> !resultSetContainsRole(roleEntities, i)).collect(Collectors.joining(", "));
             throw new InvalidInputException(String.format("Invalid roles specified: '%s'", invalidRoles));
         }
@@ -311,16 +363,20 @@ public class UserService {
      * ============== deleteRole =======================================================================================
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public void deleteRole(Long userId, RoleSet roleSet) {
+    public void deleteRole(Long userId, RoleSet roleSet) throws ResourceNotFoundException
+    {
         Optional<UserEntity> byId = this.userRepo.findById(userId);
-        if (byId.isPresent()) {
+        if (byId.isPresent())
+        {
             UserEntity userEntity = byId.get();
-            if (Boolean.TRUE.equals(userEntity.getExternal())) {
+            if (Boolean.TRUE.equals(userEntity.getExternal()))
+            {
                 throw new CannotProcessException("External user cannot be updated!");
             }
 
             // Roles
-            if (roleSet.getRoles() != null) {
+            if (roleSet.getRoles() != null)
+            {
                 // checking if input role names are valid
                 this.getRoleEntitiesByRoleNames(roleSet.getRoles());
 
@@ -330,7 +386,8 @@ public class UserService {
                 this.userRepo.save(userEntity);
             }
         }
-        else {
+        else
+        {
             throw new ResourceNotFoundException(String.format("No user found by userId: %d", userId));
         }
     }

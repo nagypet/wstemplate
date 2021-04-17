@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author Peter Nagy
  */
 
+@SuppressWarnings("serial")
 @ResponseStatus(value = HttpStatus.UNAUTHORIZED, code = HttpStatus.UNAUTHORIZED)
 public class DbAuthenticationException extends AuthenticationException {
 

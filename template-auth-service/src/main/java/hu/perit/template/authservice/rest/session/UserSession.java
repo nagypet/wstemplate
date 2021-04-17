@@ -16,15 +16,22 @@
 
 package hu.perit.template.authservice.rest.session;
 
-import hu.perit.spvitamin.spring.rest.model.*;
-import hu.perit.template.authservice.rest.api.UserApi;
-import hu.perit.template.authservice.rest.model.*;
-import hu.perit.template.authservice.services.UserService;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+
+import javax.validation.Valid;
+
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
+import hu.perit.template.authservice.rest.api.UserApi;
+import hu.perit.template.authservice.rest.model.CreateUserParams;
+import hu.perit.template.authservice.rest.model.ResponseUri;
+import hu.perit.template.authservice.rest.model.RoleSet;
+import hu.perit.template.authservice.rest.model.UpdateUserParams;
+import hu.perit.template.authservice.rest.model.UserDTO;
+import hu.perit.template.authservice.rest.model.UserDTOFiltered;
+import hu.perit.template.authservice.services.UserService;
 
 public class UserSession implements UserApi {
 
@@ -46,7 +53,7 @@ public class UserSession implements UserApi {
      * ============== getUserById ======================================================================================
      */
     @Override
-    public UserDTO getUserByIdUsingGET(String processID, Long id) {
+    public UserDTO getUserByIdUsingGET(String processID, Long id) throws ResourceNotFoundException {
         return this.userService.getUserDTOById(id);
     }
 
@@ -69,7 +76,7 @@ public class UserSession implements UserApi {
      * ============== updateUser =======================================================================================
      */
     @Override
-    public void updateUserUsingPUT(String processID, Long id, @Valid UpdateUserParams updateUserParams) {
+    public void updateUserUsingPUT(String processID, Long id, @Valid UpdateUserParams updateUserParams) throws ResourceNotFoundException {
         this.userService.update(id, updateUserParams);
     }
 
@@ -77,7 +84,7 @@ public class UserSession implements UserApi {
      * ============== deleteUser =======================================================================================
      */
     @Override
-    public void deleteUserUsingDELETE(String processID, Long id) {
+    public void deleteUserUsingDELETE(String processID, Long id) throws ResourceNotFoundException {
         this.userService.delete(id);
     }
 
@@ -85,7 +92,7 @@ public class UserSession implements UserApi {
      * ============== addRole ==========================================================================================
      */
     @Override
-    public void addRoleUsingPOST(String processID, Long id, @Valid RoleSet roleSet) {
+    public void addRoleUsingPOST(String processID, Long id, @Valid RoleSet roleSet) throws ResourceNotFoundException {
         this.userService.addRole(id, roleSet);
     }
 
@@ -93,7 +100,7 @@ public class UserSession implements UserApi {
      * ============== deleteRole =======================================================================================
      */
     @Override
-    public void deleteRoleUsingDELETE(String processID, Long id, @Valid RoleSet roleSet) {
+    public void deleteRoleUsingDELETE(String processID, Long id, @Valid RoleSet roleSet) throws ResourceNotFoundException {
         this.userService.deleteRole(id, roleSet);
     }
 }

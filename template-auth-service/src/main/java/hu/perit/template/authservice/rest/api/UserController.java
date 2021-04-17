@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.common.reflect.AbstractInvocationHandler;
 
 import hu.perit.spvitamin.core.took.Took;
+import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
@@ -41,29 +42,29 @@ import hu.perit.template.authservice.rest.model.UserDTO;
 import hu.perit.template.authservice.rest.model.UserDTOFiltered;
 import hu.perit.template.authservice.rest.session.UserSession;
 import hu.perit.template.authservice.services.UserService;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Peter Nagy
  */
 
 @RestController
-public class UserController implements UserApi {
+public class UserController implements UserApi
+{
 
     private final UserApi proxy;
 
-    public UserController(UserService userService, HttpServletRequest httpRequest, AuthorizationService authorizationService) {
-        this.proxy = (UserApi) Proxy.newProxyInstance(
-                UserApi.class.getClassLoader(),
-                new Class[]{UserApi.class},
-                new UserController.ProxyImpl(userService, authorizationService, httpRequest));
+    public UserController(UserService userService, HttpServletRequest httpRequest, AuthorizationService authorizationService)
+    {
+        this.proxy = (UserApi) Proxy.newProxyInstance(UserApi.class.getClassLoader(), new Class[]{UserApi.class},
+            new UserController.ProxyImpl(userService, authorizationService, httpRequest));
     }
 
     /*
      * ============== getAllUsers ======================================================================================
      */
     @Override
-    public List<UserDTOFiltered> getAllUsersUsingGET(String processID) {
+    public List<UserDTOFiltered> getAllUsersUsingGET(String processID)
+    {
         return this.proxy.getAllUsersUsingGET(processID);
     }
 
@@ -72,7 +73,8 @@ public class UserController implements UserApi {
      * ============== getUserById ======================================================================================
      */
     @Override
-    public UserDTO getUserByIdUsingGET(String processID, Long id) {
+    public UserDTO getUserByIdUsingGET(String processID, Long id) throws ResourceNotFoundException
+    {
         return this.proxy.getUserByIdUsingGET(processID, id);
     }
 
@@ -81,7 +83,8 @@ public class UserController implements UserApi {
      * ============== createUser =======================================================================================
      */
     @Override
-    public ResponseUri createUserUsingPOST(String processID, @Valid CreateUserParams createUserParams) {
+    public ResponseUri createUserUsingPOST(String processID, @Valid CreateUserParams createUserParams)
+    {
         return this.proxy.createUserUsingPOST(processID, createUserParams);
     }
 
@@ -90,7 +93,8 @@ public class UserController implements UserApi {
      * ============== updateUser =======================================================================================
      */
     @Override
-    public void updateUserUsingPUT(String processID, Long id, @Valid UpdateUserParams updateUserParams) {
+    public void updateUserUsingPUT(String processID, Long id, @Valid UpdateUserParams updateUserParams) throws ResourceNotFoundException
+    {
         this.proxy.updateUserUsingPUT(processID, id, updateUserParams);
     }
 
@@ -99,7 +103,8 @@ public class UserController implements UserApi {
      * ============== deleteUser =======================================================================================
      */
     @Override
-    public void deleteUserUsingDELETE(String processID, Long id) {
+    public void deleteUserUsingDELETE(String processID, Long id) throws ResourceNotFoundException
+    {
         this.proxy.deleteUserUsingDELETE(processID, id);
     }
 
@@ -108,7 +113,8 @@ public class UserController implements UserApi {
      * ============== addRole ==========================================================================================
      */
     @Override
-    public void addRoleUsingPOST(String processID, Long id, @Valid RoleSet roleSet) {
+    public void addRoleUsingPOST(String processID, Long id, @Valid RoleSet roleSet) throws ResourceNotFoundException
+    {
         this.proxy.addRoleUsingPOST(processID, id, roleSet);
     }
 
@@ -117,7 +123,8 @@ public class UserController implements UserApi {
      * ============== deleteRole =======================================================================================
      */
     @Override
-    public void deleteRoleUsingDELETE(String processID, Long id, @Valid RoleSet roleSet) {
+    public void deleteRoleUsingDELETE(String processID, Long id, @Valid RoleSet roleSet) throws ResourceNotFoundException
+    {
         this.proxy.deleteRoleUsingDELETE(processID, id, roleSet);
     }
 
@@ -126,13 +133,14 @@ public class UserController implements UserApi {
      * ============== PROXY Implementation =============================================================================
      */
 
-    @Slf4j
-    private static class ProxyImpl extends AbstractInvocationHandler {
+    private static class ProxyImpl extends AbstractInvocationHandler
+    {
         private final UserService userService;
         private final AuthorizationService authorizationService;
         private final ProxyImpl.Logger logger;
 
-        public ProxyImpl(UserService userService, AuthorizationService authorizationService, HttpServletRequest httpRequest) {
+        public ProxyImpl(UserService userService, AuthorizationService authorizationService, HttpServletRequest httpRequest)
+        {
             this.userService = userService;
             this.authorizationService = authorizationService;
             this.logger = new ProxyImpl.Logger(httpRequest);
@@ -140,39 +148,46 @@ public class UserController implements UserApi {
 
 
         @Override
-        protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable {
+        protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable
+        {
             return this.invokeWithExtras(method, args);
         }
 
 
-        private Object invokeWithExtras(Method method, Object[] args) throws Throwable {
+        private Object invokeWithExtras(Method method, Object[] args) throws Throwable
+        {
             AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
-            try (Took took = new Took(method)) {
+            try (Took took = new Took(method))
+            {
                 this.logger.traceIn(null, authenticatedUser.getUsername(), method, args);
                 UserSession session = new UserSession(this.userService);
                 Object retval = method.invoke(session, args);
                 this.logger.traceOut(null, authenticatedUser.getUsername(), method);
                 return retval;
             }
-            catch (IllegalAccessException ex) {
+            catch (IllegalAccessException ex)
+            {
                 this.logger.traceOut(null, authenticatedUser.getUsername(), method, ex);
                 throw ex;
             }
-            catch (InvocationTargetException ex) {
+            catch (InvocationTargetException ex)
+            {
                 this.logger.traceOut(null, authenticatedUser.getUsername(), method, ex.getTargetException());
                 throw ex.getTargetException();
             }
         }
 
-        @Slf4j
-        private static class Logger extends AbstractInterfaceLogger {
+        private static class Logger extends AbstractInterfaceLogger
+        {
 
-            Logger(HttpServletRequest httpRequest) {
+            Logger(HttpServletRequest httpRequest)
+            {
                 super(httpRequest);
             }
 
             @Override
-            protected String getSubsystemName() {
+            protected String getSubsystemName()
+            {
                 return Constants.SUBSYSTEM_NAME;
             }
         }

@@ -27,6 +27,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.template.authservice.db.demodb.table.UserEntity;
 import hu.perit.template.authservice.services.UserService;
@@ -65,7 +66,7 @@ public class DbAuthenticationProvider implements AuthenticationProvider {
                     .authorities(userEntity.getRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
                     .build();
         }
-        catch (RuntimeException ex) {
+        catch (RuntimeException | ResourceNotFoundException ex) {
             log.debug("Authentication failed: " + ex.getMessage());
             throw new DbAuthenticationException("Authentication failed!", ex);
         }
