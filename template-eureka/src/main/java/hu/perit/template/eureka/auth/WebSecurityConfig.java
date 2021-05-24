@@ -27,8 +27,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
-import hu.perit.spvitamin.spring.security.auth.authservice.provider.AuthServiceAuthenticationProviderWithRestTemplate;
-import lombok.extern.log4j.Log4j;
+import hu.perit.spvitamin.spring.security.authservice.provider.AuthServiceAuthenticationProviderWithRestTemplate;
 
 /**
  * #know-how:simple-httpsecurity-builder
@@ -37,36 +36,36 @@ import lombok.extern.log4j.Log4j;
  */
 
 @EnableWebSecurity
-@Log4j
-public class WebSecurityConfig {
+public class WebSecurityConfig
+{
 
     /*
      * ============== Order(1) =========================================================================================
      */
     @Configuration
     @Order(1)
-    public static class Order1 extends WebSecurityConfigurerAdapter {
+    public static class Order1 extends WebSecurityConfigurerAdapter
+    {
 
         private final AuthenticationProvider authServiceAuthenticationProvider;
 
-        public Order1(AuthServiceAuthenticationProviderWithRestTemplate authServiceAuthenticationProvider) {
+        public Order1(AuthServiceAuthenticationProviderWithRestTemplate authServiceAuthenticationProvider)
+        {
             this.authServiceAuthenticationProvider = authServiceAuthenticationProvider;
         }
 
 
         @Autowired
-        public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception
+        {
             auth.authenticationProvider(this.authServiceAuthenticationProvider);
         }
 
 
         @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            SimpleHttpSecurityBuilder.newInstance(http)
-                    .scope(
-                            AuthApi.BASE_URL_AUTHENTICATE
-                    )
-                    .basicAuth();
+        protected void configure(HttpSecurity http) throws Exception
+        {
+            SimpleHttpSecurityBuilder.newInstance(http).scope(AuthApi.BASE_URL_AUTHENTICATE).basicAuth();
         }
     }
 
@@ -75,20 +74,14 @@ public class WebSecurityConfig {
      */
     @Configuration
     @Order(2)
-    public static class Order2 extends WebSecurityConfigurerAdapter {
+    public static class Order2 extends WebSecurityConfigurerAdapter
+    {
 
         @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            SimpleHttpSecurityBuilder.newInstance(http)
-                    .scope(
-                            "/eureka/**",
-                            "/gui/**"
-                    )
-                    .defaults()
-                    .ignorePersistedSecurity()
-                    .and()
-                    .authorizeRequests()
-                    .anyRequest().permitAll();
+        protected void configure(HttpSecurity http) throws Exception
+        {
+            SimpleHttpSecurityBuilder.newInstance(http).scope("/eureka/**",
+                "/gui/**").defaults().ignorePersistedSecurity().and().authorizeRequests().anyRequest().permitAll();
         }
     }
 
@@ -98,16 +91,13 @@ public class WebSecurityConfig {
      */
     @Configuration
     @Order(3)
-    public static class Order3 extends WebSecurityConfigurerAdapter {
+    public static class Order3 extends WebSecurityConfigurerAdapter
+    {
 
         @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            SimpleHttpSecurityBuilder.newInstance(http)
-                    .scope(
-                            "/auth/**",
-                            "/scalable/**"
-                    )
-                    .permitAll();
+        protected void configure(HttpSecurity http) throws Exception
+        {
+            SimpleHttpSecurityBuilder.newInstance(http).scope("/auth/**", "/scalable/**").permitAll();
         }
     }
 }

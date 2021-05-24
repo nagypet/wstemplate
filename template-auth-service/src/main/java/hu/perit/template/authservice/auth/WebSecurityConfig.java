@@ -44,19 +44,23 @@ import lombok.extern.slf4j.Slf4j;
 
 @EnableWebSecurity
 @Slf4j
-public class WebSecurityConfig {
+public class WebSecurityConfig
+{
 
     /*
      * ============== Order(1) =========================================================================================
      */
     @Configuration
     @Order(1)
-    public static class Order1 extends WebSecurityConfigurerAdapter {
+    public static class Order1 extends WebSecurityConfigurerAdapter
+    {
 
         private final DbAuthenticationProvider dbAuthenticationProvider;
         private final LdapAuthenticationProviderConfigurer ldapAuthenticationProviderConfigurer;
 
-        public Order1(DbAuthenticationProvider dbAuthenticationProvider, LdapAuthenticationProviderConfigurer ldapAuthenticationProviderConfigurer) {
+        public Order1(DbAuthenticationProvider dbAuthenticationProvider,
+            LdapAuthenticationProviderConfigurer ldapAuthenticationProviderConfigurer)
+        {
             this.dbAuthenticationProvider = dbAuthenticationProvider;
             this.ldapAuthenticationProviderConfigurer = ldapAuthenticationProviderConfigurer;
         }
@@ -68,19 +72,21 @@ public class WebSecurityConfig {
          * @throws Exception
          */
         @Autowired
-        public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception
+        {
             SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
             // Admin user
-            if (StringUtils.hasText(securityProperties.getAdminUserName()) && !"disabled".equals(securityProperties.getAdminUserName())) {
+            if (StringUtils.hasText(securityProperties.getAdminUserName()) && !"disabled".equals(securityProperties.getAdminUserName()))
+            {
                 CryptoUtil crypto = new CryptoUtil();
                 PasswordEncoder passwordEncoder = getApplicationContext().getBean(PasswordEncoder.class);
-                auth.inMemoryAuthentication()
-                        .withUser(securityProperties.getAdminUserName())
-                        .password(passwordEncoder.encode(crypto.decrypt(SysConfig.getCryptoProperties().getSecret(), securityProperties.getAdminUserEncryptedPassword())))
-                        .authorities("ROLE_" + Role.ADMIN.name());
+                auth.inMemoryAuthentication().withUser(securityProperties.getAdminUserName()).password(
+                    passwordEncoder.encode(crypto.decrypt(SysConfig.getCryptoProperties().getSecret(),
+                        securityProperties.getAdminUserEncryptedPassword()))).authorities("ROLE_" + Role.ADMIN.name());
             }
-            else {
+            else
+            {
                 log.warn("admin user is disabled!");
             }
 
@@ -93,12 +99,11 @@ public class WebSecurityConfig {
 
 
         @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            SimpleHttpSecurityBuilder.newInstance(http)
-                    .scope(
-                            AuthApi.BASE_URL_AUTHENTICATE
-                    )
-                    .basicAuth();
+        protected void configure(HttpSecurity http) throws Exception
+        {
+            SimpleHttpSecurityBuilder.newInstance(http) //
+                .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**") //
+                .basicAuthWithSession();
 
             http.addFilterAfter(new PostAuthenticationFilter(), SessionManagementFilter.class);
         }
@@ -110,15 +115,15 @@ public class WebSecurityConfig {
      */
     @Configuration
     @Order(2)
-    public static class Order2 extends WebSecurityConfigurerAdapter {
+    public static class Order2 extends WebSecurityConfigurerAdapter
+    {
 
         @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            SimpleHttpSecurityBuilder.newInstance(http)
-                    .scope(
-                            UserApi.BASE_URL_USERS + "/**"
-                    )
-                    .basicAuth(Role.ADMIN.name());
+        protected void configure(HttpSecurity http) throws Exception
+        {
+            SimpleHttpSecurityBuilder.newInstance(http) //
+                .scope(UserApi.BASE_URL_USERS + "/**") //
+                .basicAuth(Role.ADMIN.name());
 
             http.addFilterAfter(new PostAuthenticationFilter(), SessionManagementFilter.class);
         }

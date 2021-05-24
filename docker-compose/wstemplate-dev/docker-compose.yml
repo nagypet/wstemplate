@@ -16,7 +16,7 @@ services:
     #####################################################################################                 
     discovery:
     #####################################################################################                 
-        container_name: discovery
+        container_name: wstemplate-dev_discovery
         image: template-eureka
         environment:
             #agentlib for remote debugging
@@ -26,7 +26,6 @@ services:
         ports:
             - '8400:8400'
             - '5500:5005'
-
         networks: 
             - back-tier-net
             - monitoring
@@ -36,7 +35,7 @@ services:
     #####################################################################################                 
     postgres:
     #####################################################################################                 
-        container_name: postgres
+        container_name: wstemplate-dev_postgres
         image: postgres:10.13-alpine
         environment:
             - POSTGRES_PASSWORD=sa
@@ -52,7 +51,7 @@ services:
     #####################################################################################                 
     pgadmin:
     #####################################################################################                 
-        container_name: pgadmin
+        container_name: wstemplate-dev_pgadmin
         #image: dpage/pgadmin4
         image: thajeztah/pgadmin4
         #environment:
@@ -71,11 +70,11 @@ services:
     #####################################################################################                 
     auth-service:
     #####################################################################################                 
-        container_name: auth-service
+        container_name: wstemplate-dev_auth-service
         image: template-auth-service
         environment:
               - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka
-              - TEMPLATE_AUTH_SERVICE_OPTS=-Dspring.profiles.active=default,dev,discovery,devpgdb
+              - TEMPLATE_AUTH_SERVICE_OPTS=-Dspring.profiles.active=dev,pgdb,discovery
         ports:
             - "8410:8410"
         networks: 
@@ -90,7 +89,7 @@ services:
     #####################################################################################                 
     scalable-service-1:
     #####################################################################################                 
-        container_name: scalable-service-1
+        container_name: wstemplate-dev_scalable-service-1
         image: template-scalable-service
         environment:
             - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -DHOSTNAME=scalable-service-1 -DPORT=8420
@@ -109,7 +108,7 @@ services:
     #####################################################################################                 
     scalable-service-2:
     #####################################################################################                 
-        container_name: scalable-service-2
+        container_name: wstemplate-dev_scalable-service-2
         image: template-scalable-service
         environment:
             - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -DHOSTNAME=scalable-service-2 -DPORT=8430
@@ -128,7 +127,7 @@ services:
     #####################################################################################                 
     scalable-service-3:
     #####################################################################################                 
-        container_name: scalable-service-3
+        container_name: wstemplate-dev_scalable-service-3
         image: template-scalable-service
         environment:
             - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -DHOSTNAME=scalable-service-3 -DPORT=8440
@@ -147,7 +146,7 @@ services:
     #####################################################################################                 
     prometheus:
     #####################################################################################                 
-        container_name: prometheus
+        container_name: wstemplate-dev_prometheus
         image: prometheus
         volumes:
             - prometheus:/prometheus
@@ -170,7 +169,7 @@ services:
     nodeexporter:
     #####################################################################################                 
         image: prom/node-exporter:v0.18.1
-        container_name: nodeexporter
+        container_name: wstemplate-dev_nodeexporter
         volumes:
             - /proc:/host/proc:ro
             - /sys:/host/sys:ro
@@ -193,7 +192,7 @@ services:
     cadvisor:
     #####################################################################################                 
         image: gcr.io/google-containers/cadvisor:v0.36.0
-        container_name: cadvisor
+        container_name: wstemplate-dev_cadvisor
         volumes:
             - /:/rootfs:ro
             - /var/run:/var/run:rw
@@ -212,7 +211,7 @@ services:
     #####################################################################################                 
     grafana:
     #####################################################################################                 
-        container_name: grafana
+        container_name: wstemplate-dev_grafana
         image: grafana
         volumes:
             - grafana:/var/lib/grafana

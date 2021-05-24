@@ -41,48 +41,55 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class DbAuthenticationProvider implements AuthenticationProvider {
+public class DbAuthenticationProvider implements AuthenticationProvider
+{
 
     private final ApplicationContext applicationContext;
     private final UserService userService;
 
-    public DbAuthenticationProvider(ApplicationContext applicationContext, UserService userService) {
+    public DbAuthenticationProvider(ApplicationContext applicationContext, UserService userService)
+    {
         this.applicationContext = applicationContext;
         this.userService = userService;
     }
 
-    private AuthenticatedUser loadUserByUsernameAndPassword(String userName, String password) {
-        try {
+    private AuthenticatedUser loadUserByUsernameAndPassword(String userName, String password)
+    {
+        try
+        {
             UserEntity userEntity = this.userService.getUserEntity(userName, true);
 
             PasswordEncoder passwordEncoder = this.applicationContext.getBean(PasswordEncoder.class);
-            if (!passwordEncoder.matches(password, userEntity.getEncryptedPassword())) {
+            if (!passwordEncoder.matches(password, userEntity.getEncryptedPassword()))
+            {
                 throw new DbAuthenticationException("Invalid user credentials!");
             }
 
-            return AuthenticatedUser.builder()
-                    .username(userEntity.getUserName())
-                    .userId(userEntity.getUserId())
-                    .authorities(userEntity.getRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
-                    .build();
+            return AuthenticatedUser.builder().username(userEntity.getUserName()).userId(userEntity.getUserId()).authorities(
+                userEntity.getRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())).build();
         }
-        catch (RuntimeException | ResourceNotFoundException ex) {
+        catch (RuntimeException | ResourceNotFoundException ex)
+        {
             log.debug("Authentication failed: " + ex.getMessage());
             throw new DbAuthenticationException("Authentication failed!", ex);
         }
     }
 
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        if (!(authentication instanceof UsernamePasswordAuthenticationToken)) {
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException
+    {
+        if (!(authentication instanceof UsernamePasswordAuthenticationToken))
+        {
             throw new UnsupportedOperationException("Only UsernamePasswordAuthenticationToken supported!");
         }
 
-        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken)authentication;
+        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
 
-        AuthenticatedUser authenticatedUser = this.loadUserByUsernameAndPassword((String) token.getPrincipal(), (String) token.getCredentials());
+        AuthenticatedUser authenticatedUser = this.loadUserByUsernameAndPassword((String) token.getPrincipal(),
+            (String) token.getCredentials());
 
-        if (authenticatedUser.getUserId() != 0) {
+        if (authenticatedUser.getUserId() != 0)
+        {
             this.userService.updateLoginTime(authenticatedUser.getUserId());
         }
 
@@ -90,7 +97,8 @@ public class DbAuthenticationProvider implements AuthenticationProvider {
     }
 
     @Override
-    public boolean supports(Class<?> aClass) {
+    public boolean supports(Class<?> aClass)
+    {
         return aClass.equals(UsernamePasswordAuthenticationToken.class);
     }
 }

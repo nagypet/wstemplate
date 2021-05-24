@@ -41,41 +41,54 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
-public class PostAuthenticationFilter extends OncePerRequestFilter {
+public class PostAuthenticationFilter extends OncePerRequestFilter
+{
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+        throws ServletException, IOException
+    {
 
-        try {
+        try
+        {
             AuthorizationService authorizationService = SpringContext.getBean(AuthorizationService.class);
 
             AuthenticatedUser authenticatedUser = authorizationService.getAuthenticatedUser();
-            log.debug(String.format("Authentication succeeded for user: '%s'", authenticatedUser.toString()));
 
-            if (authenticatedUser.getUserId() < 0) {
-                // authenticated from external source
-                AdGroupRoleMapper roleMapper = SpringContext.getBean(AdGroupRoleMapper.class);
-                AuthenticatedUser mappedUser = roleMapper.mapGrantedAuthorities(authenticatedUser);
+            if (!authenticatedUser.isAnonymous())
+            {
+                log.debug(String.format("Authentication succeeded for user: '%s'", authenticatedUser.toString()));
 
-                UserService userService = SpringContext.getBean(UserService.class);
-                mappedUser.setUserId(userService.createAtLogin(mappedUser));
+                if (authenticatedUser.getUserId() < 0)
+                {
+                    // authenticated from external source
+                    AdGroupRoleMapper roleMapper = SpringContext.getBean(AdGroupRoleMapper.class);
+                    AuthenticatedUser mappedUser = roleMapper.mapGrantedAuthorities(authenticatedUser);
 
-                // store in the security context
-                authorizationService.setAuthenticatedUser(mappedUser);
+                    UserService userService = SpringContext.getBean(UserService.class);
+                    mappedUser.setUserId(userService.createAtLogin(mappedUser));
+
+                    // store in the security context
+                    authorizationService.setAuthenticatedUser(mappedUser);
+                }
             }
             filterChain.doFilter(request, response);
         }
-        catch (AuthenticationException ex) {
+        catch (AuthenticationException ex)
+        {
             SecurityContextHolder.clearContext();
             HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-            if (resolver.resolveException(request, response, null, ex) == null) {
+            if (resolver.resolveException(request, response, null, ex) == null)
+            {
                 throw ex;
             }
         }
-        catch (Exception ex) {
+        catch (Exception ex)
+        {
             SecurityContextHolder.clearContext();
             HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-            if (resolver.resolveException(request, response, null, new FilterAuthenticationException("Authentication failed!", ex)) == null) {
+            if (resolver.resolveException(request, response, null, new FilterAuthenticationException("Authentication failed!", ex)) == null)
+            {
                 throw ex;
             }
         }

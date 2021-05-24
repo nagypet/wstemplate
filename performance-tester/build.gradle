@@ -51,7 +51,8 @@ sourceCompatibility = 11
 dependencies {
 	compile project(':spvitamin-core')
 	compile project(':spvitamin-spring-general')
-    compile project(':spvitamin-spring-admin-api')
+    compile project(':spvitamin-spring-security-authservice')
+    compile project(':spvitamin-spring-cloud-client')
     compile project(':spvitamin-spring-cloud-feign')
 
     // Lombok

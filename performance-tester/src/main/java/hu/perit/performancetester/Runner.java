@@ -14,7 +14,7 @@ import hu.perit.spvitamin.core.batchprocessing.BatchJob;
 import hu.perit.spvitamin.core.batchprocessing.BatchProcessor;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
-import hu.perit.spvitamin.spring.rest.client.AuthClient;
+import hu.perit.spvitamin.spring.security.authservice.restclient.AuthClient;
 import lombok.extern.log4j.Log4j;
 
 /**
@@ -23,22 +23,26 @@ import lombok.extern.log4j.Log4j;
 
 @Log4j
 @Component
-public class Runner extends BatchProcessor implements CommandLineRunner {
+public class Runner extends BatchProcessor implements CommandLineRunner
+{
 
     private final TesterProperties testerProperties;
 
-    public Runner(TesterProperties testerProperties) {
+    public Runner(TesterProperties testerProperties)
+    {
         super(testerProperties.getThreadCount());
         this.testerProperties = testerProperties;
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) throws Exception
+    {
         log.debug("Started!");
 
         long startMillis = System.currentTimeMillis();
 
-        while (!Thread.currentThread().isInterrupted() && ((System.currentTimeMillis() - startMillis) / 60000 < this.testerProperties.getDurationMins()))
+        while (!Thread.currentThread().isInterrupted()
+            && ((System.currentTimeMillis() - startMillis) / 60000 < this.testerProperties.getDurationMins()))
         {
             this.runOneBatch();
 
@@ -48,7 +52,8 @@ public class Runner extends BatchProcessor implements CommandLineRunner {
     }
 
 
-    private void runOneBatch() {
+    private void runOneBatch()
+    {
         log.debug("--------------------------------------------------------");
         log.debug("runOneBatch()");
 
@@ -72,16 +77,16 @@ public class Runner extends BatchProcessor implements CommandLineRunner {
         }
         finally
         {
-            double duration = (double)stats.getDuration();
+            double duration = (double) stats.getDuration();
             log.info(String.format("Performance test took: %.2f seconds.", duration / 1000.0));
         }
     }
 
 
-    private AuthorizationToken getAuthorizationToken() {
-        AuthClient authClient = SimpleFeignClientBuilder.newInstance()
-                .requestInterceptor(new BasicAuthRequestInterceptor("admin", "admin"))
-                .build(AuthClient.class, testerProperties.getAuthServiceUrl());
+    private AuthorizationToken getAuthorizationToken()
+    {
+        AuthClient authClient = SimpleFeignClientBuilder.newInstance().requestInterceptor(
+            new BasicAuthRequestInterceptor("admin", "admin")).build(AuthClient.class, testerProperties.getAuthServiceUrl());
 
         return authClient.authenticate(null);
     }
