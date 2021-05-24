@@ -4,25 +4,25 @@
  * Author Peter Nagy <nagy.peter.home@gmail.com>
  */
 
-import { Component, OnInit } from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-about',
   templateUrl: './about.component.html',
-  styleUrls: ['./about.component.css']
+  styleUrls: ['./about.component.scss']
 })
 export class AboutComponent implements OnInit {
 
   constructor(
-    private router: Router, private route: ActivatedRoute
-  ) {}
+    private _location: Location
+  ) {
+  }
 
   ngOnInit() {
   }
 
-  onOk()
-  {
-    this.router.navigate(['/']);
+  onOk() {
+    this._location.back();
   }
 }

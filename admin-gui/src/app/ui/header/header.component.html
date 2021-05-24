@@ -19,10 +19,10 @@
     </div>
   </div>
   <form class="form-inline">
-    <button *ngIf="globalService.isLoggedIn() !== true" type="button" class="btn btn-primary" routerLink="/login"><span class="oi oi-account-login"></span> Login</button>
-    <span *ngIf="globalService.isLoggedIn() === true" class="text-light">Welcome {{globalService.getUserName()}}!</span>
-    <button *ngIf="globalService.isLoggedIn() === true" type="button" class="btn btn-secondary" style="margin: 0 0 0 10px" (click)="onLogout()"><span class="oi oi-account-logout"></span> Logout</button>
-    <a class="nav-item nav-link" routerLink="/about" routerLinkActive="active">About</a>
+    <button *ngIf="authService.isAuthenticated() !== true" type="button" class="btn btn-primary" routerLink="/admin-gui/login"><span class="oi oi-account-login"></span> Login</button>
+    <span *ngIf="authService.isAuthenticated() === true" class="text-light">Welcome {{authService.getUserName()}}!</span>
+    <button *ngIf="authService.isAuthenticated() === true" type="button" class="btn btn-secondary" style="margin: 0 0 0 10px" (click)="onLogout()"><span class="oi oi-account-logout"></span> Logout</button>
+    <a class="nav-item nav-link" routerLink="/admin-gui/about" routerLinkActive="active">About</a>
   </form>
 </nav>
 

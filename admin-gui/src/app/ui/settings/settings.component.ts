@@ -6,16 +6,14 @@
 
 import {Component, OnInit} from '@angular/core';
 import {AdminService} from '../admin.service';
-import {GlobalService} from '../global.service';
+import {AuthService} from '../auth.service';
 
-export class ServerParameter
-{
+export class ServerParameter {
   name: string;
   value: string;
   link: boolean;
 
-  constructor(name, value, link)
-  {
+  constructor(name, value, link) {
     this.name = name;
     this.value = value;
     this.link = this.link;
@@ -25,38 +23,28 @@ export class ServerParameter
 @Component({
   selector: 'app-settings',
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.css']
+  styleUrls: ['./settings.component.scss']
 })
-export class SettingsComponent implements OnInit
-{
+export class SettingsComponent implements OnInit {
   public settings: Array<ServerParameter> = new Array<ServerParameter>();
   public shutdownIsInProgress: boolean = false;
 
   constructor(
     public adminService: AdminService,
-    public globalService: GlobalService
-  )
-  {
+    public authService: AuthService
+  ) {
 
   }
 
-  ngOnInit()
-  {
-    this.adminService.getSettingsSilently().subscribe(data => {
-      console.log("Authentication is not required, settings can be displayed!");
-      this.globalService.setSettingsAvailable(true);
+  ngOnInit() {
+    this.adminService.getSettings().subscribe(data => {
       this.settings = data;
-    }, error => {
-      console.log(error.status + " authentication is required, no settings can be displayed!");
-      this.globalService.setSettingsAvailable(false);
     });
   }
 
-  onShutdown()
-  {
-    this.adminService.postShutdown().subscribe(data =>
-    {
-      console.log(data);
+
+  onShutdown() {
+    this.adminService.postShutdown().subscribe(data => {
       this.shutdownIsInProgress = true;
     });
   }

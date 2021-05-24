@@ -4,3 +4,12 @@
  * Author Peter Nagy <nagy.peter.home@gmail.com>
  */
 
+
+table {
+  table-layout:fixed;
+  width:100%;
+}
+td {
+  overflow:hidden;
+  word-wrap: break-word;
+}

@@ -23,9 +23,11 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.scss"
             ],
-            "scripts": [/*"node_modules/bootstrap/dist/js/bootstrap.bundle.js"*/]
+            "scripts": [
+				/*"node_modules/bootstrap/dist/js/bootstrap.bundle.js"*/
+			]
           },
           "configurations": {
             "production": {
@@ -59,7 +61,8 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "admingui:build"
+            "browserTarget": "admingui:build",
+			"proxyConfig": "src/proxy.conf.js"
           },
           "configurations": {
             "production": {
@@ -81,7 +84,7 @@
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
             "styles": [
-              "src/styles.css"
+              "src/styles.scss"
             ],
             "scripts": [],
             "assets": [

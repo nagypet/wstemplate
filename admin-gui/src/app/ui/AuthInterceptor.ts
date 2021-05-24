@@ -9,7 +9,7 @@ import {HttpErrorResponse, HttpHandler, HttpInterceptor, HttpRequest} from '@ang
 import {catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 import {ToastrService} from 'ngx-toastr';
-import {GlobalService} from './global.service';
+import {AuthService} from './auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor
@@ -17,14 +17,14 @@ export class AuthInterceptor implements HttpInterceptor
 
   constructor(
     private toastr: ToastrService,
-    private globalService: GlobalService
+    private globalService: AuthService
   ) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler)
   {
     /*
     // Authorization header will be inserted in AdminService
-    const token = this.globalService.getToken();
+    const token = this.authService.getToken();
     const authorizationHeader = 'Bearer ' + token;
     console.log('Authorization header: ' + authorizationHeader);
 

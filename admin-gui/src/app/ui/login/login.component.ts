@@ -5,67 +5,56 @@
  */
 
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {AuthService} from '../auth.service';
+import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
-import {AdminService} from '../admin.service';
-import {GlobalService} from '../global.service';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit
-{
-  @ViewChild('usernameInput', { static: true }) usernameInput: ElementRef;
-  @ViewChild('passwordInput', { static: true }) passwordInput: ElementRef;
+export class LoginComponent implements OnInit {
+  @ViewChild('usernameInput', {static: true}) usernameInput: ElementRef;
+  @ViewChild('passwordInput', {static: true}) passwordInput: ElementRef;
+
+  returnUrl: string;
 
   constructor(
-    private router: Router, private route: ActivatedRoute,
-    private adminService: AdminService,
-    private globalService: GlobalService
-) { }
-
-  ngOnInit() {
+    private route: ActivatedRoute,
+    private router: Router,
+    private authService: AuthService
+  ) {
   }
 
-  onLogin()
-  {
+  ngOnInit() {
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+  }
+
+  onLogin() {
     let userName = this.usernameInput.nativeElement.value;
     let password = this.passwordInput.nativeElement.value;
 
-    this.adminService.getAuthenticationToken(userName, password).subscribe(data  =>
-    {
-      console.log(data);
-      this.globalService.login(userName, data.jwt);
-
-      this.router.navigate(['/']);
+    this.authService.authenticateWithUserNamePassword(userName, password).subscribe(data => {
+      this.router.navigateByUrl(this.returnUrl);
     });
 
   }
 
-  onCancel()
-  {
-    this.adminService.logout().subscribe(res => {
-      location.reload();
-    },err => {
-      console.log(err);
+  onCancel() {
+    this.authService.logout().subscribe(res => {
+      //location.reload();
     });
 
-    this.globalService.logout();
-
-    this.router.navigate(['/']);
+    this.router.navigateByUrl('/');
   }
 
 
-  onKeyPress(event: KeyboardEvent)
-  {
+  onKeyPress(event: KeyboardEvent) {
     //console.log("onKeyPress " + event.key);
-    if (event.key === 'Enter')
-    {
+    if (event.key === 'Enter') {
       this.onLogin();
-    }
-    else if (event.key === 'Escape')
-    {
+    } else if (event.key === 'Escape') {
       this.onCancel();
     }
   }

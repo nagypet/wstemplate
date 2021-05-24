@@ -6,16 +6,16 @@
 
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {AdminService} from '../admin.service';
-import {GlobalService} from '../global.service';
+import {AuthService} from '../auth.service';
 import {CertificateFile, KeystoreEntry} from '../../modell/keystore';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-certificates',
   templateUrl: './certificates.component.html',
-  styleUrls: ['./certificates.component.css']
+  styleUrls: ['./certificates.component.scss']
 })
-export class CertificatesComponent implements OnInit
-{
+export class CertificatesComponent implements OnInit {
   @Input('KeystoreType') keystoreType: string;
   @ViewChild('fileInput') fileInput: ElementRef;
   @ViewChild('passwordInput') passwordInput: ElementRef;
@@ -33,58 +33,49 @@ export class CertificatesComponent implements OnInit
 
   constructor(
     public adminService: AdminService,
-    public globalService: GlobalService
-  )
-  {
+    public authService: AuthService,
+    private router: Router,
+  ) {
     this.certFile = null;
     this.setCertFileName();
     this.certFileOpen = false;
   }
 
-  ngOnInit()
-  {
-    if (this.globalService.isLoggedIn())
-    {
-      if (this.keystoreType === 'keystore')
-      {
+  ngOnInit() {
+    if (this.authService.isAuthenticated()) {
+      if (this.keystoreType === 'keystore' || this.router.url === '/admin-gui/keystore') {
+        this.keystoreType = 'keystore';
         this.loadKeystoreEntries();
       }
-      else
-      {
+      else {
+        this.keystoreType = 'truststore';
         this.loadTruststoreEntries();
       }
     }
   }
 
 
-  loadKeystoreEntries()
-  {
-    this.adminService.getKeystore().subscribe(data =>
-    {
+  loadKeystoreEntries() {
+    this.adminService.getKeystore().subscribe(data => {
       this.keystoreEntries = new Array<KeystoreEntry>();
-      for (let entry of data)
-      {
+      for (let entry of data) {
         this.keystoreEntries.push(new KeystoreEntry(entry.alias, entry.password, entry.inUse, entry.type, entry.valid, entry.chain));
       }
     });
   }
 
 
-  loadTruststoreEntries()
-  {
-    this.adminService.getTruststore().subscribe(data =>
-    {
+  loadTruststoreEntries() {
+    this.adminService.getTruststore().subscribe(data => {
       this.keystoreEntries = new Array<KeystoreEntry>();
-      for (let entry of data)
-      {
+      for (let entry of data) {
         this.keystoreEntries.push(new KeystoreEntry(entry.alias, entry.password, entry.inUse, entry.type, entry.valid, entry.chain));
       }
     });
   }
 
 
-  onFileSelected(event)
-  {
+  onFileSelected(event) {
     console.log(event);
 
     let fileList: FileList = this.fileInput.nativeElement.files;
@@ -95,43 +86,35 @@ export class CertificatesComponent implements OnInit
   }
 
 
-  onOpen()
-  {
-    if (this.certFile !== null)
-    {
+  onOpen() {
+    if (this.certFile !== null) {
       let fileReader = new FileReader();
-      fileReader.onload = (e) =>
-      {
+      fileReader.onload = (e) => {
         this.getCertFileEntries(<ArrayBuffer>fileReader.result);
       };
       fileReader.readAsArrayBuffer(this.certFile);
     }
   }
 
-  arrayBufferToBase64(buffer)
-  {
+  arrayBufferToBase64(buffer) {
     let binary = '';
     let bytes = new Uint8Array(buffer);
     let len = bytes.byteLength;
-    for (let i = 0; i < len; i++)
-    {
+    for (let i = 0; i < len; i++) {
       binary += String.fromCharCode(bytes[i]);
     }
     return window.btoa(binary);
   }
 
-  getCertFileEntries(fileReaderResult: ArrayBuffer)
-  {
+  getCertFileEntries(fileReaderResult: ArrayBuffer) {
     let b64 = this.arrayBufferToBase64(fileReaderResult);
 
     this.certFilePassword = this.passwordInput.nativeElement.value;
     let cert = new CertificateFile(b64, this.certFilePassword);
 
     this.certFileEntries = new Array<KeystoreEntry>();
-    this.adminService.getEntriesFromCert(cert).subscribe(data =>
-    {
-      for (let entry of data)
-      {
+    this.adminService.getEntriesFromCert(cert).subscribe(data => {
+      for (let entry of data) {
         this.certFileEntries.push(new KeystoreEntry(entry.alias, entry.password, entry.inUse, entry.type, entry.valid, entry.chain));
       }
       this.certFileOpen = true;
@@ -139,17 +122,14 @@ export class CertificatesComponent implements OnInit
   }
 
 
-  importCertificateIntoKeystore(fileReaderResult: ArrayBuffer)
-  {
+  importCertificateIntoKeystore(fileReaderResult: ArrayBuffer) {
     let b64 = this.arrayBufferToBase64(fileReaderResult);
 
     let cert = new CertificateFile(b64, this.certFilePassword);
 
-    this.adminService.importCertificateIntoKeystore(cert, this.selectedCertFileEntry.alias).subscribe(data =>
-    {
+    this.adminService.importCertificateIntoKeystore(cert, this.selectedCertFileEntry.alias).subscribe(data => {
       this.keystoreEntries = new Array<KeystoreEntry>();
-      for (let entry of data)
-      {
+      for (let entry of data) {
         this.keystoreEntries.push(new KeystoreEntry(entry.alias, entry.password, entry.inUse, entry.type, entry.valid, entry.chain));
       }
       this.certFileOpen = true;
@@ -157,17 +137,14 @@ export class CertificatesComponent implements OnInit
   }
 
 
-  importCertificateIntoTruststore(fileReaderResult: ArrayBuffer)
-  {
+  importCertificateIntoTruststore(fileReaderResult: ArrayBuffer) {
     let b64 = this.arrayBufferToBase64(fileReaderResult);
 
     let cert = new CertificateFile(b64, this.certFilePassword);
 
-    this.adminService.importCertificateIntoTruststore(cert, this.selectedCertFileEntry.alias).subscribe(data =>
-    {
+    this.adminService.importCertificateIntoTruststore(cert, this.selectedCertFileEntry.alias).subscribe(data => {
       this.keystoreEntries = new Array<KeystoreEntry>();
-      for (let entry of data)
-      {
+      for (let entry of data) {
         this.keystoreEntries.push(new KeystoreEntry(entry.alias, entry.password, entry.inUse, entry.type, entry.valid, entry.chain));
       }
       this.certFileOpen = true;
@@ -175,8 +152,7 @@ export class CertificatesComponent implements OnInit
   }
 
 
-  onClose()
-  {
+  onClose() {
     this.certFile = null;
     this.certFileOpen = false;
     this.certFileEntries = new Array<KeystoreEntry>();
@@ -184,47 +160,36 @@ export class CertificatesComponent implements OnInit
   }
 
 
-  isCertFileOpen(): boolean
-  {
+  isCertFileOpen(): boolean {
     return this.certFileOpen;
   }
 
 
-  setCertFileName()
-  {
-    if (this.certFile !== null)
-    {
+  setCertFileName() {
+    if (this.certFile !== null) {
       this.certFileName = this.certFile.name;
     }
-    else
-    {
+    else {
       this.certFileName = 'Choose file';
     }
   }
 
 
-  onImport()
-  {
+  onImport() {
     //console.log('Uploading: ' + this.certFileName + ', password: ' + this.certFilePassword + ', alias: ' + this.selectedCertFileEntry.alias)
-    if (this.keystoreType === 'keystore')
-    {
-      if (this.certFile !== null)
-      {
+    if (this.keystoreType === 'keystore') {
+      if (this.certFile !== null) {
         let fileReader = new FileReader();
-        fileReader.onload = (e) =>
-        {
+        fileReader.onload = (e) => {
           this.importCertificateIntoKeystore(<ArrayBuffer>fileReader.result);
         };
         fileReader.readAsArrayBuffer(this.certFile);
       }
     }
-    else
-    {
-      if (this.certFile !== null)
-      {
+    else {
+      if (this.certFile !== null) {
         let fileReader = new FileReader();
-        fileReader.onload = (e) =>
-        {
+        fileReader.onload = (e) => {
           this.importCertificateIntoTruststore(<ArrayBuffer>fileReader.result);
         };
         fileReader.readAsArrayBuffer(this.certFile);
@@ -233,32 +198,24 @@ export class CertificatesComponent implements OnInit
   }
 
 
-  onCertSelected(entry: KeystoreEntry)
-  {
+  onCertSelected(entry: KeystoreEntry) {
     this.selectedCertFileEntry = entry;
   }
 
 
-  onDelete(alias: string)
-  {
-    if (this.keystoreType === 'keystore')
-    {
-      this.adminService.removeCertificateFromKeystore(alias).subscribe(data =>
-      {
+  onDelete(alias: string) {
+    if (this.keystoreType === 'keystore') {
+      this.adminService.removeCertificateFromKeystore(alias).subscribe(data => {
         this.keystoreEntries = new Array<KeystoreEntry>();
-        for (let entry of data)
-        {
+        for (let entry of data) {
           this.keystoreEntries.push(new KeystoreEntry(entry.alias, entry.password, entry.inUse, entry.type, entry.valid, entry.chain));
         }
       });
     }
-    else
-    {
-      this.adminService.removeCertificateFromTruststore(alias).subscribe(data =>
-      {
+    else {
+      this.adminService.removeCertificateFromTruststore(alias).subscribe(data => {
         this.keystoreEntries = new Array<KeystoreEntry>();
-        for (let entry of data)
-        {
+        for (let entry of data) {
           this.keystoreEntries.push(new KeystoreEntry(entry.alias, entry.password, entry.inUse, entry.type, entry.valid, entry.chain));
         }
       });
