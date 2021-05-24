@@ -14,7 +14,7 @@ import {CertificatesComponent} from './certificates/certificates.component';
 import {RouterModule, Routes} from '@angular/router';
 import {AdminService} from './admin.service';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
-import {AuthInterceptor} from './AuthInterceptor';
+import {AuthInterceptor} from './auth/AuthInterceptor';
 import {ToastrModule} from 'ngx-toastr';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {LoginComponent} from './login/login.component';
@@ -23,8 +23,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {KeystoreComponent, NgbdModalContent} from './certificates/keystore/keystore.component';
 import {AboutComponent} from './about/about.component';
 import {TabSetComponent} from './tab-set/tab-set.component';
-import {AuthGuard} from './auth.guard';
-import {AuthService} from './auth.service';
+import {AuthGuard} from './auth/auth.guard';
+import {AuthService} from './auth/auth.service';
 import {getAuthentication, tryGetSettings} from './auth/init/auth-init.factory';
 
 

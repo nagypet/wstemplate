@@ -6,7 +6,7 @@
 
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {AdminService} from '../admin.service';
-import {AuthService} from '../auth.service';
+import {AuthService} from '../auth/auth.service';
 import {CertificateFile, KeystoreEntry} from '../../modell/keystore';
 import {Router} from '@angular/router';
 

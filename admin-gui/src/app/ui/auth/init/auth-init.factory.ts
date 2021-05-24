@@ -1,4 +1,4 @@
-import {AuthService} from '../../auth.service';
+import {AuthService} from '../auth.service';
 
 export function getAuthentication(authService: AuthService) {
   return () => {

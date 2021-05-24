@@ -7,8 +7,8 @@
 import {Injectable} from '@angular/core';
 import {HttpBackend, HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {AdminService} from './admin.service';
 import {tap} from 'rxjs/operators';
+import {AdminService} from '../admin.service';
 
 
 @Injectable({

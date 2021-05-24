@@ -5,7 +5,7 @@
  */
 
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {AuthService} from '../auth.service';
+import {AuthService} from '../auth/auth.service';
 import {Location} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 
