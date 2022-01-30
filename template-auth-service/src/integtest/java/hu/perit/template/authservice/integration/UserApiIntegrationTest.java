@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import hu.perit.spvitamin.spring.config.LocalUserProperties;
+import hu.perit.spvitamin.spring.config.SpringContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,7 +58,8 @@ import lombok.extern.slf4j.Slf4j;
 @ActiveProfiles({"default", "integtest"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Slf4j
-public class UserApiIntegrationTest {
+public class UserApiIntegrationTest
+{
 
     @Autowired
     private InputUserList inputUserListFromCSV;
@@ -64,18 +67,20 @@ public class UserApiIntegrationTest {
     private TemplateAuthClient templateAuthClient;
 
     @BeforeEach
-    void setUp() {
-        try {
-            SecurityProperties securityProperties = SysConfig.getSecurityProperties();
-            CryptoUtil crypto = new CryptoUtil();
+    void setUp()
+    {
+        try
+        {
+            LocalUserProperties localUserProperties = SpringContext.getBean(LocalUserProperties.class);
 
             this.templateAuthClient = SimpleFeignClientBuilder.newInstance()
                     .requestInterceptor(new BasicAuthRequestInterceptor(
-                            securityProperties.getAdminUserName(),
-                            crypto.decrypt(SysConfig.getCryptoProperties().getSecret(), securityProperties.getAdminUserEncryptedPassword())))
+                            "admin",
+                            localUserProperties.getLocaluser().get("admin").getPassword()))
                     .build(TemplateAuthClient.class, SysConfig.getServerProperties().getServiceUrl());
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException e)
+        {
             log.error(StackTracer.toString(e));
             Assertions.fail(e.toString());
         }
@@ -83,16 +88,19 @@ public class UserApiIntegrationTest {
 
 
     @Test
-    void testUserMgmtEndpoints() throws IOException {
+    void testUserMgmtEndpoints() throws IOException
+    {
         log.debug("-----------------------------------------------------------------------------------------------------");
         log.debug("testUserMgmtEndpoints()");
 
-        try {
+        try
+        {
             this.inputUserListFromCSV.loadFromFile();
 
             // Creating users
             Map<String, CreateUserParams> inputUsers = new HashMap<>();
-            for (Map<String, String> item : this.inputUserListFromCSV) {
+            for (Map<String, String> item : this.inputUserListFromCSV)
+            {
 
                 CreateUserParams createUserParams = CreateUserParams.builder()
                         .userName(item.get("userName"))
@@ -118,12 +126,14 @@ public class UserApiIntegrationTest {
             Assertions.assertTrue(allUsers.size() >= 3 && allUsers.size() <= 4);
 
             // Retrieving user details
-            for (UserDTOFiltered item : allUsers) {
+            for (UserDTOFiltered item : allUsers)
+            {
                 UserDTO userById = this.templateAuthClient.getUserById("123", item.getUserId());
                 log.debug(userById.toString());
 
                 CreateUserParams inputUser = inputUsers.get(userById.getUserName());
-                if (inputUser != null) {
+                if (inputUser != null)
+                {
                     Assertions.assertEquals(inputUser.getDisplayName(), userById.getDisplayName());
                     Assertions.assertEquals(inputUser.getActive(), userById.getActive());
                     Assertions.assertEquals(inputUser.getAddress(), userById.getAddress());
@@ -135,7 +145,8 @@ public class UserApiIntegrationTest {
             }
 
             // Updateing users
-            for (UserDTOFiltered item : allUsers) {
+            for (UserDTOFiltered item : allUsers)
+            {
                 // get original user
                 UserDTO originalUser = this.templateAuthClient.getUserById("123", item.getUserId());
                 log.debug("original: " + originalUser.toString());
@@ -144,7 +155,8 @@ public class UserApiIntegrationTest {
                 UpdateUserParams updateUserParams = UpdateUserParams.builder()
                         .displayName("alma")
                         .build();
-                if (!item.getExternal()) {
+                if (!item.getExternal())
+                {
                     this.templateAuthClient.updateUser("123", item.getUserId(), updateUserParams);
 
                     UserDTO updatedUser = this.templateAuthClient.getUserById("123", item.getUserId());
@@ -155,17 +167,21 @@ public class UserApiIntegrationTest {
                     // Check if other properties are unchanged
                     Assertions.assertEquals(originalUser.getAddress(), updatedUser.getAddress());
                 }
-                else {
+                else
+                {
                     Assertions.assertThrows(CannotProcessException.class, () -> this.templateAuthClient.updateUser("123", item.getUserId(), updateUserParams));
                 }
             }
 
             // Removing users
-            for (UserDTOFiltered item : allUsers) {
-                if (!item.getExternal()) {
+            for (UserDTOFiltered item : allUsers)
+            {
+                if (!item.getExternal())
+                {
                     this.templateAuthClient.deleteUser("123", item.getUserId());
                 }
-                else {
+                else
+                {
                     Assertions.assertThrows(CannotProcessException.class, () -> this.templateAuthClient.deleteUser("123", item.getUserId()));
                 }
             }
@@ -174,7 +190,8 @@ public class UserApiIntegrationTest {
             allUsers = this.templateAuthClient.getAllUsers("123");
             Assertions.assertEquals(1, allUsers.size());
         }
-        catch (RuntimeException e) {
+        catch (RuntimeException e)
+        {
             log.error(StackTracer.toString(e));
             Assertions.fail(e.toString());
         }

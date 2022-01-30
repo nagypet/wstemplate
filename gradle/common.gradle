@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import groovy.text.SimpleTemplateEngine
 
 group = 'hu.perit'
 
@@ -38,6 +40,7 @@ if (project.hasProperty('compileJava')) {
 	compileJava {
 		options.compilerArgs << '--add-exports'
 		options.compilerArgs << 'java.base/sun.security.ssl=ALL-UNNAMED'
+		options.encoding = 'UTF-8'
 	}
 }
 
@@ -60,6 +63,20 @@ task dist {
 	}
 	else if (project.hasProperty('jar')) {
 		dependsOn 'jar'
+	}
+}
+
+
+task distWindowsService {
+    group 'fmake'
+	
+	if (project.hasProperty('test')) {
+		dependsOn 'test'
+	}
+	
+	if (project.hasProperty('installBootDist')) {
+		dependsOn 'installBootDist'
+		dependsOn 'updateServiceXml'
 	}
 }
 
@@ -128,8 +145,16 @@ configurations {
 
 task prepareIntegTest(type: Copy) {
     group 'fmake'
-    from "src/main/dist/bin"
+
+	from "src/main/dist/bin"
     into "${projectDir}/build/resources/integtest"
+}
+
+task prepareIntegTestInEclipse(type: Copy) {
+    group 'fmake'
+
+	from "src/main/dist/bin"
+    into "${projectDir}/bin/integtest"
 }
 
 task integtest(type: Test) {
@@ -198,8 +223,8 @@ if (project.hasProperty('bootJar')) {
 if (project.hasProperty('archivesBaseName')) {
 	task finalizeInstallBootDist(type: Copy) {
 		group 'fmake'
-		from "src/main/dist/bin"
-		into "${buildDir}/install/${archivesBaseName}-boot/bin"
+		from "src/main/dist"
+		into "${buildDir}/install/${archivesBaseName}-boot"
 	}
 }
 
@@ -208,6 +233,43 @@ if (project.hasProperty('installBootDist')) {
 }
 
 
+/********************************************************************************************************
+ * updateServiceXml
+ *******************************************************************************************************/
+if (project.hasProperty('archivesBaseName')) {
+	task updateServiceXml() {
+		group 'fmake'
+		description 'Update service xml'
+
+		dependsOn 'installBootDist'
+
+		def serviceFile = new File("${buildDir}/install/${archivesBaseName}-boot/${project.name}-service.xml")
+		def serviceFileName = serviceFile.toString()
+
+		doFirst {
+			if (serviceFile.exists()) {
+				println("> Updating ${serviceFileName} with jarname: ${project.name}-${version}.jar")
+
+				def binding = [
+						JARNAME_PLACEHOLDER: "${project.name}-${version}.jar"
+				]
+
+				def engine = new SimpleTemplateEngine()
+				def template = engine.createTemplate(serviceFile.text).make(binding)
+
+				serviceFile.write template.toString()
+			} else {
+				println("> ${serviceFileName} not found!")
+			}
+		}
+
+		outputs.upToDateWhen {
+			// Ha nem létezik, akkor up-to-date a task
+			!(new File(serviceFileName).exists())
+		}
+	}
+}
+
 
 /********************************************************************************************************
  * Application
@@ -215,7 +277,7 @@ if (project.hasProperty('installBootDist')) {
 if (project.hasProperty('application')) {
 	application {
 		if (applicationDefaultJvmArgs.isEmpty()) {
-			applicationDefaultJvmArgs = ['-XX:+UseG1GC', '-Dlog4j.configuration=file:log4j.properties', '-Djava.net.preferIPv4Stack=true', '-Duser.country=US', '-Duser.language=en', '-Dorg.freemarker.loggerLibrary=none']
+			applicationDefaultJvmArgs = ['-XX:+UseG1GC', '-Djava.net.preferIPv4Stack=true', '-Duser.country=US', '-Duser.language=en', '-Dorg.freemarker.loggerLibrary=none']
 		}
 	}
 }
@@ -252,6 +314,12 @@ task prepareRunInIDEA(type: Copy) {
     group 'fmake'
     from "src/main/dist/bin"
     into "${projectDir}/out/production/resources"
+}
+
+task prepareRunInIDEA2021(type: Copy) {
+	group 'fmake'
+	from "src/main/dist/bin"
+	into "${projectDir}/build/resources/main"
 }
 
 
@@ -304,3 +372,4 @@ if (project.hasProperty('jacocoTestReport')) {
 		}
 	}
 }
+

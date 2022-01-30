@@ -16,6 +16,8 @@
 
 package hu.perit.template.authservice.integration;
 
+import hu.perit.spvitamin.spring.config.LocalUserProperties;
+import hu.perit.spvitamin.spring.config.SpringContext;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,28 +41,30 @@ import lombok.extern.slf4j.Slf4j;
 @ActiveProfiles({"default", "integtest"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Slf4j
-class AuthApiIntegrationTest {
+class AuthApiIntegrationTest
+{
 
     @Test
-    void testRestEndpoint_withCorrectCredentials_whenUsing_DaoAuthenticationProvider() {
+    void testRestEndpoint_withCorrectCredentials_whenUsing_DaoAuthenticationProvider()
+    {
         log.debug("-----------------------------------------------------------------------------------------------------");
         log.debug("testRestEndpoint_withCorrectCredentials_whenUsing_DaoAuthenticationProvider()");
 
-        try {
-            SecurityProperties securityProperties = SysConfig.getSecurityProperties();
-            CryptoUtil crypto = new CryptoUtil();
+        try
+        {
+            LocalUserProperties localUserProperties = SpringContext.getBean(LocalUserProperties.class);
 
             TemplateAuthClient templateAuthClient = SimpleFeignClientBuilder.newInstance()
                     .requestInterceptor(new BasicAuthRequestInterceptor(
-                            securityProperties.getAdminUserName(),
-                            crypto.decrypt(SysConfig.getCryptoProperties().getSecret(), securityProperties.getAdminUserEncryptedPassword())))
-                    .build(TemplateAuthClient.class, SysConfig.getServerProperties().getServiceUrl());
+                            "admin", localUserProperties.getLocaluser().get("admin").getPassword()))
+                            .build(TemplateAuthClient.class, SysConfig.getServerProperties().getServiceUrl());
 
             // Calling the authentication endpoint
             AuthorizationToken authentication = templateAuthClient.authenticate(null);
             log.debug(authentication.getJwt());
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             log.error(StackTracer.toString(e));
             Assertions.fail(e.toString());
         }
@@ -68,7 +72,8 @@ class AuthApiIntegrationTest {
 
 
     @Test
-    void testRestEndpoint_withIncorrectUsername_whenUsing_DaoAuthenticationProvider() {
+    void testRestEndpoint_withIncorrectUsername_whenUsing_DaoAuthenticationProvider()
+    {
         log.debug("-----------------------------------------------------------------------------------------------------");
         log.debug("testRestEndpoint_withIncorrectUsername_whenUsing_DaoAuthenticationProvider()");
 
@@ -83,7 +88,8 @@ class AuthApiIntegrationTest {
 
 
     @Test
-    void testRestEndpoint_withIncorrectPassword_whenUsing_DaoAuthenticationProvider() {
+    void testRestEndpoint_withIncorrectPassword_whenUsing_DaoAuthenticationProvider()
+    {
         log.debug("-----------------------------------------------------------------------------------------------------");
         log.debug("testRestEndpoint_withIncorrectPassword_whenUsing_DaoAuthenticationProvider()");
 

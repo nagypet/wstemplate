@@ -14,7 +14,7 @@ WORKDIR /usr/src/scalable-service
 EXPOSE 8420
 
 COPY ./dependencies ./lib
-COPY ./snapshot-dependencies ./lib
+COPY ./snapshot-dependencies* ./lib
 COPY ./bin ./bin
 COPY ./application ./lib
 

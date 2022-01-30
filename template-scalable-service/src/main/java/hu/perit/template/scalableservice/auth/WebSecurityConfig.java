@@ -16,6 +16,7 @@
 
 package hu.perit.template.scalableservice.auth;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -45,16 +46,11 @@ public class WebSecurityConfig
      */
     @Configuration
     @Order(1)
+    @RequiredArgsConstructor
     public static class Order1 extends WebSecurityConfigurerAdapter
     {
 
-        private final AuthenticationProvider authServiceAuthenticationProvider;
-
-        public Order1(AuthServiceAuthenticationProviderWithRestTemplate authServiceAuthenticationProvider)
-        {
-            this.authServiceAuthenticationProvider = authServiceAuthenticationProvider;
-        }
-
+        private final AuthServiceAuthenticationProviderWithRestTemplate authServiceAuthenticationProvider;
 
         @Autowired
         public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception

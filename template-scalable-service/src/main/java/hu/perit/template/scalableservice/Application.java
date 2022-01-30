@@ -33,9 +33,11 @@ import org.springframework.context.annotation.Profile;
 @EnableEurekaClient
 @ComponentScan(basePackages = {"hu.perit.spvitamin", "hu.perit.template.scalableservice"})
 @Log4j
-public class Application {
+public class Application
+{
 
-    public static void main(String[] args) { // NOSONAR
+    public static void main(String[] args)
+    { // NOSONAR
         SpringApplication application = new SpringApplication(Application.class);
         application.addListeners(new EnvironmentPostProcessor());
         application.run(args);

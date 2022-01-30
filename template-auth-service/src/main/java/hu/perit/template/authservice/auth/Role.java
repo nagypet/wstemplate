@@ -23,5 +23,6 @@ package hu.perit.template.authservice.auth;
 public enum Role {
 
     ADMIN,
-    PUBLIC
+    PUBLIC,
+    EMPTY
 }

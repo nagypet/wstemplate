@@ -22,7 +22,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
-import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
 
@@ -34,12 +33,14 @@ import org.springframework.context.annotation.Profile;
 @SpringBootApplication
 @EnableEurekaServer
 @EnableEurekaClient
-@EnableZuulProxy
+//@EnableZuulProxy
 @ComponentScan(basePackages = {"hu.perit.spvitamin", "hu.perit.template.eureka"})
 @Log4j
-public class Application {
+public class Application
+{
 
-    public static void main(String[] args) { // NOSONAR
+    public static void main(String[] args)
+    { // NOSONAR
         SpringApplication application = new SpringApplication(Application.class);
         application.addListeners(new EnvironmentPostProcessor());
         application.run(args);

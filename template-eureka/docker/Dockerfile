@@ -14,7 +14,7 @@ WORKDIR /usr/src/eureka
 EXPOSE 8400
 
 COPY ./dependencies ./lib
-COPY ./snapshot-dependencies ./lib
+COPY ./snapshot-dependencies* ./lib
 COPY ./bin ./bin
 COPY ./application ./lib
 

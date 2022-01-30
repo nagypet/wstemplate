@@ -14,28 +14,21 @@ networks:
 services: 
     
     #####################################################################################                 
-    discovery:
+    ldap:
     #####################################################################################                 
-        container_name: wstemplate-dev_discovery
-        image: template-eureka
-        environment:
-            #agentlib for remote debugging
-            - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
-            - TEMPLATE_EUREKA_OPTS=-Dspring.profiles.active=default,dev,discovery
-            - EUREKA_ENVIRONMENT_PROFILE=dev
+        container_name: wstemplate-dev-ldap
+        image: petyaba/ldap
+        restart: unless-stopped
         ports:
-            - '8400:8400'
-            - '5500:5005'
-        networks: 
+            - "10389:10389"
+        networks:
             - back-tier-net
-            - monitoring
-        hostname: 'discovery'
-  
-  
+
+            
     #####################################################################################                 
     postgres:
     #####################################################################################                 
-        container_name: wstemplate-dev_postgres
+        container_name: wstemplate-dev-postgres
         image: postgres:10.13-alpine
         environment:
             - POSTGRES_PASSWORD=sa
@@ -51,7 +44,7 @@ services:
     #####################################################################################                 
     pgadmin:
     #####################################################################################                 
-        container_name: wstemplate-dev_pgadmin
+        container_name: wstemplate-dev-pgadmin
         #image: dpage/pgadmin4
         image: thajeztah/pgadmin4
         #environment:
@@ -68,13 +61,35 @@ services:
       
   
     #####################################################################################                 
+    discovery:
+    #####################################################################################                 
+        container_name: wstemplate-dev-discovery
+        image: wstemplate-template-eureka
+        environment:
+            #agentlib for remote debugging
+            - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+            #- TEMPLATE_EUREKA_OPTS=-Dspring.profiles.active=docker
+            - EUREKA_ENVIRONMENT_PROFILE=dev
+        ports:
+            - '8400:8400'
+            - '5501:5005'
+        networks: 
+            - back-tier-net
+            - monitoring
+        depends_on:
+            - ldap 
+            - postgres
+        hostname: 'discovery'
+  
+  
+    #####################################################################################                 
     auth-service:
     #####################################################################################                 
-        container_name: wstemplate-dev_auth-service
-        image: template-auth-service
+        container_name: wstemplate-dev-auth-service
+        image: wstemplate-template-auth-service
         environment:
               - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka
-              - TEMPLATE_AUTH_SERVICE_OPTS=-Dspring.profiles.active=dev,pgdb,discovery
+              #- TEMPLATE_AUTH_SERVICE_OPTS=-Dspring.profiles.active=pgdb
         ports:
             - "8410:8410"
         networks: 
@@ -89,11 +104,11 @@ services:
     #####################################################################################                 
     scalable-service-1:
     #####################################################################################                 
-        container_name: wstemplate-dev_scalable-service-1
-        image: template-scalable-service
+        container_name: wstemplate-dev-scalable-service-1
+        image: wstemplate-template-scalable-service
         environment:
             - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -DHOSTNAME=scalable-service-1 -DPORT=8420
-            - TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=default,dev,discovery
+            - TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=docker
         ports:
             - "8420:8420"
         networks: 
@@ -108,11 +123,11 @@ services:
     #####################################################################################                 
     scalable-service-2:
     #####################################################################################                 
-        container_name: wstemplate-dev_scalable-service-2
-        image: template-scalable-service
+        container_name: wstemplate-dev-scalable-service-2
+        image: wstemplate-template-scalable-service
         environment:
             - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -DHOSTNAME=scalable-service-2 -DPORT=8430
-            - TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=default,dev,discovery
+            - TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=docker
         ports:
             - "8430:8430"
         networks: 
@@ -127,11 +142,11 @@ services:
     #####################################################################################                 
     scalable-service-3:
     #####################################################################################                 
-        container_name: wstemplate-dev_scalable-service-3
-        image: template-scalable-service
+        container_name: wstemplate-dev-scalable-service-3
+        image: wstemplate-template-scalable-service
         environment:
             - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -DHOSTNAME=scalable-service-3 -DPORT=8440
-            - TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=default,dev,discovery
+            - TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=docker
         ports:
             - "8440:8440"
         networks: 

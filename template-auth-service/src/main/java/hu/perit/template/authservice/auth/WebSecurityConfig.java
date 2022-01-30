@@ -16,6 +16,9 @@
 
 package hu.perit.template.authservice.auth;
 
+import hu.perit.spvitamin.spring.config.LocalUserProperties;
+import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -36,6 +39,8 @@ import hu.perit.spvitamin.spring.security.ldap.LdapAuthenticationProviderConfigu
 import hu.perit.template.authservice.rest.api.UserApi;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Map;
+
 /**
  * #know-how:simple-httpsecurity-builder
  *
@@ -52,18 +57,14 @@ public class WebSecurityConfig
      */
     @Configuration
     @Order(1)
+    @RequiredArgsConstructor
     public static class Order1 extends WebSecurityConfigurerAdapter
     {
 
         private final DbAuthenticationProvider dbAuthenticationProvider;
         private final LdapAuthenticationProviderConfigurer ldapAuthenticationProviderConfigurer;
-
-        public Order1(DbAuthenticationProvider dbAuthenticationProvider,
-            LdapAuthenticationProviderConfigurer ldapAuthenticationProviderConfigurer)
-        {
-            this.dbAuthenticationProvider = dbAuthenticationProvider;
-            this.ldapAuthenticationProviderConfigurer = ldapAuthenticationProviderConfigurer;
-        }
+        private final LocalUserProperties localUserProperties;
+        private final PasswordEncoder passwordEncoder;
 
         /**
          * This is a global configuration, will be applied to all oder configurer adapters
@@ -76,18 +77,28 @@ public class WebSecurityConfig
         {
             SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
-            // Admin user
-            if (StringUtils.hasText(securityProperties.getAdminUserName()) && !"disabled".equals(securityProperties.getAdminUserName()))
+            // Local users for test reasons
+            for (Map.Entry<String, LocalUserProperties.User> userEntry : localUserProperties.getLocaluser().entrySet())
             {
-                CryptoUtil crypto = new CryptoUtil();
-                PasswordEncoder passwordEncoder = getApplicationContext().getBean(PasswordEncoder.class);
-                auth.inMemoryAuthentication().withUser(securityProperties.getAdminUserName()).password(
-                    passwordEncoder.encode(crypto.decrypt(SysConfig.getCryptoProperties().getSecret(),
-                        securityProperties.getAdminUserEncryptedPassword()))).authorities("ROLE_" + Role.ADMIN.name());
-            }
-            else
-            {
-                log.warn("admin user is disabled!");
+
+                log.warn(String.format("local user name: '%s'", userEntry.getKey()));
+
+                String password = null;
+                if (userEntry.getValue().getEncryptedPassword() != null)
+                {
+                    CryptoUtil crypto = new CryptoUtil();
+
+                    password = crypto.decrypt(SysConfig.getCryptoProperties().getSecret(), userEntry.getValue().getEncryptedPassword());
+                }
+                else
+                {
+                    password = userEntry.getValue().getPassword();
+                }
+
+                auth.inMemoryAuthentication() //
+                        .withUser(userEntry.getKey()) //
+                        .password(passwordEncoder.encode(password)) //
+                        .authorities("ROLE_" + Role.EMPTY.name());
             }
 
             // Ldap
@@ -105,7 +116,7 @@ public class WebSecurityConfig
                 .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**") //
                 .basicAuthWithSession();
 
-            http.addFilterAfter(new PostAuthenticationFilter(), SessionManagementFilter.class);
+            http.addFilterAfter(new Role2PermissionMapperFilter(), SessionManagementFilter.class);
         }
     }
 
@@ -125,7 +136,7 @@ public class WebSecurityConfig
                 .scope(UserApi.BASE_URL_USERS + "/**") //
                 .basicAuth(Role.ADMIN.name());
 
-            http.addFilterAfter(new PostAuthenticationFilter(), SessionManagementFilter.class);
+            http.addFilterAfter(new Role2PermissionMapperFilter(), SessionManagementFilter.class);
         }
     }
 }

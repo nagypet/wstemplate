@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,25 @@
 
 package hu.perit.template.scalableservice.documentation;
 
-import com.google.common.base.Predicates;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.service.*;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.ApiKey;
+import springfox.documentation.service.BasicAuth;
+import springfox.documentation.service.Contact;
+import springfox.documentation.service.SecurityScheme;
+import springfox.documentation.service.VendorExtension;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-import java.util.*;
 
 /**
  * @author Peter Nagy
@@ -33,42 +42,45 @@ import java.util.*;
 
 
 @Configuration
-@EnableSwagger2
 public class SwaggerConfig {
 
-    private static final Contact DEFAULT_CONTACT = new Contact(
-            "Peter Nagy", "http://...", "nagy.peter.home@gmail.com");
+	private static final Contact DEFAULT_CONTACT = new Contact(
+			"Peter Nagy", "https://github.com/nagypet/wstemplate", "nagy.peter.home@gmail.com");
 
-    private static final ArrayList<VendorExtension> VENDOR_EXTENSIONS = new ArrayList<>();
+	private static final ArrayList<VendorExtension> VENDOR_EXTENSIONS = new ArrayList<>();
 
-    private static final ApiInfo DEFAULT_API_INFO = new ApiInfo(
-            "Template service",
-            "This is an open source attempt to build a production ready web service using the Spring framework.",
-            "1.0",
-            "urn:tos",
-            DEFAULT_CONTACT,
-            "Apache License, Version 2.0",
-            "https://www.apache.org/licenses/LICENSE-2.0",
-            VENDOR_EXTENSIONS);
+	private static final ApiInfo DEFAULT_API_INFO = new ApiInfo(
+			"template-scalable-service",
+			"template-scalable-service",
+			"1.0",
+			"urn:tos",
+			DEFAULT_CONTACT,
+			"Apache License, Version 2.0",
+			"https://www.apache.org/licenses/LICENSE-2.0",
+			VENDOR_EXTENSIONS);
 
-    private static final Set<String> DEFAULT_PRODUCES_AND_CONSUMES = new HashSet<>(Arrays.asList("application/json"));
+	private static final Set<String> DEFAULT_PRODUCES_AND_CONSUMES = new HashSet<>(Arrays.asList("application/json"));
 
-    private static final List<SecurityScheme> DEFAULT_SECURITY_SCHEME = new ArrayList<>(Arrays.asList(
-            new BasicAuth("basicAuth"),
-            new ApiKey("Bearer",
-                    "Authorization",
-                    "header")
-    ));
+	private static final List<SecurityScheme> DEFAULT_SECURITY_SCHEME = new ArrayList<>(Arrays.asList(
+			new BasicAuth("basicAuth"),
+			new ApiKey("Bearer",
+					"Authorization",
+					"header")
+	));
 
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(DEFAULT_API_INFO)
-                .produces(DEFAULT_PRODUCES_AND_CONSUMES)
-                .consumes(DEFAULT_PRODUCES_AND_CONSUMES)
-                .securitySchemes(DEFAULT_SECURITY_SCHEME)
-                .useDefaultResponseMessages(false)
-                .select()
-                .paths(Predicates.not(PathSelectors.regex("/error.*"))).build();
-    }
+	/**
+	 * @return Docket
+	 */
+	@Bean
+	public Docket api() {
+		return new Docket(DocumentationType.SWAGGER_2) //
+				.apiInfo(DEFAULT_API_INFO) //
+				.produces(DEFAULT_PRODUCES_AND_CONSUMES) //
+				.consumes(DEFAULT_PRODUCES_AND_CONSUMES) //
+				.securitySchemes(DEFAULT_SECURITY_SCHEME) //
+				.useDefaultResponseMessages(false) //
+				.select().apis(RequestHandlerSelectors.any()) //
+				.paths(PathSelectors.any()) //
+				.build();
+	}
 }
