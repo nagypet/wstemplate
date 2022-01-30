@@ -55,9 +55,6 @@ dependencies {
     compile project(':spvitamin-spring-admin')
     compile project(':spvitamin-spring-cloud-client')
     compile project(':spvitamin-spring-cloud-eureka')
-    compile project(':spvitamin-spring-cloud-feign')
-    //compile project(':spvitamin-spring-cloud-ribbon')
-    //compile project(':spvitamin-spring-cloud-zuul')
     compile project(':spvitamin-spring-general')
     compile project(':spvitamin-spring-logging')
     compile project(':spvitamin-spring-security')
@@ -80,15 +77,6 @@ dependencies {
 
     // Eureka
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server'
-
-    // Zuul
-    //implementation 'org.springframework.cloud:spring-cloud-starter-netflix-zuul:2.2.10.RELEASE'
-
-    // Ribbon
-    //implementation 'org.springframework.cloud:spring-cloud-starter-netflix-ribbon'
-
-    // Spring Retry
-    //implementation 'org.springframework.retry:spring-retry'
 
     // JJWT
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'

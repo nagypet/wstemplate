@@ -33,7 +33,6 @@ import org.springframework.context.annotation.Profile;
 @SpringBootApplication
 @EnableEurekaServer
 @EnableEurekaClient
-//@EnableZuulProxy
 @ComponentScan(basePackages = {"hu.perit.spvitamin", "hu.perit.template.eureka"})
 @Log4j
 public class Application
