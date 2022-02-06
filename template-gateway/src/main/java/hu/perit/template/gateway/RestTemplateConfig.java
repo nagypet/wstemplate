@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -28,52 +27,41 @@ import org.springframework.web.client.RestTemplate;
 public class RestTemplateConfig
 {
 
-	private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-	public RestTemplateConfig(ObjectMapper objectMapper)
-	{
-		this.objectMapper = objectMapper;
-	}
-
-
-	@Profile("resttemplate-loadbalanced")
-	@LoadBalanced
-	@Bean
-	RestTemplate restTemplateWithLoadBalance()
-	{
-		return this.createRestTemplate();
-	}
+    public RestTemplateConfig(ObjectMapper objectMapper)
+    {
+        this.objectMapper = objectMapper;
+    }
 
 
-	@Profile("!resttemplate-loadbalanced")
-	@Bean
-	RestTemplate restTemplateWithoutLoadBalance()
-	{
-		return this.createRestTemplate();
-	}
+    @LoadBalanced
+    @Bean
+    RestTemplate restTemplateWithLoadBalance()
+    {
+        return this.createRestTemplate();
+    }
+
+    private RestTemplate createRestTemplate()
+    {
+        /*
+         * HttpComponentsClientHttpRequestFactory requestFactory = new
+         * HttpComponentsClientHttpRequestFactory(); // TODO: read from config
+         * requestFactory.setConnectTimeout(5000);
+         * requestFactory.setReadTimeout(120000);
+         *
+         * RestTemplate restTemplate = new RestTemplate(requestFactory);
+         */
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getMessageConverters().add(0, createMappingJacksonHttpMessageConverter());
+        return restTemplate;
+    }
 
 
-	private RestTemplate createRestTemplate()
-	{
-		/*
-		 * HttpComponentsClientHttpRequestFactory requestFactory = new
-		 * HttpComponentsClientHttpRequestFactory(); // TODO: read from config
-		 * requestFactory.setConnectTimeout(5000);
-		 * requestFactory.setReadTimeout(120000);
-		 * 
-		 * RestTemplate restTemplate = new RestTemplate(requestFactory);
-		 */
-		RestTemplate restTemplate = new RestTemplate();
-		restTemplate.getMessageConverters().add(0, createMappingJacksonHttpMessageConverter());
-		//restTemplate.setErrorHandler(new RestTemplateErrorHandler());
-		return restTemplate;
-	}
-
-
-	private MappingJackson2HttpMessageConverter createMappingJacksonHttpMessageConverter()
-	{
-		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-		converter.setObjectMapper(this.objectMapper);
-		return converter;
-	}
+    private MappingJackson2HttpMessageConverter createMappingJacksonHttpMessageConverter()
+    {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(this.objectMapper);
+        return converter;
+    }
 }

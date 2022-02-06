@@ -25,10 +25,6 @@ spring:
             - Path=/auth/**
           filters:
             - RewritePath=/auth(?<segment>/?.*), $\{segment}
-  config:
-    use-legacy-processing: true
-  profiles:
-    include: resttemplate-loadbalanced
 
 eureka:
   instance:
