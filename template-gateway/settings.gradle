@@ -1,1 +1,3 @@
+apply from: '../gradle/include-project-dependencies.gradle'
+
 rootProject.name = 'template-gateway'

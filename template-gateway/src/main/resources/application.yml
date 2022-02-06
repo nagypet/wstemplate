@@ -1,0 +1,42 @@
+server:
+  port: 8500
+
+spring:
+  application:
+    name: template-gateway
+  cloud:
+    gateway:
+      discovery:
+        localtor:
+          enabled: true
+      routes:
+        # --- scalable-service -----------------------------------------------------------------------------------------
+        - id: scalable-service
+          uri: lb://TEMPLATE-SCALABLE-SERVICE
+          predicates:
+            - Path=/scalable/**
+          filters:
+            - RewritePath=/scalable(?<segment>/?.*), $\{segment}
+
+        # --- auth-service ---------------------------------------------------------------------------------------------
+        - id: auth-service
+          uri: lb://TEMPLATE-AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+          filters:
+            - RewritePath=/auth(?<segment>/?.*), $\{segment}
+  config:
+    use-legacy-processing: true
+  profiles:
+    include: resttemplate-loadbalanced
+
+eureka:
+  instance:
+    hostname: ${HOSTNAME}
+    instanceId: ${eureka.instance.hostname}:${spring.application.name}:${server.port}
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    registry-fetch-interval-seconds: 5
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER}
