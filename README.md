@@ -8,7 +8,7 @@ This project implements a small, but _complete_ solution using the Spring framew
 - integration tests
 - Swagger online documentation and test UI
 - sonarqube
-- Eureka, Zuul, Ribbon, Hystrix with fault tolerance
+- Eureka, Spring Cloud Gateway, Hystrix with fault tolerance
 - components running in docker containers
 - monitoring with Prometheus/Grafana using cAdvisor and Node-exporter
 
@@ -17,10 +17,11 @@ The project can be used as a basis for POC projects as a fully dockerized micros
 ## Architecture
 ![architecture](https://github.com/nagypet/wstemplate/blob/master/docs/images/wstemplate_architecture.jpg)
 
-There are 4 main components of the system:
+There are 5 main components of the system:
 - template-auth-service: an authorization and user management service with Jwt authentication
-- template-eureka: service discovery, API gateway and load balancer
+- template-eureka: service discovery
 - template-scalable-service: 3 instances of the service is installed to achieve scalability and high availability. The services are running within a single private docker network. In a real-world scenario we would use separated docker hosts with an overlay network, but this is only a small change in the docker-compose.yml file.
+- template-gateway: API gateway and load balancer
 - performance-tester: to generate a simulated load for the system
 
 ## Build and run
