@@ -39,7 +39,7 @@ cd wstemplate
 git submodule update --init
 ```
 
-This project requires spvitamin 1.0.
+This project requires spvitamin 1.3.7-RELEASE or higher.
 
 ### Frontend
 - Install Node.js
