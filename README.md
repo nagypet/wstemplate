@@ -70,6 +70,21 @@ When the containers are up and running, go to http://localhost:5400 for pgadmin.
 - run the script in db\scripts.sql
 - start the remaining services with `coU --all`
 
+Check if all container is up and running.
+```
+C:\np\github\wstemplate\docker-compose\wstemplate-dev>docker ps
+CONTAINER ID        IMAGE                                    COMMAND                  CREATED             STATUS              PORTS                                            NAMES
+85fb212e480f        wstemplate-template-gateway              "sh ./template-gatew…"   7 minutes ago       Up 7 minutes        0.0.0.0:8500->8500/tcp                           wstemplate-dev-gateway
+a618b870ec87        wstemplate-template-auth-service         "sh ./template-auth-…"   10 minutes ago      Up 10 minutes       0.0.0.0:8410->8410/tcp                           wstemplate-dev-auth-service
+774c9cace279        wstemplate-template-scalable-service     "sh ./template-scala…"   18 minutes ago      Up 18 minutes       8420/tcp, 0.0.0.0:8440->8440/tcp                 wstemplate-dev-scalable-service-3
+389d552d67eb        wstemplate-template-scalable-service     "sh ./template-scala…"   18 minutes ago      Up 18 minutes       8420/tcp, 0.0.0.0:8430->8430/tcp                 wstemplate-dev-scalable-service-2
+9220f60041c8        wstemplate-template-scalable-service     "sh ./template-scala…"   18 minutes ago      Up 18 minutes       0.0.0.0:8420->8420/tcp                           wstemplate-dev-scalable-service-1
+e06e48809dbc        wstemplate-template-eureka               "sh ./template-eureka"   18 minutes ago      Up 18 minutes       0.0.0.0:8400->8400/tcp, 0.0.0.0:5501->5005/tcp   wstemplate-dev-discovery
+744704418c3a        thajeztah/pgadmin4                       "python ./usr/local/…"   18 minutes ago      Up 18 minutes       0.0.0.0:5400->5050/tcp                           wstemplate-dev-pgadmin
+6b5741592c1b        postgres:10.13-alpine                    "docker-entrypoint.s…"   18 minutes ago      Up 18 minutes       0.0.0.0:5432->5432/tcp                           wstemplate-dev-postgres
+425f13079d58        petyaba/ldap                             "java -jar ldap-serv…"   7 days ago          Up 5 days           0.0.0.0:10389->10389/tcp                         wstemplate-dev-ldap
+```
+
 Start the performance-tester in a command-line. The executables are located in performance-tester\build\install\performance-tester\bin\.
 
 ## Monitoring

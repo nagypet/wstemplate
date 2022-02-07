@@ -20,9 +20,13 @@ setlocal enabledelayedexpansion
 
 if "%1"=="" goto print_usage
 
+SET INFRA=0
 SET SERVICES=0
 SET MONITORING=0
 for %%x in (%*) do (	
+	if /I "%%~x"=="--infra" (
+		set INFRA=1
+	)
 	if /I "%%~x"=="--svc" (
 		set SERVICES=1
 	)
@@ -30,23 +34,32 @@ for %%x in (%*) do (
 		set MONITORING=1
 	)	
 	if /I "%%~x"=="--all" (
+		set INFRA=1
 		set SERVICES=1
 		set MONITORING=1
 	)	
 )
 
-IF !SERVICES!==0 (
-	IF !MONITORING!==0 (
-		for %%x in (%*) do (	
-			docker-compose rm -fsv %%~x
+IF !INFRA!==0 (
+	IF !SERVICES!==0 (
+		IF !MONITORING!==0 (
+			for %%x in (%*) do (	
+				docker-compose rm -fsv %%~x
+			)
+			goto end
 		)
-		goto end
 	)
 )
 
-IF !SERVICES!==1 (
+
+IF !INFRA!==1 (
 	docker-compose rm -fsv postgres
 	docker-compose rm -fsv pgadmin
+	docker-compose rm -fsv ldap
+)
+
+IF !SERVICES!==1 (
+	docker-compose rm -fsv gateway
 	docker-compose rm -fsv discovery
 	docker-compose rm -fsv auth-service
 	docker-compose rm -fsv scalable-service-1
@@ -66,6 +79,7 @@ goto end
 :print_usage
 echo usage: coD options container-name
 echo   "options"
+echo     --infra: only database and ldap
 echo     --svc: only services
 echo     --mon: only monitoring
 echo     --all: each containers

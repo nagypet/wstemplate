@@ -58,7 +58,22 @@ services:
             - db-net
         #logging:
         #    driver: none  
-      
+
+
+    #####################################################################################                 
+    gateway:
+    #####################################################################################                 
+        container_name: wstemplate-dev-gateway
+        image: wstemplate-template-gateway
+        environment:
+            - JAVA_OPTS=-DEUREKA_SERVER=http://discovery:8400/eureka
+        ports:
+            - '8500:8500'
+        networks: 
+            - back-tier-net
+            - monitoring
+        hostname: 'gateway'
+        
   
     #####################################################################################                 
     discovery:
@@ -67,7 +82,7 @@ services:
         image: wstemplate-template-eureka
         environment:
             #agentlib for remote debugging
-            - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+            - JAVA_OPTS=-DEUREKA_SERVER=http://discovery:8400/eureka -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
             #- TEMPLATE_EUREKA_OPTS=-Dspring.profiles.active=docker
             - EUREKA_ENVIRONMENT_PROFILE=dev
         ports:
@@ -88,8 +103,8 @@ services:
         container_name: wstemplate-dev-auth-service
         image: wstemplate-template-auth-service
         environment:
-              - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka
-              #- TEMPLATE_AUTH_SERVICE_OPTS=-Dspring.profiles.active=pgdb
+              - JAVA_OPTS=-DEUREKA_SERVER=http://discovery:8400/eureka
+              - TEMPLATE_AUTH_SERVICE_OPTS=-Dspring.profiles.active=pgdb
         ports:
             - "8410:8410"
         networks: 
@@ -107,8 +122,8 @@ services:
         container_name: wstemplate-dev-scalable-service-1
         image: wstemplate-template-scalable-service
         environment:
-            - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -DHOSTNAME=scalable-service-1 -DPORT=8420
-            - TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=docker
+            - JAVA_OPTS=-DEUREKA_SERVER=http://discovery:8400/eureka -DHOSTNAME=scalable-service-1 -DPORT=8420
+            #- TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=docker
         ports:
             - "8420:8420"
         networks: 
@@ -126,8 +141,8 @@ services:
         container_name: wstemplate-dev-scalable-service-2
         image: wstemplate-template-scalable-service
         environment:
-            - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -DHOSTNAME=scalable-service-2 -DPORT=8430
-            - TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=docker
+            - JAVA_OPTS=-DEUREKA_SERVER=http://discovery:8400/eureka -DHOSTNAME=scalable-service-2 -DPORT=8430
+            #- TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=docker
         ports:
             - "8430:8430"
         networks: 
@@ -145,8 +160,8 @@ services:
         container_name: wstemplate-dev-scalable-service-3
         image: wstemplate-template-scalable-service
         environment:
-            - JAVA_OPTS=-DEUREKA_SERVER=https://discovery:8400/eureka -DHOSTNAME=scalable-service-3 -DPORT=8440
-            - TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=docker
+            - JAVA_OPTS=-DEUREKA_SERVER=http://discovery:8400/eureka -DHOSTNAME=scalable-service-3 -DPORT=8440
+            #- TEMPLATE_SCALABLE_SERVICE_OPTS=-Dspring.profiles.active=docker
         ports:
             - "8440:8440"
         networks: 
