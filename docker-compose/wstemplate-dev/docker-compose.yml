@@ -103,10 +103,12 @@ services:
         container_name: wstemplate-dev-auth-service
         image: wstemplate-template-auth-service
         environment:
-              - JAVA_OPTS=-DEUREKA_SERVER=http://discovery:8400/eureka
-              - TEMPLATE_AUTH_SERVICE_OPTS=-Dspring.profiles.active=pgdb
+            #agentlib for remote debugging
+            - JAVA_OPTS=-DEUREKA_SERVER=http://discovery:8400/eureka -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+            - TEMPLATE_AUTH_SERVICE_OPTS=-Dspring.profiles.active=pgdb
         ports:
             - "8410:8410"
+            - '5502:5005'
         networks: 
             - back-tier-net
             - monitoring

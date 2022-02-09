@@ -15,12 +15,19 @@
  */
 
 plugins {
-    id 'org.springframework.boot' version '2.3.2.RELEASE'
-    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'org.springframework.boot' version '2.4.5'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'application'
     id 'jacoco'
 	id "com.github.ManifestClasspath" version "0.1.0-RELEASE"
 }
+
+ext {
+    set('springCloudVersion', "2020.0.5")
+}
+
+sourceCompatibility = 11
+
 apply from: '../gradle/common.gradle'
 apply from: '../gradle/docker.gradle'
 
@@ -34,11 +41,6 @@ repositories {
 }
 
 
-ext {
-	set('springCloudVersion', "Hoxton.SR6")
-}
-
-
 application {
     mainClassName = 'hu.perit.performancetester.Application'
     // Some JVM options already set in common.gradle
@@ -46,11 +48,9 @@ application {
 }
 
 
-sourceCompatibility = 11
-
 dependencies {
 	compile project(':spvitamin-core')
-	compile project(':spvitamin-spring-general')
+	//compile project(':spvitamin-spring-general')
     compile project(':spvitamin-spring-security-authservice')
     compile project(':spvitamin-spring-cloud-client')
     compile project(':spvitamin-spring-cloud-feign')

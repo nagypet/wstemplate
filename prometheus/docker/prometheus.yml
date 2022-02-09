@@ -24,7 +24,7 @@ scrape_configs:
   - job_name: 'discovery'
     #####################################################################################                 
     metrics_path: '/actuator/prometheus'
-    scheme: 'https'
+    scheme: 'http'
     static_configs:
       - targets: ['discovery:8400']
     tls_config:
@@ -35,7 +35,7 @@ scrape_configs:
   - job_name: 'auth-service'
     #####################################################################################                 
     metrics_path: '/actuator/prometheus'
-    scheme: 'https'
+    scheme: 'http'
     static_configs:
       - targets: ['auth-service:8410']
     tls_config:
@@ -46,7 +46,7 @@ scrape_configs:
   - job_name: 'scalable-service'
     #####################################################################################                 
     metrics_path: '/actuator/prometheus'
-    scheme: 'https'
+    scheme: 'http'
     static_configs:
       - targets: ['scalable-service-1:8420', 'scalable-service-2:8430', 'scalable-service-3:8440']
     tls_config:

@@ -16,6 +16,7 @@
 
 package hu.perit.performancetester;
 
+import hu.perit.spvitamin.spring.environment.EnvironmentPostProcessor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -32,6 +33,7 @@ public class Application {
 
     public static void main(String[] args) { // NOSONAR
         SpringApplication application = new SpringApplication(Application.class);
+        application.addListeners(new EnvironmentPostProcessor());
         application.run(args);
     }
 }

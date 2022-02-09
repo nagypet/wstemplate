@@ -32,4 +32,4 @@ pluginManagement {
 apply from: '../gradle/include-project-dependencies.gradle'
 
 
-rootProject.name = 'performance-tester'
+rootProject.name = 'template-performance-tester'

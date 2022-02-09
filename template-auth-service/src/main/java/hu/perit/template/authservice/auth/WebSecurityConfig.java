@@ -117,6 +117,7 @@ public class WebSecurityConfig
                 .basicAuthWithSession();
 
             http.addFilterAfter(new Role2PermissionMapperFilter(), SessionManagementFilter.class);
+            http.addFilterAfter(new PostAuthenticationFilter(), Role2PermissionMapperFilter.class);
         }
     }
 
@@ -137,6 +138,7 @@ public class WebSecurityConfig
                 .basicAuth(Role.ADMIN.name());
 
             http.addFilterAfter(new Role2PermissionMapperFilter(), SessionManagementFilter.class);
+            http.addFilterAfter(new PostAuthenticationFilter(), Role2PermissionMapperFilter.class);
         }
     }
 }

@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 import javax.persistence.LockModeType;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.exception.ConstraintViolationException;
 import org.modelmapper.ModelMapper;
@@ -57,6 +58,7 @@ import hu.perit.template.authservice.rest.model.UserDTOFiltered;
  */
 
 @Service
+@Slf4j
 public class UserService
 {
 
@@ -148,10 +150,10 @@ public class UserService
                 if (fromCauseChain.isPresent())
                 {
                     if (((ConstraintViolationException) fromCauseChain.get()).getConstraintName().equalsIgnoreCase(
-                        Constants.INDEXNAME_USERNAME))
+                            Constants.INDEXNAME_USERNAME))
                     {
                         throw new ResourceAlreadyExistsException(
-                            String.format("A user with username '%s' already exists!", createUserParams.getUserName()), ex);
+                                String.format("A user with username '%s' already exists!", createUserParams.getUserName()), ex);
                     }
                 }
             }
@@ -185,10 +187,13 @@ public class UserService
             else
             {
                 // The user is not yet saved in our internal user db => lets save it
-                CreateUserParams createUserParams = CreateUserParams.builder().userName(authenticatedUser.getUsername()).displayName(
-                    authenticatedUser.getUsername()).active(true).roles(
-                        authenticatedUser.getAuthorities().stream().map(i -> ((GrantedAuthority) i).getAuthority()).collect(
-                            Collectors.toSet())).nextLoginChangePwd(false).build();
+                log.debug("Authneticated user {} will be saved in the user database.", authenticatedUser.getUsername());
+                CreateUserParams createUserParams = CreateUserParams.builder()
+                        .userName(authenticatedUser.getUsername())
+                        .displayName(authenticatedUser.getUsername())
+                        .active(true)
+                        .roles(authenticatedUser.getAuthorities().stream().map(i -> ((GrantedAuthority) i).getAuthority()).collect(Collectors.toSet())).nextLoginChangePwd(false)
+                        .build();
                 long newUserId = this.create(createUserParams, true);
                 this.updateLoginTime(newUserId);
                 return newUserId;
@@ -284,7 +289,9 @@ public class UserService
     private static boolean internalFilter(boolean filterInternal, boolean entityIsExternal)
     {
         if (!filterInternal)
+        {
             return true;
+        }
         return !entityIsExternal;
     }
 
