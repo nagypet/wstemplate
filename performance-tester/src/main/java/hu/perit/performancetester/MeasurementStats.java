@@ -1,7 +1,7 @@
 package hu.perit.performancetester;
 
 import hu.perit.spvitamin.spring.metrics.SingleMetricAverageOfLastNValueGeneric;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Log4j
+@Slf4j
 public class MeasurementStats {
     private String mode;
     private final AtomicInteger documentCountSuccess = new AtomicInteger();

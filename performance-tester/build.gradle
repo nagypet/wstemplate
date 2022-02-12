@@ -50,8 +50,7 @@ application {
 
 dependencies {
 	compile project(':spvitamin-core')
-	//compile project(':spvitamin-spring-general')
-    compile project(':spvitamin-spring-security-authservice')
+    compile project(':spvitamin-spring-security-authservice-api')
     compile project(':spvitamin-spring-cloud-client')
     compile project(':spvitamin-spring-cloud-feign')
 
@@ -63,22 +62,19 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
     integtestAnnotationProcessor 'org.projectlombok:lombok'
 
-    // Test framework
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
-
     // apache.commons
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
-
-    // Log4J
-    implementation('log4j:log4j:1.2.17')
 
     // OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
     //implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.12'
+
+    // Test framework
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
 }
 
 

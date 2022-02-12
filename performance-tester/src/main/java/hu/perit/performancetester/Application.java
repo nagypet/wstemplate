@@ -17,7 +17,7 @@
 package hu.perit.performancetester;
 
 import hu.perit.spvitamin.spring.environment.EnvironmentPostProcessor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -28,7 +28,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"hu.perit.spvitamin", "hu.perit.performancetester"})
-@Log4j
+@Slf4j
 public class Application {
 
     public static void main(String[] args) { // NOSONAR

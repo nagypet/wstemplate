@@ -15,27 +15,44 @@ server:
 spring:
   application:
     name: template-gateway
+  profiles:
+    include: resttemplate-loadbalanced
   cloud:
     gateway:
       discovery:
         localtor:
           enabled: true
+      httpclient:
+        connect-timeout: 1000
+        response-timeout: 5000
       routes:
         # --- scalable-service -----------------------------------------------------------------------------------------
         - id: scalable-service
           uri: lb://TEMPLATE-SCALABLE-SERVICE
           predicates:
-            - Path=/scalable/**
+            - Path=/scalable/{segment}
           filters:
-            - RewritePath=/scalable(?<segment>/?.*), $\{segment}
+            - SetPath=/{segment}
+            - name: Retry
+              args:
+                retries: 10
+                methods: GET,PUT,POST,DELETE
+                backoff:
+                  firstBackoff: 1000ms
+                  maxBackoff: 10000ms
+                  factor: 2
+                  basedOnPreviousValue: false
+          metadata:
+            connect-timeout: 1000
+            response-timeout: 5000
 
         # --- auth-service ---------------------------------------------------------------------------------------------
         - id: auth-service
           uri: lb://TEMPLATE-AUTH-SERVICE
           predicates:
-            - Path=/auth/**
+            - Path=/auth/{segment}
           filters:
-            - RewritePath=/auth(?<segment>/?.*), $\{segment}
+            - SetPath=/{segment}
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Eureka settings
