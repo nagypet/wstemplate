@@ -8,6 +8,11 @@ server:
     key-alias: templatekey
     key-store-password: changeit
     key-store: classpath:jks/server-keystore.jks
+  error:
+    includeException: true
+    includeStacktrace: ALWAYS
+    includeMessage: ALWAYS
+    includeBindingErrors: ALWAYS
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Spring settings
@@ -35,7 +40,7 @@ spring:
             - SetPath=/{segment}
             - name: Retry
               args:
-                retries: 10
+                retries: 1
                 methods: GET,PUT,POST,DELETE
                 backoff:
                   firstBackoff: 1000ms

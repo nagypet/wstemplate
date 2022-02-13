@@ -46,8 +46,6 @@
 	<logger name="com.netflix.discovery" level="ERROR"/>
 	<logger name="org.springframework.cloud.gateway" level="DEBUG"/>
 	<logger name="org.springframework.cloud.gateway.route" level="WARN"/>
-
-	<!-- flooding the log -->
 	<logger name="org.springframework.cloud.netflix.eureka.config" level="DEBUG"/>
 
 	<!-- Spvitamin loggers -->

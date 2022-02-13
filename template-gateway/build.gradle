@@ -46,6 +46,11 @@ application {
 dependencies {
 	compile project(':spvitamin-spring-cloud-client')
 
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// Gateway
 	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
 
 	// Eureka client
