@@ -54,13 +54,14 @@ public class ScalableServiceJob extends BatchJob {
     public boolean isFatalException(Throwable ex) {
         ExceptionWrapper exception = ExceptionWrapper.of(ex);
 
-        if (exception.causedBy("org.apache.http.conn.ConnectTimeoutException")
-                || exception.causedBy("org.apache.http.NoHttpResponseException")
-                || exception.causedBy("org.apache.http.conn.HttpHostConnectException")
-        ) {
-            return false;
-        }
+//        if (exception.causedBy("org.apache.http.conn.ConnectTimeoutException")
+//                || exception.causedBy("org.apache.http.NoHttpResponseException")
+//                || exception.causedBy("org.apache.http.conn.HttpHostConnectException")
+//                || exception.causedBy("org.springframework.web.server.ResponseStatusException")
+//        ) {
+//            return false;
+//        }
 
-        return true;
+        return false;
     }
 }

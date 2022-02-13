@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Configuration
-@EnableConfigurationProperties({ServerProperties.class, ResourceProperties.class})
+@EnableConfigurationProperties({ServerProperties.class})
 public class CustomErrorWebFluxAutoConfiguration
 {
 
@@ -56,13 +56,4 @@ public class CustomErrorWebFluxAutoConfiguration
         exceptionHandler.setMessageReaders(this.serverCodecConfigurer.getReaders());
         return exceptionHandler;
     }
-
-/*
-    @Bean
-    public DefaultErrorAttributes errorAttributes()
-    {
-        DefaultErrorAttributes defaultErrorAttributes = new DefaultErrorAttributes();
-        return defaultErrorAttributes;
-    }
- */
 }

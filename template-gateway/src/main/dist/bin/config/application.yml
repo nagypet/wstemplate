@@ -12,7 +12,6 @@ server:
     includeException: true
     includeStacktrace: ALWAYS
     includeMessage: ALWAYS
-    includeBindingErrors: ALWAYS
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Spring settings
@@ -40,7 +39,7 @@ spring:
             - SetPath=/{segment}
             - name: Retry
               args:
-                retries: 1
+                retries: 10
                 methods: GET,PUT,POST,DELETE
                 backoff:
                   firstBackoff: 1000ms

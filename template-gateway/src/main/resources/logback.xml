@@ -44,7 +44,7 @@
 	-->
 	<!-- Spring cloud loggers -->
 	<logger name="com.netflix.discovery" level="ERROR"/>
-	<logger name="org.springframework.cloud.gateway" level="DEBUG"/>
+	<logger name="org.springframework.cloud.gateway" level="WARN"/>
 	<logger name="org.springframework.cloud.gateway.route" level="WARN"/>
 	<logger name="org.springframework.cloud.netflix.eureka.config" level="DEBUG"/>
 
@@ -62,6 +62,9 @@
 		<appender-ref ref="application-message"/>
 	</logger>
 	<logger name="hu.perit.spvitamin.spring.httplogging" level="INFO" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
+	<logger name="hu.perit.spvitamin.spring.exceptionhandler" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
 	<logger name="hu.perit.spvitamin.data.dynamicdatasource" level="INFO" additivity="false">
