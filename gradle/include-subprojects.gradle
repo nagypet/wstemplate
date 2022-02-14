@@ -15,10 +15,17 @@
  */
 
 
+class Constants {
+	// Set this constant to true if spvitamin will be compiled as source
+	static final boolean COMPILE_SPVITAMIN = false
+}
+
+
 new ProjectConfigurer(settings).doIt()
 
 
 class ProjectConfigurer {
+
 	File rootDir
 	Settings settings
 
@@ -41,7 +48,7 @@ class ProjectConfigurer {
 	private void discoverRecursive(File root) {
 		root.eachDir(){ dir ->
 			if (this.isDirRelevant(dir)) {
-				if (new File(dir, 'build.gradle').exists() && !dir.name.equals("spvitamin")) {
+				if (new File(dir, 'build.gradle').exists() && !dir.name.equals("spvitamin") && (Constants.COMPILE_SPVITAMIN || !"${root}".contains("spvitamin"))) {
 					this.settings.include "${dir.name}"
 					def projDir = new File("${root}", "${dir.name}")
 					this.settings.project(":${dir.name}").projectDir = projDir

@@ -13,6 +13,8 @@ pluginManagement {
 }
 
 
+// include-subprojects.gradle contains this constant: COMPILE_SPVITAMIN
+
 apply from: 'gradle/include-subprojects.gradle' 
 
 rootProject.name = 'wstemplate'
