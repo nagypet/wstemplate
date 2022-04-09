@@ -23,7 +23,7 @@ plugins {
 }
 
 ext {
-    set('spvitaminVersion', '1.3.8-RELEASE')
+    set('spvitaminVersion', '1.3.10-RELEASE')
     set('springCloudVersion', "2020.0.5")
     set('imagePrefix', 'wstemplate')
 }
@@ -51,15 +51,17 @@ application {
 
 
 dependencies {
-    //compile project(':spvitamin-core')
-    //compile project(':spvitamin-spring-admin')
-    //compile project(':spvitamin-spring-cloud-client')
-    //compile project(':spvitamin-spring-cloud-eureka')
-    //compile project(':spvitamin-spring-general')
-    //compile project(':spvitamin-spring-logging')
-    //compile project(':spvitamin-spring-security')
-    //compile project(':spvitamin-spring-security-authservice')
-    //compile project(':spvitamin-spring-server')
+    /*
+    compile project(':spvitamin-core')
+    compile project(':spvitamin-spring-admin')
+    compile project(':spvitamin-spring-cloud-client')
+    compile project(':spvitamin-spring-cloud-eureka')
+    compile project(':spvitamin-spring-general')
+    compile project(':spvitamin-spring-logging')
+    compile project(':spvitamin-spring-security')
+    compile project(':spvitamin-spring-security-authservice')
+    compile project(':spvitamin-spring-server')
+    */
 
     implementation 'hu.perit.spvitamin:spvitamin-core'
     implementation 'hu.perit.spvitamin:spvitamin-spring-admin'
