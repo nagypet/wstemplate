@@ -76,6 +76,9 @@
 	<logger name="hu.perit.spvitamin.spring.security.ldap" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
+	<logger name="hu.perit.spvitamin.spring.config" level="DEBUG" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
 
 	<!-- Application specific loggers -->
 	<logger name="hu.perit.template.scalableservice" level="DEBUG" additivity="false">

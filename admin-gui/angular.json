@@ -25,9 +25,7 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [
-				/*"node_modules/bootstrap/dist/js/bootstrap.bundle.js"*/
-			]
+            "scripts": []
           },
           "configurations": {
             "production": {
@@ -62,7 +60,7 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "browserTarget": "admingui:build",
-			"proxyConfig": "src/proxy.conf.js"
+            "proxyConfig": "src/proxy.conf.js"
           },
           "configurations": {
             "production": {
@@ -136,5 +134,8 @@
       }
     }
   },
-  "defaultProject": "admingui"
+  "defaultProject": "admingui",
+  "cli": {
+    "analytics": false
+  }
 }

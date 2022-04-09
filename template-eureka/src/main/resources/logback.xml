@@ -77,6 +77,9 @@
 	<logger name="hu.perit.spvitamin.spring.config" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
+	<logger name="hu.perit.spvitamin.spring.config" level="DEBUG" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
 
 
 	<!-- Application specific loggers -->

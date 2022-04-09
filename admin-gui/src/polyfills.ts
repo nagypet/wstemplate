@@ -1,3 +1,9 @@
+/*
+ * Copyright header
+ * The ultimate spring based webservice template project.
+ * Author Peter Nagy <nagy.peter.home@gmail.com>
+ */
+
 /***************************************************************************************************
  * Load `$localize` onto the global scope - used if i18n tags appear in Angular templates.
  */

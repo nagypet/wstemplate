@@ -8,7 +8,7 @@ const PROXY_CONFIG = [
             "/truststore",
             "/logout"
         ],
-        target: "https://localhost:8410",
+        target: "http://localhost:8410",
         secure: false
     }
 ]

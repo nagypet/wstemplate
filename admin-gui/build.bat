@@ -4,9 +4,9 @@ set SOURCE=dist\admingui
 set DEST1=..\template-auth-service
 set DEST2=..\template-eureka
 set DEST3=..\template-scalable-service
-set SITEPATH=\src\main\resources\public
+set SITEPATH=\src\main\resources\public\admin-gui
 
-call ng build --prod --configuration=production
+rem call ng build --prod --configuration=production
 
 IF EXIST %DEST1% (
 	IF EXIST %DEST1%%SITEPATH% RMDIR /S /Q %DEST1%%SITEPATH%

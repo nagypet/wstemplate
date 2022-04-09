@@ -1,3 +1,9 @@
+/*
+ * Copyright header
+ * The ultimate spring based webservice template project.
+ * Author Peter Nagy <nagy.peter.home@gmail.com>
+ */
+
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, CanActivateChild, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 import {Observable} from 'rxjs';

@@ -36,17 +36,17 @@ export class LoginComponent implements OnInit {
     let password = this.passwordInput.nativeElement.value;
 
     this.authService.authenticateWithUserNamePassword(userName, password).subscribe(data => {
-      this.router.navigateByUrl(this.returnUrl);
+      this.authService.tryGetSettings().subscribe().add(() => {
+        this.router.navigateByUrl(this.returnUrl);
+      });
     });
 
   }
 
   onCancel() {
-    this.authService.logout().subscribe(res => {
-      //location.reload();
+    this.authService.logout().subscribe().add(() => {
+      this.router.navigateByUrl('/');
     });
-
-    this.router.navigateByUrl('/');
   }
 
 

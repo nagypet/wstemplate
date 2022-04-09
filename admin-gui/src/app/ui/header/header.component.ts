@@ -7,6 +7,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AdminService} from '../admin.service';
 import {AuthService} from '../auth/auth.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -21,6 +22,7 @@ export class HeaderComponent implements OnInit {
   (
     private adminService: AdminService,
     public authService: AuthService,
+    private router: Router,
   ) {
 
   }
@@ -34,10 +36,10 @@ export class HeaderComponent implements OnInit {
   }
 
   onLogout() {
-    this.authService.logout().subscribe(res => {
-      location.reload();
+    this.authService.logout().subscribe().add(() => {
+      this.authService.tryGetSettings().subscribe().add(() => {
+        this.router.navigateByUrl('/');
+      });
     });
-
-    this.authService.tryGetSettings();
   }
 }
