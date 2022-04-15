@@ -6,7 +6,7 @@ set DEST2=..\template-eureka
 set DEST3=..\template-scalable-service
 set SITEPATH=\src\main\resources\public\admin-gui
 
-rem call ng build --prod --configuration=production
+call ng build --prod --configuration=production
 
 IF EXIST %DEST1% (
 	IF EXIST %DEST1%%SITEPATH% RMDIR /S /Q %DEST1%%SITEPATH%
