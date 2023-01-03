@@ -27,7 +27,12 @@ AdminGUI/dist
 .gradle
 build
 out
-bin
 polc
 distributions
 application-dev_private.properties
+performance-tester/bin
+template-auth-api/bin
+template-auth-service/bin
+template-eureka/bin
+template-gateway/bin
+template-scalable-service/bin

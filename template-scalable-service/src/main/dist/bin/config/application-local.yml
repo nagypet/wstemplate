@@ -1,0 +1,4 @@
+HOSTNAME: localhost
+PORT: 8420
+EUREKA_SERVER: http://localhost:8400/eureka
+
