@@ -85,7 +85,7 @@ if (project.hasProperty('application')) {
 		doLast { dockerImageInputsChanged = true }
 	}
 
-	task dockerBackendImage(type: Exec) {
+	task dockerBackendImage() {
 		group 'docker'
 		description 'Builds docker image based on the installation'
 
@@ -99,8 +99,22 @@ if (project.hasProperty('application')) {
 		doFirst {
 			logger.quiet "Building docker image: ${dockerImageName}"			
 		}
-		workingDir dockerBuildDir
-		commandLine 'docker', 'build', '-t', "${dockerImageName}", '.'
+		doLast {
+			exec {
+				workingDir dockerBuildDir
+				commandLine 'docker', 'build', '-t', "${dockerImageName}", '.'
+			}
+			if (project.hasProperty('dockerRegistry')) {
+				exec {
+					workingDir dockerBuildDir
+					commandLine 'docker', 'tag', "${dockerImageName}", "${dockerRegistry}/${dockerImageName}:${version}"
+				}
+				exec {
+					workingDir dockerBuildDir
+					commandLine 'docker', 'push', "${dockerRegistry}/${dockerImageName}:${version}"
+				}
+			}
+		}
 		
 		outputs.upToDateWhen { !dockerImageInputsChanged }
 	}

@@ -16,58 +16,35 @@
 
 package hu.perit.template.authservice.rest.api;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.web.bind.annotation.RestController;
-
-import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
-import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
+import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
 import hu.perit.template.authservice.config.Constants;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Peter Nagy
  */
 
 @RestController
-public class AuthController extends AbstractInterfaceLogger implements AuthApi {
+@RequiredArgsConstructor
+public class AuthController implements AuthApi {
 
     private final JwtTokenProvider tokenProvider;
     private final AuthorizationService authorizationService;
 
-    public AuthController(JwtTokenProvider tokenProvider, AuthorizationService authorizationService, HttpServletRequest httpRequest) {
-        super(httpRequest);
-        this.tokenProvider = tokenProvider;
-        this.authorizationService = authorizationService;
-    }
-
 
     @Override
+    @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
     public AuthorizationToken authenticateUsingGET(String processID) {
         AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
-        this.traceIn(processID, authenticatedUser.getUsername(), this.getMyMethodName(), 1);
 
-        try (Took took = new Took(processID)) {
-            AuthorizationToken token = tokenProvider.generateToken(
-                    authenticatedUser.getUsername(),
-                    new TokenClaims(authenticatedUser.getUserId(), authenticatedUser.getAuthorities())
-            );
-            return token;
-        }
-        catch (Throwable ex)
-        {
-            this.traceOut(processID, authenticatedUser.getUsername(), this.getMyMethodName(), 1, ex);
-            throw ex;
-        }
-    }
-
-    @Override
-    protected String getSubsystemName() {
-        return Constants.SUBSYSTEM_NAME;
+        return tokenProvider.generateToken(authenticatedUser.getUsername(),
+                new TokenClaims(authenticatedUser.getUserId(), authenticatedUser.getAuthorities(), authenticatedUser.getLdapUrl()));
     }
 }

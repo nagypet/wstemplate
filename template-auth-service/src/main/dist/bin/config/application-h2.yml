@@ -14,15 +14,24 @@
 # limitations under the License.
 #
 
-#-----------------------------------------------------------------------------------------------------------------------
-# datasource demodb on postgres
-#-----------------------------------------------------------------------------------------------------------------------
-datasource.demodb.db-type=postgresql
-datasource.demodb.host=localhost
-datasource.demodb.db-name=testdb
-datasource.demodb.username=postgres
-datasource.demodb.encrypted-password=1tvmTu8Ya8A=
-datasource.demodb.ddl-auto=update
 
-#H2
-spring.h2.console.enabled=false
+#-----------------------------------------------------------------------------------------------------------------------
+# datasource demodb on h2
+#-----------------------------------------------------------------------------------------------------------------------
+datasource:
+  demodb:
+    db-type: h2
+    host: mem
+    db-name: testdb;MODE=MSSQLServer
+    username: sa
+    encrypted-password: AX4q2W53V4P+9eGENG2wwQ==
+    ddl-auto: update
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# H2
+#-----------------------------------------------------------------------------------------------------------------------
+spring:
+  h2:
+    console.enabled: true
+    console.path: /h2

@@ -19,7 +19,7 @@ task clean(type: Delete) {
 }
 
 
-task dockerCreateImage(type: Exec) {
+task dockerCreateImage() {
     group 'docker'
     description "Builds the ${dockerImageName} docker image."
 
@@ -28,8 +28,23 @@ task dockerCreateImage(type: Exec) {
     doFirst {
         logger.quiet "Building docker image: $dockerImageName"
     }
-    workingDir dockerBuildDir
-    commandLine 'docker', 'build', '-t', dockerImageName, '.'
+
+	doLast {
+		exec {
+			workingDir dockerBuildDir
+			commandLine 'docker', 'build', '-t', "${dockerImageName}", '.'
+		}
+		if (project.hasProperty('dockerRegistry')) {
+			exec {
+				workingDir dockerBuildDir
+				commandLine 'docker', 'tag', "${dockerImageName}", "${dockerRegistry}/${dockerImageName}:${version}"
+			}
+			exec {
+				workingDir dockerBuildDir
+				commandLine 'docker', 'push', "${dockerRegistry}/${dockerImageName}:${version}"
+			}
+		}
+	}
 	
 	outputs.upToDateWhen { !dockerImageInputsChanged }
 }
