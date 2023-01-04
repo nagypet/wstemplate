@@ -25,8 +25,8 @@ import {Router} from '@angular/router';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
-  public title: string = '';
-  public version: string = '';
+  public title = '';
+  public version = '';
 
   constructor
   (

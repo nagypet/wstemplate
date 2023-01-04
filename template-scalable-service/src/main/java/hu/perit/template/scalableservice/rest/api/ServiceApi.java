@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Api(value = "service-api-controller", description = "Some service", tags = "service-api-controller")
 public interface ServiceApi {
 
-    String BASE_URL_SERVICE = "/service";
+    String BASE_URL_SERVICE = "/api/service";
 
     /*
      * ============== getAllUsers ======================================================================================

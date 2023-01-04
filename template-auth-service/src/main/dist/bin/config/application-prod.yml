@@ -14,7 +14,8 @@
 # limitations under the License.
 #
 
-security.swagger-access=ADMIN
-security.management-endpoints-access=ADMIN
-security.admin-gui-access=*
-security.admin-endpoints-access=ADMIN
+security:
+  swagger-access: ADMIN
+  management-endpoints-access: ADMIN
+  admin-gui-access: "*"
+  admin-endpoints-access: ADMIN

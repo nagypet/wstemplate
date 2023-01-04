@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-const PROXY_CONFIG = [
-  {
-    context: [
-      "/backend"
-    ],
-    target: "http://localhost:8410",
-    secure: false,
-    pathRewrite: {"^/backend": ""}
-  }
-]
-
-module.exports = PROXY_CONFIG;
+export interface AuthToken {
+  sub: string;
+  jwt: string;
+  iat: Date;
+  exp: Date;
+}

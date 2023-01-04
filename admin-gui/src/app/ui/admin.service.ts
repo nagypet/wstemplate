@@ -18,6 +18,7 @@ import {Injectable} from '@angular/core';
 import {HttpBackend, HttpClient, HttpUrlEncodingCodec} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {CertificateFile} from '../modell/keystore';
+import {environment} from '../../environments/environment';
 
 
 @Injectable({
@@ -33,23 +34,6 @@ export class AdminService {
     this.httpSilent = new HttpClient(handler);
   }
 
-  public static getServiceUrl(path: string): string {
-    const host = window.location.hostname;
-    const protocol = window.location.protocol;
-    const port = window.location.port;
-
-    let url = '';
-    if (port === '4200') {
-      // running on dev environment
-      url = 'http://localhost:4200' + path;
-    } else {
-      url = protocol + '//' + host + ':' + port + path;
-    }
-
-    console.log('Connecting to \'' + url + '\'');
-    return url;
-  }
-
 
   private removeWhitespacesFromString(input: string): string {
     const codec = new HttpUrlEncodingCodec();
@@ -60,50 +44,50 @@ export class AdminService {
 
   public getVersionInfo(): Observable<any> {
 
-    return this.http.get(AdminService.getServiceUrl('/admin/version'));
+    return this.http.get(`${environment.baseURL}/api/spvitamin/admin/version`);
   }
 
   public getSettings(): Observable<any> {
-    return this.http.get(AdminService.getServiceUrl('/admin/settings'));
+    return this.http.get(`${environment.baseURL}/api/spvitamin/admin/settings`);
   }
 
   public postShutdown(): Observable<any> {
-    return this.http.post(AdminService.getServiceUrl('/admin/shutdown'), '');
+    return this.http.post(`${environment.baseURL}/api/spvitamin/admin/shutdown`, '');
   }
 
   public getKeystore(): Observable<any> {
-    return this.http.get(AdminService.getServiceUrl('/keystore'));
+    return this.http.get(`${environment.baseURL}/api/spvitamin/keystore`);
   }
 
 
   public saveKeystore(): Observable<any> {
-    return this.http.post(AdminService.getServiceUrl('/keystore'), null);
+    return this.http.post(`${environment.baseURL}/api/spvitamin/keystore`, null);
   }
 
 
   public getEntriesFromCert(certFile: CertificateFile): Observable<any> {
-    return this.http.post(AdminService.getServiceUrl('/keystore/certificates'), certFile);
+    return this.http.post(`${environment.baseURL}/api/spvitamin/keystore/certificates`, certFile);
   }
 
   public importCertificateIntoKeystore(certFile: CertificateFile, alias: string): Observable<any> {
-    return this.http.post(AdminService.getServiceUrl('/keystore/privatekey'), {certificateFile: certFile, alias: alias});
+    return this.http.post(`${environment.baseURL}/api/spvitamin/keystore/privatekey`, {certificateFile: certFile, alias: alias});
   }
 
   public removeCertificateFromKeystore(alias: string): Observable<any> {
     // we have to remove white spaces from the alias name
-    return this.http.delete(AdminService.getServiceUrl('/keystore/privatekey/' + this.removeWhitespacesFromString(alias)));
+    return this.http.delete(`${environment.baseURL}/api/spvitamin/keystore/privatekey/${this.removeWhitespacesFromString(alias)}`);
   }
 
   public getTruststore(): Observable<any> {
-    return this.http.get(AdminService.getServiceUrl('/truststore'));
+    return this.http.get(`${environment.baseURL}/api/spvitamin/truststore`);
   }
 
   public importCertificateIntoTruststore(certFile: CertificateFile, alias: string): Observable<any> {
-    return this.http.post(AdminService.getServiceUrl('/truststore/certificate'), {certificateFile: certFile, alias: alias});
+    return this.http.post(`${environment.baseURL}/api/spvitamin/truststore/certificate`, {certificateFile: certFile, alias: alias});
   }
 
   public removeCertificateFromTruststore(alias: string): Observable<any> {
     // we have to remove white spaces from the alias name
-    return this.http.delete(AdminService.getServiceUrl('/truststore/certificate/' + this.removeWhitespacesFromString(alias)));
+    return this.http.delete(`${environment.baseURL}/api/spvitamin/truststore/certificate/${this.removeWhitespacesFromString(alias)}`);
   }
 }

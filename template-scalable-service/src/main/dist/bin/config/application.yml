@@ -1,5 +1,5 @@
 #
-# Copyright 2020-2020 the original author or authors.
+# Copyright 2020-2022 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,114 +14,116 @@
 # limitations under the License.
 #
 
-#-----------------------------------------------------------------------------------------------------------------------
-# System settings
-#-----------------------------------------------------------------------------------------------------------------------
-system.time-zone=Europe/Budapest
-
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Spring settings
 #-----------------------------------------------------------------------------------------------------------------------
-spring.application.name=template-scalable-service
+spring:
+  application:
+    name: template-scalable-service
+  jackson:
+    serialization.write-dates-as-timestamps: false
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: ${system.time-zone}
+  # To enable spring.profiles.include
+  config.use-legacy-processing: true
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# System settings
+#-----------------------------------------------------------------------------------------------------------------------
+system.time-zone: Europe/Budapest
 
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Crypto settings
 #-----------------------------------------------------------------------------------------------------------------------
-crypto.secret=xM!75hjlLHG,mnGHlhg79685gv
+crypto.secret: xM!75hjlLHG,mnGHlhg79685gv
 
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Server settings
 #-----------------------------------------------------------------------------------------------------------------------
-server.fqdn=${HOSTNAME}
-server.port=${PORT}
-server.tomcat.max-threads=30
-server.ssl.enabled=false
-server.ssl.key-store=classpath:jks/server-keystore.jks
-server.ssl.key-store-password=changeit
-server.ssl.key-alias=templatekey
-server.ssl.key-password=changeit
+server:
+  fqdn: localhost
+  port: 8420
+  ssl:
+    enabled: false
+    key-store: classpath:jks/server-keystore.jks
+    key-store-password: changeit
+    key-alias: templatekey
+    key-password: changeit
 
-server.ssl.trust-store=classpath:jks/client-truststore.jks
-server.ssl.trust-store-password=changeit
+    trust-store: classpath:jks/client-truststore.jks
+    trust-store-password: changeit
 
-# We do not have a real certificate
-server.ssl.ignore-certificate-validation=true
+    # We do not have a real certificate
+    ignore-certificate-validation: true
+
+  error:
+    includeException: true
+    includeStacktrace: ALWAYS
+    includeMessage: ALWAYS
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Admin settings
+#-----------------------------------------------------------------------------------------------------------------------
+admin:
+  admin-gui-url: /admin-gui
+  default-site-url: /admin-gui
+  keystore-admin-enabled: false
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Swagger settings
+#-----------------------------------------------------------------------------------------------------------------------
+springfox:
+  documentation:
+    swagger-ui:
+      base-url: "/docs"
+    swagger:
+      v2:
+        path: "/docs"
 
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Security settings
 #-----------------------------------------------------------------------------------------------------------------------
+#Security settings
 #security.allowed-origins=http://localhost:1337
 #security.allowed-headers
 #security.allowed-methods
 # * or comma separated roles (e.g. ADMIN)
-security.swagger-access=*
-security.management-endpoints-access=*
-security.admin-gui-access=*
-security.admin-endpoints-access=*
+security:
+  swagger-access: "*"
+  management-endpoints-access: ADMIN
+  admin-gui-access: "*"
+  admin-endpoints-access: "*"
 
 
 #-----------------------------------------------------------------------------------------------------------------------
 # JWT token
 #-----------------------------------------------------------------------------------------------------------------------
-jwt.public-key-alias=templatekey
+jwt:
+  public-key-alias: templatekey
 
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Management endpoints
 #-----------------------------------------------------------------------------------------------------------------------
-management.endpoints.web.exposure.include=health,env,info,metrics,prometheus
-management.endpoint.health.show-details=always
-management.health.db.enabled=false
-#management.health.ldap.enabled=false
-management.health.refresh.enabled=false
-
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Admin-GUI settings
-#-----------------------------------------------------------------------------------------------------------------------
-admin.default-site-url=/admin-gui
-admin.admin-gui-url=/admin-gui
-
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Jackson
-#-----------------------------------------------------------------------------------------------------------------------
-spring.jackson.serialization.write-dates-as-timestamps=false
-spring.jackson.date-format=yyyy-MM-dd HH:mm:ss
-spring.jackson.time-zone=${system.time-zone}
-
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Eureka config
-#-----------------------------------------------------------------------------------------------------------------------
-eureka.instance.hostname=${HOSTNAME}
-eureka.instance.instanceId=${eureka.instance.hostname}:${spring.application.name}:${server.port}
-eureka.instance.non-secure-port-enabled=true
-eureka.instance.non-secure-port=${server.port}
-eureka.instance.secure-port-enabled=false
-eureka.instance.secure-port=${server.port}
-eureka.instance.lease-renewal-interval-in-seconds=5
-eureka.instance.lease-expiration-duration-in-seconds=10
-
-eureka.client.enabled=true
-eureka.client.registerWithEureka=true
-eureka.client.fetchRegistry=true
-eureka.client.registry-fetch-interval-seconds=5
-eureka.client.serviceUrl.defaultZone=${EUREKA_SERVER}
+management:
+  endpoints:
+    web.exposure.include: health,env,info,metrics,prometheus
+    health.show-details: always
+  health:
+    db.enabled: false
+    ldap.enabled: false
+    refresh.enabled: false
 
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Microservice environment
 #-----------------------------------------------------------------------------------------------------------------------
-microservices.auth-service.url=https://template-auth-service
-spring.cloud.loadbalancer.ribbon.enabled=true
-
-
-# To enable spring.profiles.include
-spring.config.use-legacy-processing=true
-
-spring.profiles.include=resttemplate-loadbalanced
+microservices:
+  auth-service.url: http://auth-service

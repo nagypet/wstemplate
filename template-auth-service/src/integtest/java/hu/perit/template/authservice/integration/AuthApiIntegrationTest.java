@@ -16,29 +16,26 @@
 
 package hu.perit.template.authservice.integration;
 
+import feign.auth.BasicAuthRequestInterceptor;
+import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.LocalUserProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.config.SysConfig;
+import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
+import hu.perit.template.authservice.rest.client.TemplateAuthClient;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.context.ActiveProfiles;
 
-import feign.auth.BasicAuthRequestInterceptor;
-import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.crypto.CryptoUtil;
-import hu.perit.spvitamin.spring.auth.AuthorizationToken;
-import hu.perit.spvitamin.spring.config.SecurityProperties;
-import hu.perit.spvitamin.spring.config.SysConfig;
-import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
-import hu.perit.template.authservice.rest.client.TemplateAuthClient;
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * @author Peter Nagy
  */
 
-@ActiveProfiles({"default", "integtest"})
+@ActiveProfiles({"local", "h2", "integtest"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Slf4j
 class AuthApiIntegrationTest
@@ -57,7 +54,7 @@ class AuthApiIntegrationTest
             TemplateAuthClient templateAuthClient = SimpleFeignClientBuilder.newInstance()
                     .requestInterceptor(new BasicAuthRequestInterceptor(
                             "admin", localUserProperties.getLocaluser().get("admin").getPassword()))
-                            .build(TemplateAuthClient.class, SysConfig.getServerProperties().getServiceUrl());
+                    .build(TemplateAuthClient.class, SysConfig.getServerProperties().getServiceUrl());
 
             // Calling the authentication endpoint
             AuthorizationToken authentication = templateAuthClient.authenticate(null);

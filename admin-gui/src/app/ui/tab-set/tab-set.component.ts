@@ -14,24 +14,42 @@
  * limitations under the License.
  */
 
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {AdminService} from '../admin.service';
 
 @Component({
   selector: 'app-tab-set',
   templateUrl: './tab-set.component.html',
   styleUrls: ['./tab-set.component.scss']
 })
-export class TabSetComponent implements OnInit {
+export class TabSetComponent implements OnInit
+{
 
   tabs: Array<{ route: string, title: string }> = [
     {route: 'settings', title: 'Settings'},
-    {route: 'keystore', title: 'Keystore'},
-    {route: 'truststore', title: 'Truststore'}
+    {route: 'keystore-disabled', title: 'Keystore'},
+    {route: 'truststore-disabled', title: 'Truststore'}
   ];
 
-  constructor() { }
-
-  ngOnInit(): void {
+  constructor(
+    private adminService: AdminService
+  )
+  {
   }
 
+  ngOnInit()
+  {
+    this.adminService.getVersionInfo().subscribe(data =>
+    {
+      const keystoreAdminEnabled = data.KeystoreAdminEnabled;
+      if (keystoreAdminEnabled === 'true')
+      {
+        this.tabs = [
+          {route: 'settings', title: 'Settings'},
+          {route: 'keystore', title: 'Keystore'},
+          {route: 'truststore', title: 'Truststore'}
+        ];
+      }
+    });
+  }
 }

@@ -16,15 +16,8 @@
 
 package hu.perit.template.authservice.documentation;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
@@ -36,13 +29,20 @@ import springfox.documentation.service.VendorExtension;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * @author Peter Nagy
  */
 
 
 @Configuration
-public class SwaggerConfig {
+public class SwaggerConfig
+{
 
     private static final Contact DEFAULT_CONTACT = new Contact(
             "Peter Nagy", "https://github.com/nagypet/wstemplate", "nagy.peter.home@gmail.com");
@@ -72,15 +72,16 @@ public class SwaggerConfig {
      * @return Docket
      */
     @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2) //
-                .apiInfo(DEFAULT_API_INFO) //
-                .produces(DEFAULT_PRODUCES_AND_CONSUMES) //
-                .consumes(DEFAULT_PRODUCES_AND_CONSUMES) //
-                .securitySchemes(DEFAULT_SECURITY_SCHEME) //
-                .useDefaultResponseMessages(false) //
-                .select().apis(RequestHandlerSelectors.any()) //
-                .paths(PathSelectors.any()) //
+    public Docket api()
+    {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(DEFAULT_API_INFO)
+                .produces(DEFAULT_PRODUCES_AND_CONSUMES)
+                .consumes(DEFAULT_PRODUCES_AND_CONSUMES)
+                .securitySchemes(DEFAULT_SECURITY_SCHEME)
+                .useDefaultResponseMessages(false)
+                .select().apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.any())
                 .build();
     }
 }

@@ -36,6 +36,7 @@ import {TabSetComponent} from './tab-set/tab-set.component';
 import {AuthGuard} from './auth/auth.guard';
 import {AuthService} from './auth/auth.service';
 import {getAuthentication, tryGetSettings} from './auth/init/auth-init.factory';
+import { FunctionDisabledWarningComponent } from './function-disabled-warning/function-disabled-warning.component';
 
 
 export const routes: Routes = [
@@ -47,6 +48,8 @@ export const routes: Routes = [
       {path: 'settings', component: SettingsComponent},
       {path: 'keystore', component: CertificatesComponent, canActivate: [AuthGuard]},
       {path: 'truststore', component: CertificatesComponent, canActivate: [AuthGuard]},
+      {path: 'keystore-disabled', component: FunctionDisabledWarningComponent},
+      {path: 'truststore-disabled', component: FunctionDisabledWarningComponent},
     ],
   },
   {path: 'admin-gui/login', component: LoginComponent},
@@ -64,7 +67,8 @@ export const routes: Routes = [
     KeystoreComponent,
     NgbdModalContent,
     AboutComponent,
-    TabSetComponent],
+    TabSetComponent,
+    FunctionDisabledWarningComponent],
   imports: [
     CommonModule,
     BrowserModule,

@@ -53,7 +53,7 @@ import io.swagger.annotations.Authorization;
 public interface UserApi
 {
 
-    String BASE_URL_USERS = "/users";
+    String BASE_URL_USERS = "/api/users";
     String PATH_ROLES = "/roles";
 
     /*

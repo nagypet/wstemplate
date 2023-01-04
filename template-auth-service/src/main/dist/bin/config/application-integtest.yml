@@ -14,10 +14,4 @@
 # limitations under the License.
 #
 
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Microservice environment
-#-----------------------------------------------------------------------------------------------------------------------
-#eureka.client.enabled=false
-#spring.cloud.loadbalancer.ribbon.enabled=false
-#microservices.auth-service.url=https://localhost:8410
+server.ssl.ignore-certificate-validation: true

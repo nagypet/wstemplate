@@ -14,18 +14,29 @@
  * limitations under the License.
  */
 
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {AdminService} from '../admin.service';
 
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss']
 })
-export class FooterComponent implements OnInit {
+export class FooterComponent implements OnInit
+{
+  public copyright = '';
 
-  constructor() { }
+  constructor(
+    private adminService: AdminService
+  )
+  {}
 
-  ngOnInit() {
+  ngOnInit()
+  {
+    this.adminService.getVersionInfo().subscribe(data =>
+    {
+      console.log(data);
+      this.copyright = data.Copyright;
+    });
   }
-
 }

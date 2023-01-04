@@ -16,6 +16,150 @@
 
 
 #-----------------------------------------------------------------------------------------------------------------------
+# Spring settings
+#-----------------------------------------------------------------------------------------------------------------------
+spring:
+  application:
+    name: template-auth-service
+  h2:
+    console:
+      enabled: false
+  jackson:
+    serialization.write-dates-as-timestamps: false
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: ${system.time-zone}
+  # To enable spring.profiles.include
+  config.use-legacy-processing: true
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# System settings
+#-----------------------------------------------------------------------------------------------------------------------
+system.time-zone: Europe/Budapest
+
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Crypto settings
+#-----------------------------------------------------------------------------------------------------------------------
+crypto.secret: xM!75hjlLHG,mnGHlhg79685gv
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Server settings
+#-----------------------------------------------------------------------------------------------------------------------
+server:
+  fqdn: localhost
+  port: 8410
+  ssl:
+    enabled: false
+    key-store: classpath:jks/server-keystore.jks
+    key-store-password: changeit
+    key-alias: templatekey
+    key-password: changeit
+
+    trust-store: classpath:jks/client-truststore.jks
+    trust-store-password: changeit
+
+    # We do not have a real certificate
+    ignore-certificate-validation: true
+
+  error:
+    includeException: true
+    includeStacktrace: ALWAYS
+    includeMessage: ALWAYS
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Admin settings
+#-----------------------------------------------------------------------------------------------------------------------
+admin:
+  admin-gui-url: /admin-gui
+  default-site-url: /admin-gui
+  keystore-admin-enabled: false
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Swagger settings
+#-----------------------------------------------------------------------------------------------------------------------
+springfox:
+  documentation:
+    swagger-ui:
+      base-url: "/docs"
+    swagger:
+      v2:
+        path: "/docs"
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Security settings
+#-----------------------------------------------------------------------------------------------------------------------
+#Security settings
+#security.allowed-origins=http://localhost:1337
+#security.allowed-headers
+#security.allowed-methods
+# * or comma separated roles (e.g. ADMIN)
+security:
+  swagger-access: "*"
+  management-endpoints-access: ADMIN
+  admin-gui-access: "*"
+  admin-endpoints-access: "*"
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Local users for test reasons
+#-----------------------------------------------------------------------------------------------------------------------
+# Please set either password or encryptedPassword property
+localuser:
+  admin:
+    password: admin
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# AD group -> role mapping (all = '*')
+#-----------------------------------------------------------------------------------------------------------------------
+# admin
+roles:
+  ROLE_ADMIN:
+   groups: Admin
+   #roles.ROLE_ADMIN.includes=
+   users: admin
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Role -> permission mapping
+#-----------------------------------------------------------------------------------------------------------------------
+# ADMIN
+#rolemap.ROLE_ADMIN=BOOK_WRITE_ACCESS
+
+# PUBLIC
+#rolemap.ROLE_PUBLIC=BOOK_READ_ACCESS,AUTHOR_READ_ACCESS
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# JWT token
+#-----------------------------------------------------------------------------------------------------------------------
+#JWT token
+jwt:
+  private-key-alias: templatekey
+  private-key-encryptedPassword: jdP5CKDIu5v2VUafF33pPQ==
+  public-key-alias: templatekey
+  expiration-in-minutes:  60
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Management endpoints
+#-----------------------------------------------------------------------------------------------------------------------
+management:
+  endpoints:
+    web.exposure.include: health,env,info,metrics,prometheus
+    health.show-details: always
+  health:
+    db.enabled: false
+    ldap.enabled: false
+    refresh.enabled: false
+
+
+#-----------------------------------------------------------------------------------------------------------------------
 # datasource postgres on postgres
 #-----------------------------------------------------------------------------------------------------------------------
 datasource:
@@ -27,25 +171,20 @@ datasource:
     encrypted-password: 1tvmTu8Ya8A=
     ddl-auto: update
 
-spring:
-  h2:
-    console:
-      enabled: false
-
 
 #-----------------------------------------------------------------------------------------------------------------------
 # AD settings
 #-----------------------------------------------------------------------------------------------------------------------
-  ldaps:
-    ad1:
-      enabled: true
-      url: ldap://ldap:10389
-      root-dn: OU=Users,DC=perit,DC=hu
-      #ldaps.ad1.filter=(&(objectClass=user)(userPrincipalName={0}))
-      filter: (sAMAccountName={0})
-      #if this is set to true the domain will be put as postfix to the username when searching the AD. For userPrincipalName
-      #it should be true, for sAMAccountName false.
-      userprincipal-with-domain: false
-      domain: perit.hu
-      connect-timeout-ms: 2000
-      bind-user-pattern: uid={0},ou=Users,dc=perit,dc=hu
+ldaps:
+  ad1:
+    enabled: true
+    url: ldap://ldap:10389
+    root-dn: OU=Users,DC=perit,DC=hu
+    #ldaps.ad1.filter=(&(objectClass=user)(userPrincipalName={0}))
+    filter: (sAMAccountName={0})
+    #if this is set to true the domain will be put as postfix to the username when searching the AD. For userPrincipalName
+    #it should be true, for sAMAccountName false.
+    userprincipal-with-domain: false
+    domain: perit.hu
+    connect-timeout-ms: 2000
+    bind-user-pattern: uid={0},ou=Users,dc=perit,dc=hu

@@ -52,28 +52,28 @@ application {
 
 
 dependencies {
-    //compile project(':spvitamin-core')
-    //compile project(':spvitamin-spring-admin')
-    //compile project(':spvitamin-spring-cloud-eureka')
-    //compile project(':spvitamin-spring-cloud-feign')
-    //compile project(':spvitamin-spring-general')
-    //compile project(':spvitamin-spring-logging')
-    //compile project(':spvitamin-spring-security')
-    //compile project(':spvitamin-spring-security-ldap')
-    //compile project(':spvitamin-spring-server')
-    //compile project(':spvitamin-spring-data')
+    compile project(':spvitamin-core')
+    compile project(':spvitamin-spring-admin')
+    compile project(':spvitamin-spring-cloud-client')
+    compile project(':spvitamin-spring-cloud-feign')
+    compile project(':spvitamin-spring-general')
+    compile project(':spvitamin-spring-logging')
+    compile project(':spvitamin-spring-security')
+    compile project(':spvitamin-spring-security-ldap')
+    compile project(':spvitamin-spring-server')
+    compile project(':spvitamin-spring-data')
     compile project(':template-auth-api')
 
-    implementation 'hu.perit.spvitamin:spvitamin-core'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-admin'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-client'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-eureka'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-general'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-logging'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-security'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-security-ldap'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-server'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-data'
+//    implementation 'hu.perit.spvitamin:spvitamin-core'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-admin'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-client'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-feign'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-general'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-logging'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-security'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-security-ldap'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-server'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-data'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -91,9 +91,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    // Eureka
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-
     // JJWT
     implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 
@@ -109,14 +106,7 @@ dependencies {
     // javax.validation
     implementation group: 'javax.validation', name: 'validation-api'
     implementation group: 'org.hibernate', name: 'hibernate-validator', version: '6.1.5.Final'
-
-    // Test framework
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
-
-    testImplementation 'org.springframework.security:spring-security-test'
-
+    
     // Swagger
     implementation "io.springfox:springfox-boot-starter:3.0.0"
     implementation "io.springfox:springfox-swagger-ui:3.0.0"
@@ -127,8 +117,6 @@ dependencies {
 
     // Slf4J
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-    //implementation group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'    
-    //implementation('log4j:log4j:1.2.17')
 
     // ModelMapper
     implementation group: 'org.modelmapper.extensions', name: 'modelmapper-spring', version: '2.3.5'
@@ -136,13 +124,24 @@ dependencies {
     // OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
-    //implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.12'
 
     // OpenCSV
     implementation group: 'com.opencsv', name: 'opencsv', version: '4.0'
 
     // Micrometer Prometheus plugin
     implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.5.3'
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Test dependencies
+    //------------------------------------------------------------------------------------------------------------------
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+
+    testImplementation 'org.springframework.security:spring-security-test'
+
+    testRuntime 'com.h2database:h2'
+    testRuntime 'org.postgresql:postgresql'
 }
 
 

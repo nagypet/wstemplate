@@ -14,26 +14,29 @@
 # limitations under the License.
 #
 
-spring.application.name=template-performance-tester
+spring:
+  application:
+    name: template-performance-tester
 
-system.time-zone=Europe/Budapest
+system.time-zone: Europe/Budapest
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Server settings
 #-----------------------------------------------------------------------------------------------------------------------
-server.ssl.ignore-certificate-validation=true
+server.ssl.ignore-certificate-validation: true
 
-tester.threadcount=60
-# count of test documents
-tester.batchsize=10000
-# duration in minutes
-tester.duration-mins=60
-# pause between test cycles in seconds
-tester.pause-seconds=10
+tester:
+  threadcount: 60
+  # count of test documents
+  batchsize: 10000
+  # duration in minutes
+  duration-mins: 60
+  # pause between test cycles in seconds
+  pause-seconds: 10
 
-### Auth service parameters
-tester.auth-service-url=https://localhost:8500/auth
+  ### Auth service parameters
+  auth-service-url: https://auth-service.wstemplate.k8s-test.perit.hu
 
-### Scalable service parameters
-tester.scalable-service-url=https://localhost:8500/scalable
+  ### Scalable service parameters
+  scalable-service-url: https://scalable-service.wstemplate.k8s-test.perit.hu
 

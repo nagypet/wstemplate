@@ -18,13 +18,15 @@ import {Injectable} from '@angular/core';
 import {HttpBackend, HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {tap} from 'rxjs/operators';
-import {AdminService} from '../admin.service';
+import {AuthToken} from '../../modell/auth-model';
+import {environment} from '../../../environments/environment';
 
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
+export class AuthService
+{
 
   private httpSilent: HttpClient;
 
@@ -36,40 +38,48 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private handler: HttpBackend
-  ) {
+  )
+  {
     this.httpSilent = new HttpClient(handler);
   }
 
 
-  public isAuthenticated(): boolean {
+  public isAuthenticated(): boolean
+  {
     return this.authenticated;
   }
 
 
-  public getUserName(): string {
+  public getUserName(): string
+  {
     return this.userName;
   }
 
 
-  public getToken(): string {
+  public getToken(): string
+  {
     return this.token;
   }
 
 
-  public areSettingsAvailable(): boolean {
+  public areSettingsAvailable(): boolean
+  {
     return this.settingsAreAvailable;
   }
 
 
-  public authenticateWithUserNamePassword(userName: string, password: string): Observable<any> {
-    return this.http.get(AdminService.getServiceUrl('/authenticate'), this.getAuthHeaderForLegacyAuthentication(userName, password)).pipe(
-      tap(response => {
+  public authenticateWithUserNamePassword(userName: string, password: string): Observable<any>
+  {
+    return this.http.get(`${environment.baseURL}/api/spvitamin/authenticate`, this.getAuthHeaderForLegacyAuthentication(userName, password)).pipe(
+      tap(response =>
+      {
         console.log('authenticateWithUserNamePassword()');
         console.log(response);
         this.authenticated = true;
         this.userName = response.sub;
         this.token = response.jwt;
-      }, err => {
+      }, err =>
+      {
         console.log(err);
         this.authenticated = false;
         this.userName = '';
@@ -79,14 +89,17 @@ export class AuthService {
   }
 
 
-  public getAuthentication(): Observable<any> {
-    return this.httpSilent.get(AdminService.getServiceUrl('/authenticate')).pipe(
-      tap(response => {
+  public getAuthentication(): Observable<any>
+  {
+    return this.httpSilent.get<AuthToken>(`${environment.baseURL}/api/spvitamin/authenticate`).pipe(
+      tap(response =>
+      {
         console.log('getAuthentication(): Session already authenticated!');
         this.authenticated = true;
         this.userName = response.sub;
         this.token = response.jwt;
-      }, err => {
+      }, err =>
+      {
         console.log('getAuthentication() error: ' + err.status + ' Session is not authenticated!');
         console.log(err);
         this.authenticated = false;
@@ -97,12 +110,15 @@ export class AuthService {
   }
 
 
-  public tryGetSettings(): Observable<any> {
-    return this.httpSilent.get(AdminService.getServiceUrl('/admin/settings')).pipe(
-      tap(response => {
+  public tryGetSettings(): Observable<any>
+  {
+    return this.httpSilent.get(`${environment.baseURL}/api/spvitamin/admin/settings`).pipe(
+      tap(response =>
+      {
         console.log('tryGetSettings(): Authentication is not required, settings can be displayed!');
         this.settingsAreAvailable = true;
-      }, err => {
+      }, err =>
+      {
         console.log('tryGetSettings() error: ' + err.status + ' authentication is required, no settings can be displayed!');
         this.settingsAreAvailable = false;
       })
@@ -110,13 +126,16 @@ export class AuthService {
   }
 
 
-  public logout(): Observable<any> {
-    return this.http.get(AdminService.getServiceUrl('/logout')).pipe(
-      tap(response => {
+  public logout(): Observable<any>
+  {
+    return this.http.get(`${environment.baseURL}/logout`).pipe(
+      tap(response =>
+      {
         this.authenticated = false;
         this.userName = '';
         this.token = '';
-      }, err => {
+      }, err =>
+      {
         console.log(err);
         this.authenticated = false;
         this.userName = '';
@@ -126,12 +145,15 @@ export class AuthService {
   }
 
 
-  private getAuthHeaderForLegacyAuthentication(userName?: String, password?: String): { headers: HttpHeaders } {
+  private getAuthHeaderForLegacyAuthentication(userName?: String, password?: String): { headers: HttpHeaders }
+  {
     let authorizationHeader = '';
-    if (userName !== undefined && password !== undefined) {
+    if (userName !== undefined && password !== undefined)
+    {
       const credentials = userName + ':' + password;
       authorizationHeader = 'Basic ' + btoa(credentials);
-    } else {
+    } else
+    {
       const credentials = this.getToken();
       authorizationHeader = 'Bearer ' + credentials;
     }
@@ -147,7 +169,8 @@ export class AuthService {
   }
 
 
-  private getAuthHeaderForToken(token: String): { headers: HttpHeaders } {
+  private getAuthHeaderForToken(token: String): { headers: HttpHeaders }
+  {
     const authorizationHeader = 'Bearer ' + token;
 
     return {
