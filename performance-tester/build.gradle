@@ -24,7 +24,7 @@ plugins {
 
 ext {
     set('springCloudVersion', "2020.0.5")
-    set('spvitaminVersion', '1.8.0-RELEASE')
+    set('spvitaminVersion', '1.9.0-RELEASE')
 }
 
 sourceCompatibility = 11
@@ -51,15 +51,15 @@ application {
 
 
 dependencies {
-	compile project(':spvitamin-core')
-    compile project(':spvitamin-spring-security-authservice-api')
-    compile project(':spvitamin-spring-general')
-    compile project(':spvitamin-spring-cloud-feign')
+//	compile project(':spvitamin-core')
+//    compile project(':spvitamin-spring-security-authservice-api')
+//    compile project(':spvitamin-spring-general')
+//    compile project(':spvitamin-spring-cloud-feign')
 
-//    implementation 'hu.perit.spvitamin:spvitamin-core'
-//    implementation 'hu.perit.spvitamin:spvitamin-spring-security-authservice-api'
-//    implementation 'hu.perit.spvitamin:spvitamin-spring-general'
-//    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-feign'
+    implementation 'hu.perit.spvitamin:spvitamin-core'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-security-authservice-api'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-general'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-feign'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'

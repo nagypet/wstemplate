@@ -15,7 +15,7 @@ This project implements a small, but _complete_ solution using the Spring framew
 The project can be used as a basis for POC projects as a fully dockerized microservice environment.
 
 ## Architecture
-![architecture](https://github.com/nagypet/wstemplate/blob/master/docs/images/wstemplate_architecture.jpg)
+![architecture](docs/images/wstemplate_architecture-K8s.jpg)
 
 There are 5 main components of the system:
 - template-auth-service: an authorization and user management service with Jwt authentication
