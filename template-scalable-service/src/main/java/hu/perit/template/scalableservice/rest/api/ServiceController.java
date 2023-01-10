@@ -45,6 +45,8 @@ public class ServiceController implements ServiceApi
     @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
     public Integer makeSomeLongCalculationUsingGET(String processID) throws InterruptedException
     {
+        this.metricsService.incrementWsCall();
+
         try (Took took = new TookWithMetric(this.metricsService.getMetricService(), processID, false))
         {
             TimeUnit.MILLISECONDS.sleep(2000);

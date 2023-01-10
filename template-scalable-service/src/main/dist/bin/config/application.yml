@@ -65,6 +65,9 @@ server:
     includeStacktrace: ALWAYS
     includeMessage: ALWAYS
 
+  tomcat:
+    mbeanregistry:
+      enabled: true
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Admin settings
