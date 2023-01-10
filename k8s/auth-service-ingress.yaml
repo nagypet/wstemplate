@@ -10,7 +10,7 @@ spec:
   tls:
     - hosts:
         - auth-service.wstemplate.k8s-test.perit.hu
-      secretName: templatekey
+      secretName: wstemplate-tls
   rules:
   - host: auth-service.wstemplate.k8s-test.perit.hu
     http:

@@ -3,12 +3,15 @@ kind: Service
 metadata:
   name: scalable-service
   namespace: wstemplate
+  labels:
+    monitored: prometheus
 spec:
   type: ClusterIP
   selector:
     component: scalable-service
   ports:
-  - protocol: TCP
+  - name: http
+    protocol: TCP
     port: 80
     targetPort: http
 ---
@@ -29,7 +32,7 @@ spec:
     spec:
       containers:
       - name: scalable-service
-        image: docker-registry:5000/wstemplate-template-scalable-service:1.0.3-SNAPSHOT
+        image: docker-registry:5000/wstemplate-template-scalable-service:1.0.4-SNAPSHOT
         imagePullPolicy: Always
         ports:
         - name: http

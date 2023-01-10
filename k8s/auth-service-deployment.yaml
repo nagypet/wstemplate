@@ -3,12 +3,15 @@ kind: Service
 metadata:
   name: auth-service
   namespace: wstemplate
+  labels:
+    monitored: prometheus
 spec:
   type: ClusterIP
   selector:
     component: auth-service
   ports:
-  - protocol: TCP
+  - name: http
+    protocol: TCP
     port: 80
     targetPort: http
 ---

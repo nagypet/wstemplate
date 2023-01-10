@@ -10,7 +10,7 @@ spec:
   tls:
     - hosts:
         - scalable-service.wstemplate.k8s-test.perit.hu
-      secretName: templatekey
+      secretName: wstemplate-tls
   rules:
   - host: scalable-service.wstemplate.k8s-test.perit.hu
     http:
