@@ -24,10 +24,6 @@ spring:
   h2:
     console:
       enabled: false
-  jackson:
-    serialization.write-dates-as-timestamps: false
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: ${system.time-zone}
   # To enable spring.profiles.include
   config.use-legacy-processing: true
 
@@ -76,17 +72,6 @@ server:
 admin:
   keystore-admin-enabled: false
 
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Swagger settings
-#-----------------------------------------------------------------------------------------------------------------------
-springfox:
-  documentation:
-    swagger-ui:
-      base-url: "/docs"
-    swagger:
-      v2:
-        path: "/docs"
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Security settings
@@ -186,3 +171,9 @@ ldaps:
     domain: perit.hu
     connect-timeout-ms: 2000
     bind-user-pattern: uid={0},ou=Users,dc=perit,dc=hu
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Include portable spvitamin defaults
+#-----------------------------------------------------------------------------------------------------------------------
+spring.profiles.include: spvitamin-defaults

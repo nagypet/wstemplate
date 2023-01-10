@@ -21,10 +21,6 @@
 spring:
   application:
     name: template-scalable-service
-  jackson:
-    serialization.write-dates-as-timestamps: false
-    date-format: yyyy-MM-dd HH:mm:ss
-    time-zone: ${system.time-zone}
   # To enable spring.profiles.include
   config.use-legacy-processing: true
 
@@ -65,27 +61,11 @@ server:
     includeStacktrace: ALWAYS
     includeMessage: ALWAYS
 
-  tomcat:
-    mbeanregistry:
-      enabled: true
-
 #-----------------------------------------------------------------------------------------------------------------------
 # Admin settings
 #-----------------------------------------------------------------------------------------------------------------------
 admin:
   keystore-admin-enabled: false
-
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Swagger settings
-#-----------------------------------------------------------------------------------------------------------------------
-springfox:
-  documentation:
-    swagger-ui:
-      base-url: "/docs"
-    swagger:
-      v2:
-        path: "/docs"
 
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -128,3 +108,9 @@ management:
 #-----------------------------------------------------------------------------------------------------------------------
 microservices:
   auth-service.url: http://auth-service
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Include portable spvitamin defaults
+#-----------------------------------------------------------------------------------------------------------------------
+spring.profiles.include: spvitamin-defaults
