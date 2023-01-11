@@ -20,7 +20,7 @@ import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.metrics.TookWithMetric;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.template.scalableservice.config.Constants;
-import hu.perit.template.scalableservice.metrics.MetricsService;
+import hu.perit.template.scalableservice.metrics.MicrometerMetricsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class ServiceController implements ServiceApi
 {
-    private final MetricsService metricsService;
+    private final MicrometerMetricsService micrometerMetricsService;
 
     /*
      * ============== makeSomeLongCalculation ==========================================================================
@@ -45,9 +45,9 @@ public class ServiceController implements ServiceApi
     @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
     public Integer makeSomeLongCalculationUsingGET(String processID) throws InterruptedException
     {
-        this.metricsService.incrementWsCall();
+        this.micrometerMetricsService.incrementWsCall();
 
-        try (Took took = new TookWithMetric(this.metricsService.getMetricService(), processID, false))
+        try (Took took = new TookWithMetric(this.micrometerMetricsService.getMetricService(), processID, false))
         {
             TimeUnit.MILLISECONDS.sleep(2000);
             return 12;

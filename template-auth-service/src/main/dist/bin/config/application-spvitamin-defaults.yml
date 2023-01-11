@@ -47,3 +47,26 @@ springfox:
     swagger:
       v2:
         path: "/docs"
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Management endpoints
+#-----------------------------------------------------------------------------------------------------------------------
+management:
+  endpoint:
+    refresh.enabled: true
+    health:
+      show-details: always
+      group:
+        startup:
+          include: "ping, healthIndicatorDatabase, diskSpace"
+        readiness:
+          include: "ping"
+        liveness:
+          include: "ping"
+  endpoints:
+    web.exposure.include: health,env,info,metrics,prometheus
+  health:
+    db.enabled: false
+    ldap.enabled: false
+    refresh.enabled: false

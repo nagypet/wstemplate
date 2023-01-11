@@ -32,8 +32,31 @@ spec:
     spec:
       containers:
       - name: scalable-service
-        image: docker-registry:5000/wstemplate-template-scalable-service:1.0.6-SNAPSHOT
+        image: docker-registry:5000/wstemplate-template-scalable-service:1.0.7-SNAPSHOT
         imagePullPolicy: Always
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /actuator/health/liveness
+            port: 80
+            scheme: HTTP
+          periodSeconds: 300
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        startupProbe:
+          failureThreshold: 30
+          httpGet:
+            path: /actuator/health/startup
+            port: 80
+            scheme: HTTP
+          periodSeconds: 10          
         ports:
         - name: http
           containerPort: 80

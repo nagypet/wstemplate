@@ -23,7 +23,7 @@ plugins {
 }
 
 ext {
-    set('spvitaminVersion', '1.9.0-RELEASE')
+    set('spvitaminVersion', '1.9.1-RELEASE')
     set('springCloudVersion', "2020.0.5")
     set('imagePrefix', 'wstemplate')
     set('dockerRegistry', 'docker-registry:5000')

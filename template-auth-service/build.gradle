@@ -23,7 +23,7 @@ plugins {
 }
 
 ext {
-    set('spvitaminVersion', '1.9.0-RELEASE')
+    set('spvitaminVersion', '1.9.1-RELEASE')
     set('springCloudVersion', "2020.0.5")
     set('imagePrefix', 'wstemplate')
     set('dockerRegistry', 'docker-registry:5000')
@@ -98,11 +98,6 @@ dependencies {
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime'
 
-    // H2
-    runtimeOnly 'com.h2database:h2'
-    // PostgreSQL
-    runtimeOnly 'org.postgresql:postgresql'
-
     // javax.validation
     implementation group: 'javax.validation', name: 'validation-api'
     implementation group: 'org.hibernate', name: 'hibernate-validator', version: '6.1.5.Final'
@@ -118,7 +113,7 @@ dependencies {
     // Slf4J
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
 
-    // ModelMapper
+    // ModelMapper TODO: mapstruct
     implementation group: 'org.modelmapper.extensions', name: 'modelmapper-spring', version: '2.3.5'
 
     // OpenFeign
@@ -130,6 +125,16 @@ dependencies {
 
     // Micrometer Prometheus plugin
     implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.5.3'
+
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Runtime dependencies
+    //------------------------------------------------------------------------------------------------------------------
+    // H2
+    runtimeOnly 'com.h2database:h2'
+    // PostgreSQL
+    runtimeOnly 'org.postgresql:postgresql'
+
 
     //------------------------------------------------------------------------------------------------------------------
     // Test dependencies
