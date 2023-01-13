@@ -86,7 +86,9 @@ task distWindowsService {
  *******************************************************************************************************/
 if (project.hasProperty('bootJar')) {
 	bootJar {
-		layered()
+		layered {
+                        enabled = true
+                }
 	}
 }
 
