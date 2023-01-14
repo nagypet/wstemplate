@@ -35,7 +35,7 @@ apply from: '../gradle/common.gradle'
 
 
 ext {
-    set('spvitaminVersion', '2.0.0-RELEASE')
+    set('spvitaminVersion', '2.0.1-RELEASE')
     set('springCloudVersion', "2020.0.5")
     set('imagePrefix', 'wstemplate')
 }
