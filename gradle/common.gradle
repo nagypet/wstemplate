@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2022 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-group = 'hu.perit.spvitamin'
+import groovy.text.SimpleTemplateEngine
+
+group = 'hu.perit'
 
 
 /********************************************************************************************************
@@ -70,6 +72,20 @@ task dist {
 }
 
 
+task distWindowsService {
+    group 'fmake'
+	
+	if (project.hasProperty('test')) {
+		dependsOn 'test'
+	}
+	
+	if (project.hasProperty('installBootDist')) {
+		dependsOn 'installBootDist'
+		dependsOn 'updateServiceXml'
+	}
+}
+
+
 /********************************************************************************************************
  * Layered bootJar
  *******************************************************************************************************/
@@ -95,7 +111,9 @@ else if (new File("${projectDir}/../version.ver").exists())
 }
 else
 {
-	throw new RuntimeException("version.ver not found while processing ${project.name}!")
+	println "version.ver not found while processing ${project.name}!"
+	version = 'dev'
+	//throw new RuntimeException("version.ver not found while processing ${project.name}!")
 }
 
 
@@ -141,8 +159,16 @@ configurations {
 
 task prepareIntegTest(type: Copy) {
     group 'fmake'
-    from "src/main/dist/bin"
+
+	from "src/main/dist/bin"
     into "${projectDir}/build/resources/integtest"
+}
+
+task prepareIntegTestInEclipse(type: Copy) {
+    group 'fmake'
+
+	from "src/main/dist/bin"
+    into "${projectDir}/bin/integtest"
 }
 
 task integtest(type: Test) {
@@ -155,6 +181,12 @@ task integtest(type: Test) {
 
 integtest {
     useJUnitPlatform()
+}
+
+if (project.hasProperty('processIntegtestResources')) {
+	processIntegtestResources {
+		duplicatesStrategy = 'include'
+	}
 }
 
 
@@ -175,7 +207,7 @@ if (project.hasProperty('jar')) {
 				if (project.hasProperty('application')) {
 					attributes(
 						'Implementation-Title': applicationName,
-						'Implementation-Type': 'Library'
+						'Implementation-Type': 'Application'
 					)
 				}
 			}
@@ -195,7 +227,7 @@ if (project.hasProperty('bootJar')) {
 				if (project.hasProperty('application')) {
 					attributes(
 						'Implementation-Title': applicationName,
-						'Implementation-Type': 'Library'
+						'Implementation-Type': 'Application'
 					)
 				}
 			}
@@ -220,6 +252,43 @@ if (project.hasProperty('installBootDist')) {
 	installBootDist.finalizedBy finalizeInstallBootDist
 }
 
+
+/********************************************************************************************************
+ * updateServiceXml
+ *******************************************************************************************************/
+if (project.hasProperty('archivesBaseName')) {
+	task updateServiceXml() {
+		group 'fmake'
+		description 'Update service xml'
+
+		dependsOn 'installBootDist'
+
+		def serviceFile = new File("${buildDir}/install/${archivesBaseName}-boot/${project.name}-service.xml")
+		def serviceFileName = serviceFile.toString()
+
+		doFirst {
+			if (serviceFile.exists()) {
+				println("> Updating ${serviceFileName} with jarname: ${project.name}-${version}.jar")
+
+				def binding = [
+						JARNAME_PLACEHOLDER: "${project.name}-${version}.jar"
+				]
+
+				def engine = new SimpleTemplateEngine()
+				def template = engine.createTemplate(serviceFile.text).make(binding)
+
+				serviceFile.write template.toString()
+			} else {
+				println("> ${serviceFileName} not found!")
+			}
+		}
+
+		outputs.upToDateWhen {
+			// Ha nem létezik, akkor up-to-date a task
+			!(new File(serviceFileName).exists())
+		}
+	}
+}
 
 
 /********************************************************************************************************
@@ -321,81 +390,6 @@ if (project.hasProperty('jacocoTestReport')) {
 		reports {
 			xml.enabled true
 		}
-	}
-}
-
-
-/********************************************************************************************************
- * Publishing with source and javadoc
- *******************************************************************************************************/
-if (project.hasProperty('java')) {
-	java {
-		withSourcesJar()
-	}
-	java {
-		withJavadocJar()
-	}
-	tasks.withType(Javadoc) {
-		failOnError false
-		options.addStringOption('Xdoclint:none', '-quiet')
-		options.addStringOption('encoding', 'UTF-8')
-		options.addStringOption('charSet', 'UTF-8')
-	}	
-}
-
-
-pluginManager.withPlugin('maven-publish') {
-	if (project.hasProperty('ossrhUsername')) {
-		publishing {
-			repositories {
-				maven {
-					credentials {
-						username "${ossrhUsername}"
-						password "${ossrhPassword}"
-					}
-					name 'Staging'
-					url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-				}
-			}
-			publications {
-				mavenJava(MavenPublication) {
-					groupId = "${project.group}"
-					artifactId = "${project.name}"
-					version = "${version}"
-					from components.java
-					pom {
-						name = "${project.group}:${project.name}"
-						description = 'A general purpose library to use in a spring based microservice environment.'
-						url = 'https://github.com/nagypet/spvitamin'
-						licenses {
-							license {
-								name = 'The Apache License, Version 2.0'
-								url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-							}
-						}
-						developers {
-							developer {
-								id = 'nagypet'
-								name = 'Peter Nagy'
-								email = 'peter.nagy@perit.hu'
-							}
-						}
-						scm {
-							connection = 'scm:git:git://github.com/nagypet/spvitamin.git'
-							developerConnection = 'scm:git:ssh://github.com:nagypet/spvitamin.git'
-							url = 'https://github.com/nagypet/spvitamin.git'
-						}
-					}
-				}
-			}
-		}
-		
-		
-		pluginManager.withPlugin('signing') {
-			signing {
-				sign publishing.publications.mavenJava
-			}
-		}		
 	}
 }
 
