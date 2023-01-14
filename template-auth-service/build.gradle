@@ -23,7 +23,7 @@ plugins {
 }
 
 ext {
-    set('spvitaminVersion', '1.9.1-RELEASE')
+    set('spvitaminVersion', '2.0.0-RELEASE')
     set('springCloudVersion', "2021.0.5")
     set('imagePrefix', 'wstemplate')
     set('dockerRegistry', 'docker-registry:5000')
@@ -36,11 +36,8 @@ apply from: '../gradle/docker.gradle'
 
 
 repositories {
-    jcenter()
     mavenCentral()
-    flatDir {
-        dirs '../gradle/localrepo'
-    }
+    mavenLocal()
 }
 
 
@@ -52,16 +49,16 @@ application {
 
 
 dependencies {
-//    compile project(':spvitamin-core')
-//    compile project(':spvitamin-spring-admin')
-//    compile project(':spvitamin-spring-cloud-client')
-//    compile project(':spvitamin-spring-cloud-feign')
-//    compile project(':spvitamin-spring-general')
-//    compile project(':spvitamin-spring-logging')
-//    compile project(':spvitamin-spring-security')
-//    compile project(':spvitamin-spring-security-ldap')
-//    compile project(':spvitamin-spring-server')
-//    compile project(':spvitamin-spring-data')
+//    implementation project(':spvitamin-core')
+//    implementation project(':spvitamin-spring-admin')
+//    implementation project(':spvitamin-spring-cloud-client')
+//    implementation project(':spvitamin-spring-cloud-feign')
+//    implementation project(':spvitamin-spring-general')
+//    implementation project(':spvitamin-spring-logging')
+//    implementation project(':spvitamin-spring-security')
+//    implementation project(':spvitamin-spring-security-ldap')
+//    implementation project(':spvitamin-spring-server')
+//    implementation project(':spvitamin-spring-data')
     implementation project(':template-auth-api')
 
     implementation 'hu.perit.spvitamin:spvitamin-core'

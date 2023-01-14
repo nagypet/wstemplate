@@ -24,7 +24,7 @@ plugins {
 
 ext {
     set('springCloudVersion', "2020.0.5")
-    set('spvitaminVersion', '1.9.1-RELEASE')
+    set('spvitaminVersion', '2.0.0-RELEASE')
 }
 
 sourceCompatibility = 11

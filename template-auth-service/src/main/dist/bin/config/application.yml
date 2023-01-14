@@ -24,8 +24,6 @@ spring:
   h2:
     console:
       enabled: false
-  # To enable spring.profiles.include
-  config.use-legacy-processing: true
 
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -158,9 +156,3 @@ ldaps:
     domain: perit.hu
     connect-timeout-ms: 2000
     bind-user-pattern: uid={0},ou=Users,dc=perit,dc=hu
-
-
-#-----------------------------------------------------------------------------------------------------------------------
-# Include portable spvitamin defaults
-#-----------------------------------------------------------------------------------------------------------------------
-spring.profiles.include: spvitamin-defaults

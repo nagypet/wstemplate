@@ -16,9 +16,8 @@
 
 package hu.perit.template.scalableservice;
 
-import hu.perit.spvitamin.spring.environment.EnvironmentPostProcessor;
+import hu.perit.spvitamin.spring.SpvitaminApplication;
 import lombok.extern.log4j.Log4j;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
@@ -36,8 +35,6 @@ public class Application
 
     public static void main(String[] args)
     { // NOSONAR
-        SpringApplication application = new SpringApplication(Application.class);
-        application.addListeners(new EnvironmentPostProcessor());
-        application.run(args);
+        SpvitaminApplication.run(Application.class, args);
     }
 }

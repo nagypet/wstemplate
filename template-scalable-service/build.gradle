@@ -23,7 +23,7 @@ plugins {
 }
 
 ext {
-    set('spvitaminVersion', '1.9.1-RELEASE')
+    set('spvitaminVersion', '2.0.0-RELEASE')
     set('springCloudVersion', "2020.0.5")
     set('imagePrefix', 'wstemplate')
     set('dockerRegistry', 'docker-registry:5000')
@@ -38,6 +38,7 @@ apply from: '../gradle/docker.gradle'
 repositories {
     jcenter()
     mavenCentral()
+    mavenLocal()
     flatDir {
         dirs '../gradle/localrepo'
     }

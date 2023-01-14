@@ -30,17 +30,22 @@ if (project.hasProperty('compileJava')) {
 		}
 	}
 	compileJava.finalizedBy createBuildTimeTxt
+	
+	compileJava { 
+		options.encoding = "CP1252" 
+	}
 }
 
 
 /********************************************************************************************************
  * JDK > 1.8
  *******************************************************************************************************/
-if (project.hasProperty('compileJava')) {
-	compileJava {
-		options.compilerArgs << '--add-exports'
-		options.compilerArgs << 'java.base/sun.security.ssl=ALL-UNNAMED'
-		options.encoding = 'UTF-8'
+if (project.hasProperty('java') && project.hasProperty('compileJava')) {
+	if (java.sourceCompatibility != JavaVersion.VERSION_1_8) {
+		compileJava {
+			options.compilerArgs << '--add-exports'
+			options.compilerArgs << 'java.base/sun.security.ssl=ALL-UNNAMED'
+		}
 	}
 }
 
@@ -100,10 +105,17 @@ if (new File("${projectDir}/version.ver").exists())
 {
 	version = rootProject.file("${projectDir}/version.ver").text.trim()
 }
+else if (new File("${projectDir}/../version.ver").exists())
+{
+	version = rootProject.file("${projectDir}/../version.ver").text.trim()
+}
 else
 {
+	println "version.ver not found while processing ${project.name}!"
 	version = 'dev'
+	//throw new RuntimeException("version.ver not found while processing ${project.name}!")
 }
+
 
 
 /********************************************************************************************************
@@ -169,6 +181,12 @@ task integtest(type: Test) {
 
 integtest {
     useJUnitPlatform()
+}
+
+if (project.hasProperty('processIntegtestResources')) {
+	processIntegtestResources {
+		duplicatesStrategy = 'include'
+	}
 }
 
 

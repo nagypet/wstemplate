@@ -19,7 +19,6 @@ buildscript {
         springBootVersion = '2.4.5'
     }
     repositories {
-        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -27,7 +26,7 @@ buildscript {
     }
 }
 
-// Note that plugins block cannot be used in subprojects, that is wha the old fashioned way
+// Note that plugins block cannot be used in subprojects, that is why the old fashioned way
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: 'java-library'
@@ -36,20 +35,15 @@ apply from: '../gradle/common.gradle'
 
 
 ext {
-    set('spvitaminVersion', '1.9.1-RELEASE')
+    set('spvitaminVersion', '2.0.0-RELEASE')
     set('springCloudVersion', "2020.0.5")
     set('imagePrefix', 'wstemplate')
 }
 
 
 repositories {
-    jcenter()
     mavenCentral()
-    maven { url 'https://repo.spring.io/milestone' }
-    maven { url 'https://repo.spring.io/snapshot' }
-    flatDir {
-        dirs '../gradle/localrepo'
-    }
+    mavenLocal()
 }
 
 
@@ -61,9 +55,11 @@ bootJar {
 sourceCompatibility = 11
 
 dependencies {
-	//compile project(':spvitamin-spring-admin')
+//    implementation project(':spvitamin-spring-admin')
+//    implementation project(':spvitamin-spring-security')
 
     implementation 'hu.perit.spvitamin:spvitamin-spring-admin'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-security'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
