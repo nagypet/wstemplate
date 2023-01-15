@@ -16,20 +16,14 @@
 
 package hu.perit.template.scalableservice.rest.api;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.web.bind.annotation.RestController;
-
 import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
-import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
-import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.spvitamin.spring.security.SecurityContextUtil;
-import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import hu.perit.template.scalableservice.config.Constants;
 import lombok.extern.log4j.Log4j;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Peter Nagy
@@ -37,41 +31,20 @@ import lombok.extern.log4j.Log4j;
 
 @RestController
 @Log4j
-public class AuthController extends AbstractInterfaceLogger implements AuthApi {
-
-    private final AuthorizationService authorizationService;
-
-    public AuthController(AuthorizationService authorizationService, HttpServletRequest httpRequest) {
-        super(httpRequest);
-        this.authorizationService = authorizationService;
-    }
-
-
+public class AuthController implements AuthApi
+{
     @Override
-    public AuthorizationToken authenticateUsingGET(String processID) {
-        AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
-        this.traceIn(processID, authenticatedUser.getUsername(), this.getMyMethodName(), 1);
-
-        try (Took took = new Took(processID)) {
-            if (SecurityContextUtil.getToken() instanceof AuthorizationToken) {
-                AuthorizationToken token = (AuthorizationToken) SecurityContextUtil.getToken();
-                this.traceOut(processID, authenticatedUser.getUsername(), this.getMyMethodName(), 1);
-                return token;
-            }
-            else {
-                throw new UnexpectedConditionException("Token is not instance of AuthorizationToken!");
-            }
-        }
-        catch (Throwable ex)
+    @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
+    public AuthorizationToken authenticateUsingGET(String processID)
+    {
+        if (SecurityContextUtil.getToken() instanceof AuthorizationToken)
         {
-            this.traceOut(processID, authenticatedUser.getUsername(), this.getMyMethodName(), 1, ex);
-            throw ex;
+            AuthorizationToken token = (AuthorizationToken) SecurityContextUtil.getToken();
+            return token;
         }
-    }
-
-
-    @Override
-    protected String getSubsystemName() {
-        return Constants.SUBSYSTEM_NAME;
+        else
+        {
+            throw new UnexpectedConditionException("Token is not instance of AuthorizationToken!");
+        }
     }
 }

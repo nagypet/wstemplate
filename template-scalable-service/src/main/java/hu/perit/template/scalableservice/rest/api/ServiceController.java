@@ -16,24 +16,16 @@
 
 package hu.perit.template.scalableservice.rest.api;
 
-import com.google.common.reflect.AbstractInvocationHandler;
-import hu.perit.spvitamin.core.connectablecontext.ThreadContextKey;
 import hu.perit.spvitamin.core.took.Took;
-import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
 import hu.perit.spvitamin.spring.metrics.TookWithMetric;
-import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
+import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.template.scalableservice.config.Constants;
-import hu.perit.template.scalableservice.metrics.MetricsService;
-import hu.perit.template.scalableservice.rest.session.ServiceSession;
-import hu.perit.template.scalableservice.rest.session.ServiceSessionHolder;
+import hu.perit.template.scalableservice.metrics.MicrometerMetricsService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Peter Nagy
@@ -41,90 +33,24 @@ import java.lang.reflect.Proxy;
 
 @RestController
 @Log4j
-public class ServiceController implements ServiceApi {
-
-    private final ServiceApi proxy;
-    private final MetricsService metricsService;
-
-    public ServiceController(
-            ServiceSessionHolder serviceSessionHolder,
-            AuthorizationService authorizationService,
-            MetricsService metricsService,
-            HttpServletRequest httpRequest) {
-        proxy = (ServiceApi) Proxy.newProxyInstance(
-                ServiceApi.class.getClassLoader(),
-                new Class[]{ServiceApi.class},
-                new ServiceController.ProxyImpl(httpRequest, serviceSessionHolder, authorizationService, metricsService));
-
-        this.metricsService = metricsService;
-    }
+@RequiredArgsConstructor
+public class ServiceController implements ServiceApi
+{
+    private final MicrometerMetricsService micrometerMetricsService;
 
     /*
      * ============== makeSomeLongCalculation ==========================================================================
      */
     @Override
-    public Integer makeSomeLongCalculationUsingGET(String processID) throws InterruptedException {
-        try (TookWithMetric took = new TookWithMetric(this.metricsService.getMetricService(), processID, false)) {
-            return this.proxy.makeSomeLongCalculationUsingGET(processID);
-        }
-    }
+    @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
+    public Integer makeSomeLongCalculationUsingGET(String processID) throws InterruptedException
+    {
+        this.micrometerMetricsService.incrementWsCall();
 
-
-    @Log4j
-    private static class ProxyImpl extends AbstractInvocationHandler {
-        private final ServiceSessionHolder threadContextHolder;
-        private final AuthorizationService authorizationService;
-        private final MetricsService metricsService;
-        private final ProxyImpl.Logger logger;
-
-        public ProxyImpl(HttpServletRequest httpRequest, ServiceSessionHolder threadContextHolder, AuthorizationService authorizationService, MetricsService metricsService) {
-            this.threadContextHolder = threadContextHolder;
-            this.authorizationService = authorizationService;
-            this.metricsService = metricsService;
-            this.logger = new ProxyImpl.Logger(httpRequest);
-        }
-
-
-        @Override
-        protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable {
-            return this.invokeInContext(method, args);
-        }
-
-
-        private Object invokeInContext(Method method, Object[] args) throws Throwable {
-            UserDetails user = this.authorizationService.getAuthenticatedUser();
-            try (Took took = new Took(method)) {
-                this.metricsService.incrementWsCall();
-                this.logger.traceIn(null, user.getUsername(), method, args);
-
-                ServiceSession serviceSession = this.threadContextHolder.getContext(new ThreadContextKey());
-
-                Object retval = method.invoke(serviceSession, args);
-
-                this.logger.traceOut(null, user.getUsername(), method);
-                return retval;
-            }
-            catch (IllegalAccessException ex) {
-                this.logger.traceOut(null, user.getUsername(), method, ex);
-                throw ex;
-            }
-            catch (InvocationTargetException ex) {
-                this.logger.traceOut(null, user.getUsername(), method, ex.getTargetException());
-                throw ex.getTargetException();
-            }
-        }
-
-        @Log4j
-        private static class Logger extends AbstractInterfaceLogger {
-
-            protected Logger(HttpServletRequest httpRequest) {
-                super(httpRequest);
-            }
-
-            @Override
-            protected String getSubsystemName() {
-                return Constants.SUBSYSTEM_NAME;
-            }
+        try (Took took = new TookWithMetric(this.micrometerMetricsService.getMetricService(), processID, false))
+        {
+            TimeUnit.MILLISECONDS.sleep(2000);
+            return 12;
         }
     }
 }

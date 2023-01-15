@@ -16,10 +16,6 @@
 
 package hu.perit.template.authservice.rest.client;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.RequestBody;
-
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -30,15 +26,19 @@ import hu.perit.template.authservice.rest.model.RoleSet;
 import hu.perit.template.authservice.rest.model.UpdateUserParams;
 import hu.perit.template.authservice.rest.model.UserDTO;
 import hu.perit.template.authservice.rest.model.UserDTOFiltered;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 /**
  * @author Peter Nagy
  */
 
-public interface TemplateAuthClient {
+public interface TemplateAuthClient
+{
 
-    String BASE_URL_AUTHENTICATE = "/authenticate";
-    String BASE_URL_USERS = "/users";
+    String BASE_URL_AUTHENTICATE = "/api/spvitamin/authenticate";
+    String BASE_URL_USERS = "/api/users";
     String PATH_ROLES = "/roles";
 
     /*

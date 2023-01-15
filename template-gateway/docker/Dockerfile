@@ -13,8 +13,7 @@ WORKDIR /usr/src/gateway
 
 EXPOSE 8500
 
-COPY ./dependencies ./lib
-COPY ./snapshot-dependencies* ./lib
+COPY ./dependencies ./snapshot-dependencies* ./lib
 COPY ./bin ./bin
 COPY ./application ./lib
 

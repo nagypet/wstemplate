@@ -22,7 +22,7 @@ import feign.RequestLine;
 
 public interface TemplateScalableServiceClient {
 
-    String BASE_URL_SERVICE = "/service";
+    String BASE_URL_SERVICE = "/api/service";
 
     /*
      * ============== service ==========================================================================================

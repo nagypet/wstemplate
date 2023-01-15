@@ -22,6 +22,7 @@ import java.util.Map;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -59,15 +60,16 @@ import lombok.extern.slf4j.Slf4j;
 public class DemoDbConfig
 {
     static final String PACKAGES = "hu.perit.template.authservice.db.demodb";
-    static final String ENTITY_MANAGER_FACTORY = "entityManagerFactory";
+    public static final String ENTITY_MANAGER_FACTORY = "entityManagerFactory";
     static final String TRANSACTION_MANAGER = "transactionManager";
 
-    private static final String PERSISTENCE_UNIT = "demodb";
+    public static final String PERSISTENCE_UNIT = "demodb";
     private static final String DATASOURCE = "dataSource";
 
     private final ConnectionParam connectionParam;
 
-    public DemoDbConfig(DatasourceCollectionProperties dbProperties) {
+    public DemoDbConfig(DatasourceCollectionProperties dbProperties)
+    {
         this.connectionParam = new ConnectionParam(dbProperties.getDatasource().get(PERSISTENCE_UNIT));
     }
 
@@ -92,16 +94,17 @@ public class DemoDbConfig
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder, @Qualifier(DATASOURCE) DataSource dataSource)
     {
         Map<String, String> properties = new HashMap<>();
-        properties.put("hibernate.dialect", this.connectionParam.getDialect());
-        properties.put("hibernate.connection.handling_mode", PhysicalConnectionHandlingMode.DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION.name());
-        properties.put("hibernate.hbm2ddl.auto", this.connectionParam.getDdlAuto());
+        properties.put(AvailableSettings.DIALECT, this.connectionParam.getDialect());
+        properties.put(AvailableSettings.CONNECTION_HANDLING, PhysicalConnectionHandlingMode.DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION.name());
+        properties.put(AvailableSettings.HBM2DDL_AUTO, this.connectionParam.getDdlAuto());
+        properties.put(AvailableSettings.ENABLE_LAZY_LOAD_NO_TRANS, "true");
+        properties.put(AvailableSettings.STATEMENT_BATCH_SIZE, "100");
+        properties.put(AvailableSettings.ORDER_INSERTS, "true");
+        properties.put(AvailableSettings.ORDER_UPDATES, "true");
+        //properties.put(AvailableSettings.BATCH_VERSIONED_DATA, "true");
+        properties.put(AvailableSettings.JPA_LOCK_TIMEOUT, "3000");
 
-        return builder
-                .dataSource(dataSource)
-                .packages(PACKAGES)
-                .persistenceUnit(PERSISTENCE_UNIT)
-                .properties(properties)
-                .build();
+        return builder.dataSource(dataSource).packages(PACKAGES).persistenceUnit(PERSISTENCE_UNIT).properties(properties).build();
     }
 
     @Primary
@@ -117,7 +120,8 @@ public class DemoDbConfig
      * @return
      */
     @Bean
-    public AuditorAware<Long> auditorProvider() {
+    public AuditorAware<Long> auditorProvider()
+    {
         return new SpringSecurityAuditorAware();
     }
 }

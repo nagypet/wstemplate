@@ -28,5 +28,13 @@ public class Constants {
 
     public static final String INDEXNAME_USERNAME = "user_ix_username";
 
+    public static final int USER_API_GET_ALL = 1;
+    public static final int USER_API_GET_BY_ID = 2;
+    public static final int USER_API_CREATE = 3;
+    public static final int USER_API_UPDATE = 4;
+    public static final int USER_API_DELETE = 5;
+    public static final int USER_API_ADD_ROLE = 6;
+    public static final int USER_API_DELETE_ROLE = 7;
+
     public static final String SUBSYSTEM_NAME = "template-auth-service";
 }

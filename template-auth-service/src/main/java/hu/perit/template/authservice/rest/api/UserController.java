@@ -16,22 +16,8 @@
 
 package hu.perit.template.authservice.rest.api;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import org.springframework.web.bind.annotation.RestController;
-
-import com.google.common.reflect.AbstractInvocationHandler;
-
-import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
-import hu.perit.spvitamin.spring.logging.AbstractInterfaceLogger;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import hu.perit.template.authservice.config.Constants;
 import hu.perit.template.authservice.rest.model.CreateUserParams;
@@ -40,32 +26,34 @@ import hu.perit.template.authservice.rest.model.RoleSet;
 import hu.perit.template.authservice.rest.model.UpdateUserParams;
 import hu.perit.template.authservice.rest.model.UserDTO;
 import hu.perit.template.authservice.rest.model.UserDTOFiltered;
-import hu.perit.template.authservice.rest.session.UserSession;
 import hu.perit.template.authservice.services.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import javax.validation.Valid;
+import java.net.URI;
+import java.util.List;
 
 /**
  * @author Peter Nagy
  */
 
 @RestController
+@RequiredArgsConstructor
 public class UserController implements UserApi
 {
-
-    private final UserApi proxy;
-
-    public UserController(UserService userService, HttpServletRequest httpRequest, AuthorizationService authorizationService)
-    {
-        this.proxy = (UserApi) Proxy.newProxyInstance(UserApi.class.getClassLoader(), new Class[]{UserApi.class},
-            new UserController.ProxyImpl(userService, authorizationService, httpRequest));
-    }
+    private final UserService userService;
+    private final AuthorizationService authorizationService;
 
     /*
      * ============== getAllUsers ======================================================================================
      */
     @Override
+    @LoggedRestMethod(eventId = Constants.USER_API_GET_ALL, subsystem = Constants.SUBSYSTEM_NAME)
     public List<UserDTOFiltered> getAllUsersUsingGET(String processID)
     {
-        return this.proxy.getAllUsersUsingGET(processID);
+        return this.userService.getAll();
     }
 
 
@@ -73,9 +61,10 @@ public class UserController implements UserApi
      * ============== getUserById ======================================================================================
      */
     @Override
+    @LoggedRestMethod(eventId = Constants.USER_API_GET_BY_ID, subsystem = Constants.SUBSYSTEM_NAME)
     public UserDTO getUserByIdUsingGET(String processID, Long id) throws ResourceNotFoundException
     {
-        return this.proxy.getUserByIdUsingGET(processID, id);
+        return this.userService.getUserDTOById(id);
     }
 
 
@@ -83,9 +72,12 @@ public class UserController implements UserApi
      * ============== createUser =======================================================================================
      */
     @Override
+    @LoggedRestMethod(eventId = Constants.USER_API_CREATE, subsystem = Constants.SUBSYSTEM_NAME)
     public ResponseUri createUserUsingPOST(String processID, @Valid CreateUserParams createUserParams)
     {
-        return this.proxy.createUserUsingPOST(processID, createUserParams);
+        long newUserId = this.userService.create(createUserParams);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newUserId).toUri();
+        return new ResponseUri().location(location.toString());
     }
 
 
@@ -93,9 +85,10 @@ public class UserController implements UserApi
      * ============== updateUser =======================================================================================
      */
     @Override
+    @LoggedRestMethod(eventId = Constants.USER_API_UPDATE, subsystem = Constants.SUBSYSTEM_NAME)
     public void updateUserUsingPUT(String processID, Long id, @Valid UpdateUserParams updateUserParams) throws ResourceNotFoundException
     {
-        this.proxy.updateUserUsingPUT(processID, id, updateUserParams);
+        this.userService.update(id, updateUserParams);
     }
 
 
@@ -103,9 +96,10 @@ public class UserController implements UserApi
      * ============== deleteUser =======================================================================================
      */
     @Override
+    @LoggedRestMethod(eventId = Constants.USER_API_DELETE, subsystem = Constants.SUBSYSTEM_NAME)
     public void deleteUserUsingDELETE(String processID, Long id) throws ResourceNotFoundException
     {
-        this.proxy.deleteUserUsingDELETE(processID, id);
+        this.userService.delete(id);
     }
 
 
@@ -113,9 +107,10 @@ public class UserController implements UserApi
      * ============== addRole ==========================================================================================
      */
     @Override
+    @LoggedRestMethod(eventId = Constants.USER_API_ADD_ROLE, subsystem = Constants.SUBSYSTEM_NAME)
     public void addRoleUsingPOST(String processID, Long id, @Valid RoleSet roleSet) throws ResourceNotFoundException
     {
-        this.proxy.addRoleUsingPOST(processID, id, roleSet);
+        this.userService.addRole(id, roleSet);
     }
 
 
@@ -123,73 +118,9 @@ public class UserController implements UserApi
      * ============== deleteRole =======================================================================================
      */
     @Override
+    @LoggedRestMethod(eventId = Constants.USER_API_DELETE_ROLE, subsystem = Constants.SUBSYSTEM_NAME)
     public void deleteRoleUsingDELETE(String processID, Long id, @Valid RoleSet roleSet) throws ResourceNotFoundException
     {
-        this.proxy.deleteRoleUsingDELETE(processID, id, roleSet);
-    }
-
-
-    /*
-     * ============== PROXY Implementation =============================================================================
-     */
-
-    private static class ProxyImpl extends AbstractInvocationHandler
-    {
-        private final UserService userService;
-        private final AuthorizationService authorizationService;
-        private final ProxyImpl.Logger logger;
-
-        public ProxyImpl(UserService userService, AuthorizationService authorizationService, HttpServletRequest httpRequest)
-        {
-            this.userService = userService;
-            this.authorizationService = authorizationService;
-            this.logger = new ProxyImpl.Logger(httpRequest);
-        }
-
-
-        @Override
-        protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable
-        {
-            return this.invokeWithExtras(method, args);
-        }
-
-
-        private Object invokeWithExtras(Method method, Object[] args) throws Throwable
-        {
-            AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
-            try (Took took = new Took(method))
-            {
-                this.logger.traceIn(null, authenticatedUser.getUsername(), method, args);
-                UserSession session = new UserSession(this.userService);
-                Object retval = method.invoke(session, args);
-                this.logger.traceOut(null, authenticatedUser.getUsername(), method);
-                return retval;
-            }
-            catch (IllegalAccessException ex)
-            {
-                this.logger.traceOut(null, authenticatedUser.getUsername(), method, ex);
-                throw ex;
-            }
-            catch (InvocationTargetException ex)
-            {
-                this.logger.traceOut(null, authenticatedUser.getUsername(), method, ex.getTargetException());
-                throw ex.getTargetException();
-            }
-        }
-
-        private static class Logger extends AbstractInterfaceLogger
-        {
-
-            Logger(HttpServletRequest httpRequest)
-            {
-                super(httpRequest);
-            }
-
-            @Override
-            protected String getSubsystemName()
-            {
-                return Constants.SUBSYSTEM_NAME;
-            }
-        }
+        this.userService.deleteRole(id, roleSet);
     }
 }

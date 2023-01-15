@@ -23,9 +23,10 @@ plugins {
 }
 
 ext {
-    set('spvitaminVersion', '1.3.10-RELEASE')
+    set('spvitaminVersion', '2.0.2-RELEASE')
     set('springCloudVersion', "2020.0.5")
     set('imagePrefix', 'wstemplate')
+    set('dockerRegistry', 'docker-registry:5000')
 }
 
 sourceCompatibility = 11
@@ -37,6 +38,7 @@ apply from: '../gradle/docker.gradle'
 repositories {
     jcenter()
     mavenCentral()
+    mavenLocal()
     flatDir {
         dirs '../gradle/localrepo'
     }
@@ -51,20 +53,18 @@ application {
 
 
 dependencies {
-    //compile project(':spvitamin-core')
-    //compile project(':spvitamin-spring-admin')
-    //compile project(':spvitamin-spring-cloud-client')
-    //compile project(':spvitamin-spring-cloud-eureka')
-    //compile project(':spvitamin-spring-general')
-    //compile project(':spvitamin-spring-logging')
-    //compile project(':spvitamin-spring-security')
-    //compile project(':spvitamin-spring-security-authservice')
-    //compile project(':spvitamin-spring-server')
+//    implementation project(':spvitamin-core')
+//    implementation project(':spvitamin-spring-admin')
+//    implementation project(':spvitamin-spring-cloud-client')
+//    implementation project(':spvitamin-spring-general')
+//    implementation project(':spvitamin-spring-logging')
+//    implementation project(':spvitamin-spring-security')
+//    implementation project(':spvitamin-spring-security-authservice')
+//    implementation project(':spvitamin-spring-server')
 
     implementation 'hu.perit.spvitamin:spvitamin-core'
     implementation 'hu.perit.spvitamin:spvitamin-spring-admin'
     implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-client'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-eureka'
     implementation 'hu.perit.spvitamin:spvitamin-spring-general'
     implementation 'hu.perit.spvitamin:spvitamin-spring-logging'
     implementation 'hu.perit.spvitamin:spvitamin-spring-security'
@@ -84,9 +84,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-
-    // Eureka client
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
     // Guava
     implementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'

@@ -45,10 +45,12 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "user", schema = "dbo", indexes = {
+@Table(name = UserEntity.TABLE_NAME, schema = "dbo", indexes = {
         @Index(columnList = "username", name = Constants.INDEXNAME_USERNAME, unique = true)
 })
-public class UserEntity {
+public class UserEntity
+{
+    public static final String TABLE_NAME = "user";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,11 +73,14 @@ public class UserEntity {
     // Important to have a Set here! Hibernate will generate a composite primary key only when using a Set.
     private Set<RoleEntity> roleEntities;
 
-    public Set<String> getRoles() {
-        if (roleEntities != null) {
+    public Set<String> getRoles()
+    {
+        if (roleEntities != null)
+        {
             return this.roleEntities.stream().map(RoleEntity::getRole).collect(Collectors.toSet());
         }
-        else {
+        else
+        {
             return Collections.emptySet();
         }
     }

@@ -16,13 +16,10 @@
 
 package hu.perit.template.authservice;
 
-import org.springframework.boot.SpringApplication;
+import hu.perit.spvitamin.spring.SpvitaminApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
-
-import hu.perit.spvitamin.spring.environment.EnvironmentPostProcessor;
 
 /**
  * @author Peter Nagy
@@ -30,13 +27,11 @@ import hu.perit.spvitamin.spring.environment.EnvironmentPostProcessor;
 
 @Profile("!unittest")
 @SpringBootApplication
-@EnableEurekaClient
 @ComponentScan(basePackages = {"hu.perit.spvitamin", "hu.perit.template.authservice"})
-public class Application {
-
-    public static void main(String[] args) { // NOSONAR
-        SpringApplication application = new SpringApplication(Application.class);
-        application.addListeners(new EnvironmentPostProcessor());
-        application.run(args);
+public class Application
+{
+    public static void main(String[] args)
+    { // NOSONAR
+        SpvitaminApplication.run(Application.class, args);
     }
 }

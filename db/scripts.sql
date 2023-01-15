@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS dbo.role (
 
 ALTER TABLE dbo.role OWNER to postgres;
 
-INSERT INTO dbo.role(roleid, role) VALUES (1, 'ROLE_ADMIN'), (2, 'ROLE_PUBLIC');
+INSERT INTO dbo.role(roleid, role) VALUES (1, 'ROLE_ADMIN'), (2, 'ROLE_PUBLIC'), (3, 'ROLE_EMPTY');
 
 
 	
