@@ -1,6 +1,12 @@
 # wstemplate
 
-This project implements a small, but _complete_ solution using the Spring framework and a microservice architecture for demonstration purposes. What makes this solution complete?
+This project implements a small, but _complete_ solution using the Spring framework and a microservice architecture for demonstration purposes. This is actually the test environment of the [spvitamin](https://github.com/nagypet/spvitamin) project. 
+
+The first version was a standalone docker-compose deployment, with an API gateway and a Eureka discovery service. Then I have reworked the project using Kubernetes as the deployment target. So the `template-gateway` project was replaced by an nginx ingress-controller and the `template-eureka` project is not used anymore.
+
+Also, besides the performance-tester project there is now a JMeter performance test.
+
+What makes this solution complete?
 - scalability and high availability with redundant services
 - https communication
 - secured webservice endpoints
@@ -8,20 +14,18 @@ This project implements a small, but _complete_ solution using the Spring framew
 - integration tests
 - Swagger online documentation and test UI
 - sonarqube
-- Eureka, Spring Cloud Gateway, Hystrix with fault tolerance
-- components running in docker containers
-- monitoring with Prometheus/Grafana using cAdvisor and Node-exporter
+- (Eureka, Spring Cloud Gateway, Hystrix with fault tolerance)
+- deployment in Kubernetes
+- monitoring with Prometheus/Grafana
 
-The project can be used as a basis for POC projects as a fully dockerized microservice environment.
+The project can be used as a basis for further POC projects as a fully containerized microservice environment.
 
 ## Architecture
 ![architecture](docs/images/wstemplate_architecture-K8s.jpg)
 
-There are 5 main components of the system:
+There are 3 main components of the system:
 - template-auth-service: an authorization and user management service with Jwt authentication
-- template-eureka: service discovery
-- template-scalable-service: 3 instances of the service is installed to achieve scalability and high availability. The services are running within a single private docker network. In a real-world scenario we would use separated docker hosts with an overlay network, but this is only a small change in the docker-compose.yml file.
-- template-gateway: API gateway and load balancer
+- template-scalable-service: 3 instances of the service are installed to achieve scalability and high availability.
 - performance-tester: to generate a simulated load for the system
 
 ## Build and run
@@ -32,14 +36,17 @@ wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | sudo 
 sudo add-apt-repository --yes https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/
 sudo apt install adoptopenjdk-11-hotspot
 ```
-- Get the sources. Please note that the spvitamin library is stored in a git submodule, so you have to update this in a separate step:
+- Get the sources. Please note that the spvitamin library is availyble in the maven central repository, so you do not have to install in in source format. Getting the sources is only needed when developing the spvitamin library:
 ```
 git clone https://github.com/nagypet/wstemplate.git
+```
+optional:
+```
 cd wstemplate
 git submodule update --init
 ```
 
-This project requires spvitamin 1.3.7-RELEASE or higher.
+This project requires spvitamin 2.0.2-RELEASE or higher.
 
 ### Frontend
 - Install Node.js
@@ -54,44 +61,31 @@ npm install --save-dev @angular/cli@latest
 ```
 
 ### Backends
-- Configure your AD parameter in template-auth-service\src\main\dist\bin\config\application-dev.properties or set ldaps.ad1.enabled=false if you do not have access to an AD.
+- The build scripts will create the docker images and push them in a repository for use within the Kubernetes cluster. I have used `docker-registry:5000`, but you can customize this in build.gradle.
 - cd to the root folder and
 ```
-gradlew dist dockerImage --parallel
+gradlew clean dockerImage
 ```
-- then cd to docker-compose\dev\ and
-```
-coU postgres pgadmin
-```
-When the containers are up and running, go to http://localhost:5400 for pgadmin. 
+When the containers are up and running, go to http://pgadmin.wstemplate.k8s-test.perit.hu for pgadmin. 
 - login with postgres/sa
 - create a new connection. Parameters: host: postgres, port: 5432, username: postgres, password: sa
 - create a new database with the name 'testdb'. 
 - run the script in db\scripts.sql
-- start the remaining services with `coU --all`
 
 Check if all container is up and running.
-```
-C:\np\github\wstemplate\docker-compose\wstemplate-dev>docker ps
-CONTAINER ID        IMAGE                                    COMMAND                  CREATED             STATUS              PORTS                                            NAMES
-85fb212e480f        wstemplate-template-gateway              "sh ./template-gatew…"   7 minutes ago       Up 7 minutes        0.0.0.0:8500->8500/tcp                           wstemplate-dev-gateway
-a618b870ec87        wstemplate-template-auth-service         "sh ./template-auth-…"   10 minutes ago      Up 10 minutes       0.0.0.0:8410->8410/tcp                           wstemplate-dev-auth-service
-774c9cace279        wstemplate-template-scalable-service     "sh ./template-scala…"   18 minutes ago      Up 18 minutes       8420/tcp, 0.0.0.0:8440->8440/tcp                 wstemplate-dev-scalable-service-3
-389d552d67eb        wstemplate-template-scalable-service     "sh ./template-scala…"   18 minutes ago      Up 18 minutes       8420/tcp, 0.0.0.0:8430->8430/tcp                 wstemplate-dev-scalable-service-2
-9220f60041c8        wstemplate-template-scalable-service     "sh ./template-scala…"   18 minutes ago      Up 18 minutes       0.0.0.0:8420->8420/tcp                           wstemplate-dev-scalable-service-1
-e06e48809dbc        wstemplate-template-eureka               "sh ./template-eureka"   18 minutes ago      Up 18 minutes       0.0.0.0:8400->8400/tcp, 0.0.0.0:5501->5005/tcp   wstemplate-dev-discovery
-744704418c3a        thajeztah/pgadmin4                       "python ./usr/local/…"   18 minutes ago      Up 18 minutes       0.0.0.0:5400->5050/tcp                           wstemplate-dev-pgadmin
-6b5741592c1b        postgres:10.13-alpine                    "docker-entrypoint.s…"   18 minutes ago      Up 18 minutes       0.0.0.0:5432->5432/tcp                           wstemplate-dev-postgres
-425f13079d58        petyaba/ldap                             "java -jar ldap-serv…"   7 days ago          Up 5 days           0.0.0.0:10389->10389/tcp                         wstemplate-dev-ldap
-```
+
+![architecture](docs/images/wstemplate-in-k8s.jpg)
 
 Start the performance-tester in a command-line. The executables are located in performance-tester\build\install\performance-tester\bin\.
+Or use the JMeter tester.
 
 ## Monitoring
-Go to http://localhost:3000 for Grafana. Login with admin/admin.
-![image](https://github.com/nagypet/wstemplate/blob/master/docs/images/grafana.jpg)
+Go to http://grafana.wstemplate.k8s-test.perit.hu for Grafana. Login with admin/admin.
+![image](docs/images/grafana-in-k8s.jpg)
 
 ## Know-how tags:
+This chapter is not up-to-date!
+
 Find the tags in the source code to see how it was made.
 
 | Tag | Description |
