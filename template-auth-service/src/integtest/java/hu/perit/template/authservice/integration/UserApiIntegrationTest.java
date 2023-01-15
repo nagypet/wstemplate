@@ -55,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 
-@ActiveProfiles({"default", "integtest"})
+@ActiveProfiles({"default", "integtest", "h2", "spvitamin-defaults"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Slf4j
 public class UserApiIntegrationTest

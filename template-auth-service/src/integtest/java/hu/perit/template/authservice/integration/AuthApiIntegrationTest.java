@@ -35,7 +35,7 @@ import org.springframework.test.context.ActiveProfiles;
  * @author Peter Nagy
  */
 
-@ActiveProfiles({"local", "h2", "integtest"})
+@ActiveProfiles({"local", "integtest", "h2", "spvitamin-defaults"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Slf4j
 class AuthApiIntegrationTest

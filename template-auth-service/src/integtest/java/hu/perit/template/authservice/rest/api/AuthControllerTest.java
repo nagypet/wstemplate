@@ -39,7 +39,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author Peter Nagy
  */
 
-@ActiveProfiles({"default", "integtest"})
+@ActiveProfiles({"local", "integtest", "spvitamin-defaults"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Slf4j
 class AuthControllerTest {

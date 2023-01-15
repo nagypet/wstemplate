@@ -50,11 +50,11 @@ import java.util.stream.Collectors;
 })
 public class UserEntity
 {
-    public static final String TABLE_NAME = "user";
+    public static final String TABLE_NAME = "users";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userid", nullable = false, columnDefinition = "bigserial")
+    @Column(name = "userid", nullable = false)
     private Long userId;
 
     @Column(name = "username")
