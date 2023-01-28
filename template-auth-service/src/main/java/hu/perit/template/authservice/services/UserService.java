@@ -16,24 +16,6 @@
 
 package hu.perit.template.authservice.services;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.persistence.LockModeType;
-
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.hibernate.exception.ConstraintViolationException;
-import org.modelmapper.ModelMapper;
-import org.springframework.context.ApplicationContext;
-import org.springframework.data.jpa.repository.Lock;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.spring.exception.CannotProcessException;
 import hu.perit.spvitamin.spring.exception.InvalidInputException;
@@ -50,6 +32,22 @@ import hu.perit.template.authservice.rest.model.RoleSet;
 import hu.perit.template.authservice.rest.model.UpdateUserParams;
 import hu.perit.template.authservice.rest.model.UserDTO;
 import hu.perit.template.authservice.rest.model.UserDTOFiltered;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.exception.ConstraintViolationException;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import javax.persistence.LockModeType;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Manages CRUD operations. All the concurrency issues are handled by the persistence layer.
@@ -59,19 +57,12 @@ import hu.perit.template.authservice.rest.model.UserDTOFiltered;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserService
 {
-
-    private final ApplicationContext applicationContext;
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
-
-    public UserService(ApplicationContext applicationContext, UserRepo userRepo, RoleRepo roleRepo)
-    {
-        this.applicationContext = applicationContext;
-        this.userRepo = userRepo;
-        this.roleRepo = roleRepo;
-    }
+    private final PasswordEncoder passwordEncoder;
 
     /*
      * ============== getAll ===========================================================================================
@@ -120,7 +111,6 @@ public class UserService
             UserEntity userEntity = modelMapper.map(createUserParams, UserEntity.class);
 
             // Encrypting password
-            PasswordEncoder passwordEncoder = this.applicationContext.getBean(PasswordEncoder.class);
             if (StringUtils.isNotBlank(createUserParams.getPassword()))
             {
                 userEntity.setEncryptedPassword(passwordEncoder.encode(createUserParams.getPassword()));
@@ -187,12 +177,12 @@ public class UserService
             else
             {
                 // The user is not yet saved in our internal user db => lets save it
-                log.debug("Authneticated user {} will be saved in the user database.", authenticatedUser.getUsername());
+                log.debug("Authenticated user {} will be saved in the user database.", authenticatedUser.getUsername());
                 CreateUserParams createUserParams = CreateUserParams.builder()
                         .userName(authenticatedUser.getUsername())
                         .displayName(authenticatedUser.getUsername())
                         .active(true)
-                        .roles(authenticatedUser.getAuthorities().stream().map(i -> ((GrantedAuthority) i).getAuthority()).collect(Collectors.toSet())).nextLoginChangePwd(false)
+                        .roles(authenticatedUser.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toSet())).nextLoginChangePwd(false)
                         .build();
                 long newUserId = this.create(createUserParams, true);
                 this.updateLoginTime(newUserId);
@@ -223,7 +213,6 @@ public class UserService
             modelMapper.map(updateUserParams, userEntity);
 
             // Encrypting passwords
-            PasswordEncoder passwordEncoder = this.applicationContext.getBean(PasswordEncoder.class);
             if (StringUtils.isNotBlank(updateUserParams.getPassword()))
             {
                 userEntity.setEncryptedPassword(passwordEncoder.encode(updateUserParams.getPassword()));

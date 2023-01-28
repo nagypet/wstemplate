@@ -18,7 +18,6 @@ package hu.perit.template.authservice.rest.api;
 
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
-import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import hu.perit.template.authservice.config.Constants;
 import hu.perit.template.authservice.rest.model.CreateUserParams;
 import hu.perit.template.authservice.rest.model.ResponseUri;
@@ -44,7 +43,6 @@ import java.util.List;
 public class UserController implements UserApi
 {
     private final UserService userService;
-    private final AuthorizationService authorizationService;
 
     /*
      * ============== getAllUsers ======================================================================================
