@@ -4,17 +4,17 @@ metadata:
   name: pgadmin-ingress
   namespace: wstemplate
   annotations:
-    nginx.ingress.kubernetes.io/use-regex: /$1
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: nginx
   rules:
-  - host: pgadmin.wstemplate.k8s-test.perit.hu
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: pgadmin-service
-            port:
-              name: http
+    - host: pgadmin.wstemplate.k8s-test.perit.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pgadmin-service
+                port:
+                  name: http

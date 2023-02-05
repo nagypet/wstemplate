@@ -9,10 +9,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - auth-service.wstemplate.k8s-test.perit.hu
+        - auth-service.wstemplate.k8s-test.perit.local
       secretName: wstemplate-tls
   rules:
-  - host: auth-service.wstemplate.k8s-test.perit.hu
+  - host: auth-service.wstemplate.k8s-test.perit.local
     http:
       paths:
       - path: /

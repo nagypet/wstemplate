@@ -9,10 +9,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - scalable-service.wstemplate.k8s-test.perit.hu
+        - scalable-service.wstemplate.k8s-test.perit.local
       secretName: wstemplate-tls
   rules:
-  - host: scalable-service.wstemplate.k8s-test.perit.hu
+  - host: scalable-service.wstemplate.k8s-test.perit.local
     http:
       paths:
       - path: /

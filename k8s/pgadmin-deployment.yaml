@@ -5,9 +5,9 @@ metadata:
   namespace: wstemplate
 spec:
   ports:
-  - protocol: TCP
-    port: 5050
-    targetPort: http
+    - protocol: TCP
+      port: 5050
+      targetPort: http
   selector:
     component: pgadmin
   type: ClusterIP
