@@ -71,4 +71,4 @@ spec:
             - name: NAMESPACE
               value: wstemplate
             - name: DOMAIN
-              value: k8s-test.perit.hu
+              value: k8s-test.perit.local
