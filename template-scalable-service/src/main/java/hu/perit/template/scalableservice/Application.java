@@ -17,7 +17,7 @@
 package hu.perit.template.scalableservice;
 
 import hu.perit.spvitamin.spring.SpvitaminApplication;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Profile;
 @Profile("!unittest")
 @SpringBootApplication
 @ComponentScan(basePackages = {"hu.perit.spvitamin", "hu.perit.template.scalableservice"})
-@Log4j
+@Slf4j
 public class Application
 {
 

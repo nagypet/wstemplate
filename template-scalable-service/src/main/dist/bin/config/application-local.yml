@@ -34,3 +34,6 @@ security:
 #-----------------------------------------------------------------------------------------------------------------------
 microservices:
   auth-service.url: http://localhost:8410
+
+logging:
+  config: classpath:logback-local.xml

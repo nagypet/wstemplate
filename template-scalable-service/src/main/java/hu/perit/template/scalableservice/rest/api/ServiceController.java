@@ -22,7 +22,7 @@ import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.template.scalableservice.config.Constants;
 import hu.perit.template.scalableservice.metrics.MicrometerMetricsService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.concurrent.TimeUnit;
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  */
 
 @RestController
-@Log4j
+@Slf4j
 @RequiredArgsConstructor
 public class ServiceController implements ServiceApi
 {

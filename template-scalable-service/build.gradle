@@ -113,9 +113,6 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
 
-    // Log4J
-    implementation('log4j:log4j:1.2.17')
-
     // ModelMapper
     implementation group: 'org.modelmapper.extensions', name: 'modelmapper-spring', version: '2.3.5'
 
@@ -126,6 +123,12 @@ dependencies {
 
     // Micrometer Prometheus plugin
     implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.5.3'
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Runtime dependencies
+    //------------------------------------------------------------------------------------------------------------------
+    // Logging in json format
+    runtimeOnly 'net.logstash.logback:logstash-logback-encoder:7.2'
 }
 
 

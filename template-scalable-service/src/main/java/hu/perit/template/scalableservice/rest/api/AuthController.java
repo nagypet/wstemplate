@@ -22,7 +22,7 @@ import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.spvitamin.spring.security.SecurityContextUtil;
 import hu.perit.template.scalableservice.config.Constants;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
-@Log4j
+@Slf4j
 public class AuthController implements AuthApi
 {
     @Override

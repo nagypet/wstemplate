@@ -107,9 +107,6 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
 
-    // Slf4J
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-
     // ModelMapper TODO: mapstruct
     implementation group: 'org.modelmapper.extensions', name: 'modelmapper-spring', version: '2.3.5'
 
@@ -131,6 +128,9 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     // PostgreSQL
     runtimeOnly 'org.postgresql:postgresql'
+
+    // Logging in json format
+    runtimeOnly 'net.logstash.logback:logstash-logback-encoder:7.2'
 
 
     //------------------------------------------------------------------------------------------------------------------
