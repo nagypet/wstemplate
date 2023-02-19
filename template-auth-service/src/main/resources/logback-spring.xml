@@ -29,6 +29,7 @@
                         "level": "%level",
                         "message": "%m",
                         "thread": "%t",
+                        "thread-short": "%.10t",
                         "class": "%c",
                         "line": "%L"
                         }
@@ -52,6 +53,7 @@
                         "level": "%level",
                         "message": "%m",
                         "thread": "%t",
+                        "thread-short": "%.10t",
                         "class": "%c",
                         "line": "%L"
                         }

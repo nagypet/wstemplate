@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: docker-registry:5000/wstemplate-template-auth-service:1.0.14-SNAPSHOT
+          image: docker-registry:5000/wstemplate-template-auth-service:1.0.15-SNAPSHOT
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3
