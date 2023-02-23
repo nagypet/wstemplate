@@ -24,10 +24,6 @@ plugins {
 apply from: '../gradle/common.gradle'
 apply from: '../gradle/docker.gradle'
 
-ext {
-    set('imagePrefix', 'wstemplate')
-}
-
 
 repositories {
     jcenter()
@@ -115,14 +111,14 @@ dependencies {
     implementation group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
     //implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.12'
 
-    // Micrometer Prometheus plugin
-    implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.5.3'
-
     //------------------------------------------------------------------------------------------------------------------
     // Runtime dependencies
     //------------------------------------------------------------------------------------------------------------------
     // Logging in json format
     runtimeOnly 'net.logstash.logback:logstash-logback-encoder:7.2'
+
+    // Micrometer Prometheus plugin
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 }
 
 

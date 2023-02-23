@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import hu.perit.spvitamin.spring.mvc.EnableSwagger3WithSpringBoot2_7;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -42,6 +43,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 
 
 @Configuration
+@EnableSwagger3WithSpringBoot2_7
 public class SwaggerConfig {
 
 	private static final Contact DEFAULT_CONTACT = new Contact(

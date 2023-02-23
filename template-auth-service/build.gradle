@@ -24,9 +24,6 @@ plugins {
 apply from: '../gradle/common.gradle'
 apply from: '../gradle/docker.gradle'
 
-ext {
-    set('imagePrefix', 'wstemplate')
-}
 
 repositories {
     mavenCentral()
@@ -110,9 +107,6 @@ dependencies {
     // OpenCSV
     implementation group: 'com.opencsv', name: 'opencsv', version: '4.0'
 
-    // Micrometer Prometheus plugin
-    implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.9.6'
-
 
     //------------------------------------------------------------------------------------------------------------------
     // Runtime dependencies
@@ -124,6 +118,9 @@ dependencies {
 
     // Logging in json format
     runtimeOnly 'net.logstash.logback:logstash-logback-encoder:7.2'
+
+    // Micrometer Prometheus plugin
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
 
     //------------------------------------------------------------------------------------------------------------------
