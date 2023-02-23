@@ -17,7 +17,7 @@
 
 class Constants {
 	// Set this constant to true if spvitamin will be compiled as source
-	static final boolean COMPILE_SPVITAMIN = false
+	static final boolean COMPILE_SPVITAMIN = true
 }
 
 

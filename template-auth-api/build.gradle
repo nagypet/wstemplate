@@ -14,29 +14,16 @@
  * limitations under the License.
  */
 
-buildscript {
-    ext {
-        springBootVersion = '2.4.5'
-    }
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-    }
+plugins {
+    id 'org.springframework.boot' version "${springBootVersion}"
+    id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
+    id 'java-library'
+    id 'jacoco'
 }
-
-// Note that plugins block cannot be used in subprojects, that is why the old fashioned way
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
-apply plugin: 'java-library'
-apply plugin: 'jacoco'
 apply from: '../gradle/common.gradle'
 
 
 ext {
-    set('spvitaminVersion', '2.0.2-RELEASE')
-    set('springCloudVersion', "2020.0.5")
     set('imagePrefix', 'wstemplate')
 }
 
@@ -52,14 +39,12 @@ bootJar {
    enabled = false
 }
 
-sourceCompatibility = 11
-
 dependencies {
-//    implementation project(':spvitamin-spring-admin')
-//    implementation project(':spvitamin-spring-security')
+    implementation project(':spvitamin-spring-admin')
+    implementation project(':spvitamin-spring-security')
 
-    implementation 'hu.perit.spvitamin:spvitamin-spring-admin'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-security'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-admin'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-security'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'

@@ -15,31 +15,19 @@
  */
 
 plugins {
-    id 'org.springframework.boot' version '2.4.5'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.springframework.boot' version "${springBootVersion}"
+    id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
     id 'application'
     id 'jacoco'
 	id "com.github.ManifestClasspath" version "0.1.0-RELEASE"
 }
-
-ext {
-    set('springCloudVersion', "2020.0.5")
-    set('spvitaminVersion', '2.0.0-RELEASE')
-}
-
-sourceCompatibility = 11
-
 apply from: '../gradle/common.gradle'
 apply from: '../gradle/docker.gradle'
 
 
 repositories {
-    jcenter()
     mavenCentral()
     mavenLocal()
-    flatDir {
-        dirs '../gradle/localrepo'
-    }
 }
 
 
@@ -51,15 +39,15 @@ application {
 
 
 dependencies {
-//	compile project(':spvitamin-core')
-//    compile project(':spvitamin-spring-security-authservice-api')
-//    compile project(':spvitamin-spring-general')
-//    compile project(':spvitamin-spring-cloud-feign')
+    implementation project(':spvitamin-core')
+    implementation project(':spvitamin-spring-security-authservice-api')
+    implementation project(':spvitamin-spring-general')
+    implementation project(':spvitamin-spring-cloud-feign')
 
-    implementation 'hu.perit.spvitamin:spvitamin-core'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-security-authservice-api'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-general'
-    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-feign'
+//    implementation 'hu.perit.spvitamin:spvitamin-core'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-security-authservice-api'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-general'
+//    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-feign'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
