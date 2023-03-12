@@ -32,6 +32,7 @@ import hu.perit.template.authservice.rest.model.RoleSet;
 import hu.perit.template.authservice.rest.model.UpdateUserParams;
 import hu.perit.template.authservice.rest.model.UserDTO;
 import hu.perit.template.authservice.rest.model.UserDTOFiltered;
+import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -42,7 +43,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.LockModeType;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -348,7 +348,8 @@ public class UserService
         if (roleEntities.size() != roleNames.size())
         {
             String invalidRoles = roleNames.stream().filter(i -> !resultSetContainsRole(roleEntities, i)).collect(Collectors.joining(", "));
-            throw new InvalidInputException(String.format("Invalid roles specified: '%s'", invalidRoles));
+            log.warn("Roles ignored: {}", invalidRoles);
+            //throw new InvalidInputException(String.format("Invalid roles specified: '%s'", invalidRoles));
         }
 
         return roleEntities;

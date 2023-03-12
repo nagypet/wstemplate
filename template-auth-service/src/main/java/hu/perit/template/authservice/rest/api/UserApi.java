@@ -16,11 +16,24 @@
 
 package hu.perit.template.authservice.rest.api;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
+import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
+import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
+import hu.perit.spvitamin.spring.logging.EventLogId;
+import hu.perit.template.authservice.rest.model.CreateUserParams;
+import hu.perit.template.authservice.rest.model.ResponseUri;
+import hu.perit.template.authservice.rest.model.RoleSet;
+import hu.perit.template.authservice.rest.model.UpdateUserParams;
+import hu.perit.template.authservice.rest.model.UserDTO;
+import hu.perit.template.authservice.rest.model.UserDTOFiltered;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,26 +43,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
-import hu.perit.spvitamin.spring.logging.EventLogId;
-import hu.perit.template.authservice.rest.model.CreateUserParams;
-import hu.perit.template.authservice.rest.model.ResponseUri;
-import hu.perit.template.authservice.rest.model.RoleSet;
-import hu.perit.template.authservice.rest.model.UpdateUserParams;
-import hu.perit.template.authservice.rest.model.UserDTO;
-import hu.perit.template.authservice.rest.model.UserDTOFiltered;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author Peter Nagy
  */
 
-@Api(value = "user-api-controller", description = "User management", tags = "user-api-controller")
+@Tag(name = "user-api-controller", description = "User management")
 public interface UserApi
 {
 
@@ -60,104 +61,151 @@ public interface UserApi
      * ============== getAllUsers ======================================================================================
      */
     @GetMapping(BASE_URL_USERS)
-    @ApiOperation(value = "getAllUsers() - Retrieves all users", authorizations = {@Authorization(value = "basicAuth")})
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Success"), @ApiResponse(code = 401, message = "Invalid credentials"),
-        @ApiResponse(code = 500, message = "Internal server error")})
+    @Secured("USER_GET_ALL_USERS")
+    @Operation(summary = "getAllUsers() - Retrieves all users",
+            security = {@SecurityRequirement(name = "bearer")},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
+            }
+    )
     @ResponseStatus(value = HttpStatus.OK)
     @EventLogId(eventId = 1)
-    List<UserDTOFiltered> getAllUsersUsingGET(
-        @ApiParam(value = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID);
+    List<UserDTOFiltered> getAllUsersUsingGET(@RequestHeader(value = "processID", required = false) String processID);
 
 
     /*
      * ============== getUserById ======================================================================================
      */
     @GetMapping(BASE_URL_USERS + "/{id}")
-    @ApiOperation(value = "getUserById() - Retrieves a user by ID", authorizations = {@Authorization(value = "basicAuth")})
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Success"), @ApiResponse(code = 401, message = "Invalid credentials"),
-        @ApiResponse(code = 404, message = "User not found"), @ApiResponse(code = 500, message = "Internal server error")})
+    @Secured("USER_GET_USER")
+    @Operation(summary = "getUserById() - Retrieves a user by ID",
+            security = {@SecurityRequirement(name = "bearer")},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "User not found", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+            }
+    )
     @ResponseStatus(value = HttpStatus.OK)
     @EventLogId(eventId = 2)
     UserDTO getUserByIdUsingGET(
-        @ApiParam(value = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
-        @ApiParam(value = "User ID", required = true) @PathVariable("id") Long id) throws ResourceNotFoundException;
+            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
+            @Parameter(name = "User ID", required = true) @PathVariable("id") Long id) throws ResourceNotFoundException;
 
 
     /*
      * ============== createUser =======================================================================================
      */
     @PostMapping(BASE_URL_USERS)
-    @ApiOperation(value = "createUser() - creates a new user", authorizations = {@Authorization(value = "basicAuth")})
-    @ApiResponses(value = {@ApiResponse(code = 201, message = "Created"), @ApiResponse(code = 400, message = "Bad request"),
-        @ApiResponse(code = 401, message = "Invalid credentials"), @ApiResponse(code = 409, message = "User already exists"),
-        @ApiResponse(code = 500, message = "Internal server error")})
+    @Secured("USER_CREATE_USER")
+    @Operation(summary = "createUser() - creates a new user",
+            security = {@SecurityRequirement(name = "bearer")},
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Created"),
+                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "409", description = "User already exists", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+            }
+    )
     @ResponseStatus(value = HttpStatus.CREATED)
     @EventLogId(eventId = 3)
     ResponseUri createUserUsingPOST(
-        @ApiParam(value = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
-        @ApiParam(value = "User properties", required = true) @Valid @RequestBody CreateUserParams createUserParams);
+            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
+            @Parameter(name = "User properties", required = true) @Valid @RequestBody CreateUserParams createUserParams);
 
 
     /*
      * ============== updateUser =======================================================================================
      */
     @PutMapping(BASE_URL_USERS + "/{id}")
-    @ApiOperation(value = "updateUser() - Updates a user by ID", authorizations = {@Authorization(value = "basicAuth")})
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Success"), @ApiResponse(code = 401, message = "Invalid credentials"),
-        @ApiResponse(code = 404, message = "User not found"), @ApiResponse(code = 500, message = "Internal server error")})
+    @Secured("USER_UPDATE_USER")
+    @Operation(summary = "updateUser() - Updates a user by ID",
+            security = {@SecurityRequirement(name = "bearer")},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "User not found", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
+            }
+    )
     @ResponseStatus(value = HttpStatus.OK)
     @EventLogId(eventId = 4)
     void updateUserUsingPUT(
-        @ApiParam(value = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
-        @ApiParam(value = "User ID", required = true) @PathVariable("id") Long id,
-        @ApiParam(value = "User properties", required = true) @Valid @RequestBody UpdateUserParams updateUserParams)
-        throws ResourceNotFoundException;
+            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
+            @Parameter(name = "User ID", required = true) @PathVariable("id") Long id,
+            @Parameter(name = "User properties", required = true) @Valid @RequestBody UpdateUserParams updateUserParams)
+            throws ResourceNotFoundException;
 
 
     /*
      * ============== deleteUser =======================================================================================
      */
     @DeleteMapping(BASE_URL_USERS + "/{id}")
-    @ApiOperation(value = "deleteUser() - removes a user by ID", authorizations = {@Authorization(value = "basicAuth")})
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Success"), @ApiResponse(code = 400, message = "Bad request"),
-        @ApiResponse(code = 401, message = "Invalid credentials"), @ApiResponse(code = 404, message = "User not found"),
-        @ApiResponse(code = 500, message = "Internal server error")})
+    @Secured("USER_DELETE_USER")
+    @Operation(summary = "deleteUser() - removes a user by ID",
+            security = {@SecurityRequirement(name = "bearer")},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "User not found", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
+            }
+    )
     @ResponseStatus(value = HttpStatus.OK)
     @EventLogId(eventId = 5)
     void deleteUserUsingDELETE(
-        @ApiParam(value = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
-        @ApiParam(value = "User ID", required = true) @PathVariable("id") Long id) throws ResourceNotFoundException;
+            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
+            @Parameter(name = "User ID", required = true) @PathVariable("id") Long id) throws ResourceNotFoundException;
 
 
     /*
      * ============== addRole ==========================================================================================
      */
     @PutMapping(BASE_URL_USERS + "/{id}" + PATH_ROLES)
-    @ApiOperation(value = "addRole() - adds a new role to the user", authorizations = {@Authorization(value = "basicAuth")})
-    @ApiResponses(value = {@ApiResponse(code = 201, message = "Created"), @ApiResponse(code = 400, message = "Bad request"),
-        @ApiResponse(code = 401, message = "Invalid credentials"), @ApiResponse(code = 404, message = "User not found"),
-        @ApiResponse(code = 500, message = "Internal server error")})
-    @ResponseStatus(value = HttpStatus.OK)
+    @Secured("USER_ADD_ROLE")
+    @Operation(summary = "addRole() - adds a new role to the user",
+            security = {@SecurityRequirement(name = "bearer")},
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Created"),
+                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "User not found", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
+            }
+    )
+    @ResponseStatus(value = HttpStatus.CREATED)
     @EventLogId(eventId = 6)
     void addRoleUsingPOST(
-        @ApiParam(value = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
-        @ApiParam(value = "User ID", required = true) @PathVariable("id") Long id,
-        @ApiParam(value = "Set of roles", required = true) @Valid @RequestBody RoleSet roleSet) throws ResourceNotFoundException;
+            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
+            @Parameter(name = "User ID", required = true) @PathVariable("id") Long id,
+            @Parameter(name = "Set of roles", required = true) @Valid @RequestBody RoleSet roleSet) throws ResourceNotFoundException;
 
 
     /*
      * ============== deleteRole =======================================================================================
      */
     @DeleteMapping(BASE_URL_USERS + "/{id}" + PATH_ROLES)
-    @ApiOperation(value = "deleteRole() - removes a user role", authorizations = {@Authorization(value = "basicAuth")})
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Success"), @ApiResponse(code = 400, message = "Bad request"),
-        @ApiResponse(code = 401, message = "Invalid credentials"), @ApiResponse(code = 404, message = "User not found"),
-        @ApiResponse(code = 500, message = "Internal server error")})
+    @Secured("USER_DELETE_ROLE")
+    @Operation(summary = "deleteRole() - removes a user role",
+            security = {@SecurityRequirement(name = "bearer")},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "User not found", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
+            }
+    )
     @ResponseStatus(value = HttpStatus.OK)
     @EventLogId(eventId = 7)
     void deleteRoleUsingDELETE(
-        @ApiParam(value = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
-        @ApiParam(value = "User ID", required = true) @PathVariable("id") Long id,
-        @ApiParam(value = "Set of roles", required = true) @Valid @RequestBody RoleSet roleSet) throws ResourceNotFoundException;
-
+            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
+            @Parameter(name = "User ID", required = true) @PathVariable("id") Long id,
+            @Parameter(name = "Set of roles", required = true) @Valid @RequestBody RoleSet roleSet) throws ResourceNotFoundException;
 }

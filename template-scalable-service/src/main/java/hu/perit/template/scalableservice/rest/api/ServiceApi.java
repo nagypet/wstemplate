@@ -16,8 +16,15 @@
 
 package hu.perit.template.scalableservice.rest.api;
 
+import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.logging.EventLogId;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -27,8 +34,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author Peter Nagy
  */
 
-@Api(value = "service-api-controller", description = "Some service", tags = "service-api-controller")
-public interface ServiceApi {
+@Tag(name = "service-api-controller", description = "Some service")
+public interface ServiceApi
+{
 
     String BASE_URL_SERVICE = "/api/service";
 
@@ -36,17 +44,17 @@ public interface ServiceApi {
      * ============== getAllUsers ======================================================================================
      */
     @GetMapping(BASE_URL_SERVICE)
-    @ApiOperation(value = "makeSomeLongCalculation() - Makes some time consuming calculation",
-            authorizations = {@Authorization(value = "Bearer")}
+    @Operation(summary = "makeSomeLongCalculation() - Makes some time consuming calculation",
+            security = {@SecurityRequirement(name = "bearer")},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
+            }
     )
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Success"),
-            @ApiResponse(code = 401, message = "Invalid credentials"),
-            @ApiResponse(code = 500, message = "Internal server error")
-    })
     @ResponseStatus(value = HttpStatus.OK)
     @EventLogId(eventId = 1)
     Integer makeSomeLongCalculationUsingGET(
-            @ApiParam(value = "ProcessID", required=false) @RequestHeader(value="processID", required=false) String processID
+            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID
     ) throws InterruptedException;
 }

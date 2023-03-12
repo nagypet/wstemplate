@@ -4,12 +4,12 @@ import hu.perit.spvitamin.spring.data.config.DatasourceCollectionProperties;
 import hu.perit.spvitamin.spring.data.config.DatasourceProperties;
 import hu.perit.spvitamin.spring.data.nativequery.NativeQueryRepoImpl;
 import hu.perit.template.authservice.db.demodb.DemoDbConfig;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
 /**

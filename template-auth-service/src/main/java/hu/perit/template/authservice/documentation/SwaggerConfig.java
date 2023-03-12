@@ -16,25 +16,14 @@
 
 package hu.perit.template.authservice.documentation;
 
-import hu.perit.spvitamin.spring.mvc.EnableSwagger3WithSpringBoot2_7;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.ApiKey;
-import springfox.documentation.service.BasicAuth;
-import springfox.documentation.service.Contact;
-import springfox.documentation.service.SecurityScheme;
-import springfox.documentation.service.VendorExtension;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Peter Nagy
@@ -42,48 +31,26 @@ import java.util.Set;
 
 
 @Configuration
-@EnableSwagger3WithSpringBoot2_7
 public class SwaggerConfig
 {
-
-    private static final Contact DEFAULT_CONTACT = new Contact(
-            "Peter Nagy", "https://github.com/nagypet/wstemplate", "nagy.peter.home@gmail.com");
-
-    private static final ArrayList<VendorExtension> VENDOR_EXTENSIONS = new ArrayList<>();
-
-    private static final ApiInfo DEFAULT_API_INFO = new ApiInfo(
-            "template-auth-service",
-            "template-auth-service",
-            "1.0",
-            "urn:tos",
-            DEFAULT_CONTACT,
-            "Apache License, Version 2.0",
-            "https://www.apache.org/licenses/LICENSE-2.0",
-            VENDOR_EXTENSIONS);
-
-    private static final Set<String> DEFAULT_PRODUCES_AND_CONSUMES = new HashSet<>(Arrays.asList("application/json"));
-
-    private static final List<SecurityScheme> DEFAULT_SECURITY_SCHEME = new ArrayList<>(Arrays.asList(
-            new BasicAuth("basicAuth"),
-            new ApiKey("Bearer",
-                    "Authorization",
-                    "header")
-    ));
-
-    /**
-     * @return Docket
-     */
     @Bean
-    public Docket api()
+    public OpenAPI openApi()
     {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(DEFAULT_API_INFO)
-                .produces(DEFAULT_PRODUCES_AND_CONSUMES)
-                .consumes(DEFAULT_PRODUCES_AND_CONSUMES)
-                .securitySchemes(DEFAULT_SECURITY_SCHEME)
-                .useDefaultResponseMessages(false)
-                .select().apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
-                .build();
+        return new OpenAPI()
+                .info(new Info()
+                        .title("template-auth-service")
+                        .description("template-auth-service")
+                        .version("1.0")
+                        .license(new License()
+                                .name("Apache License, Version 2.0")
+                                .url("https://www.apache.org/licenses/LICENSE-2.0"))
+                        .contact(new Contact()
+                                .name("Peter Nagy")
+                                .url("https://github.com/nagypet/wstemplate")
+                                .email("nagy.peter.home@gmail.com")))
+                .components(new Components()
+                        .addSecuritySchemes("basic", new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("basic"))
+                        .addSecuritySchemes("bearer", new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer"))
+                );
     }
 }

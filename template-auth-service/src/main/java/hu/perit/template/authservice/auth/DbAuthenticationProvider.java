@@ -18,6 +18,7 @@ package hu.perit.template.authservice.auth;
 
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,17 +42,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DbAuthenticationProvider implements AuthenticationProvider
 {
-
     private final ApplicationContext applicationContext;
     private final UserService userService;
-
-    public DbAuthenticationProvider(ApplicationContext applicationContext, UserService userService)
-    {
-        this.applicationContext = applicationContext;
-        this.userService = userService;
-    }
 
     private AuthenticatedUser loadUserByUsernameAndPassword(String userName, String password)
     {

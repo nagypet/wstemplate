@@ -4,14 +4,13 @@ import java.util.concurrent.TimeoutException;
 
 import hu.perit.spvitamin.core.timeoutlatch.TimeoutLatch;
 import hu.perit.template.authservice.db.demodb.repo.UserRepo;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.metrics.AsyncExecutor;
 import lombok.extern.slf4j.Slf4j;
-
-import javax.annotation.PostConstruct;
 
 @Slf4j
 @Service

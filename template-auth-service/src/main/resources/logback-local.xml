@@ -34,17 +34,15 @@
 	<logger name="org.springframework.cache" level="TRACE"/>
 	<logger name="com.zaxxer.hikari.HikariConfig" level="INFO"/>
 	<logger name="com.zaxxer.hikari" level="ERROR"/>
-	<logger name="org.springframework.boot.context.config" level="DEBUG"/>
-	<logger name="com.thoughtworks.xstream" level="OFF"/>
-	<!--
 	<logger name="org.hibernate.SQL" level="DEBUG"/>
 	<logger name="org.springframework.orm.jpa" level="DEBUG"/>
 	<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+	<logger name="com.thoughtworks.xstream" level="OFF"/>
+	<!--
 	<logger name="org.springframework.transaction.interceptor" level="TRACE"/>
 	-->
 	<!-- flooding the log -->
 	<logger name="com.netflix.discovery" level="ERROR"/>
-	<logger name="org.springframework.cloud.netflix.eureka.config" level="DEBUG"/>
 
 	<!-- Spvitamin loggers -->
 	<logger name="hu.perit.spvitamin.core.took" level="DEBUG" additivity="false">
@@ -83,11 +81,19 @@
 	<logger name="hu.perit.spvitamin.spring.config" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
+	<logger name="hu.perit.spvitamin.spring.environment" level="DEBUG" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
+
 
 	<!-- Application specific loggers -->
 	<logger name="hu.perit.template.authservice" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
+	<logger name="sun.security.ssl" level="DEBUG" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
+
 
 	<!--
 	<logger name="com.netflix.discovery" level="OFF"/>

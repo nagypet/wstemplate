@@ -16,30 +16,20 @@
 
 package hu.perit.template.authservice.auth;
 
-import hu.perit.spvitamin.spring.config.LocalUserProperties;
-import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.session.SessionManagementFilter;
-import org.springframework.util.StringUtils;
-
-import hu.perit.spvitamin.core.crypto.CryptoUtil;
-import hu.perit.spvitamin.spring.config.SecurityProperties;
-import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
+import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
+import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.EnableLocalUserAuthProvider;
 import hu.perit.spvitamin.spring.security.ldap.LdapAuthenticationProviderConfigurer;
 import hu.perit.template.authservice.rest.api.UserApi;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Map;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * #know-how:simple-httpsecurity-builder
@@ -47,98 +37,47 @@ import java.util.Map;
  * @author Peter Nagy
  */
 
-@EnableWebSecurity
 @Slf4j
+@Configuration
+@RequiredArgsConstructor
+@EnableWebSecurity
+@EnableLocalUserAuthProvider
 public class WebSecurityConfig
 {
+    private final DbAuthenticationProvider dbAuthenticationProvider;
+    private final LdapAuthenticationProviderConfigurer ldapAuthenticationProviderConfigurer;
 
-    /*
-     * ============== Order(1) =========================================================================================
-     */
-    @Configuration
+
+    @Bean
     @Order(1)
-    @RequiredArgsConstructor
-    public static class Order1 extends WebSecurityConfigurerAdapter
+    public SecurityFilterChain configureAuthenticateEndpoint(HttpSecurity http) throws Exception
     {
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
+                .authorizeRequests(r -> r.anyRequest().authenticated())
+                .basicAuth()
+                .jwtAuth();
 
-        private final DbAuthenticationProvider dbAuthenticationProvider;
-        private final LdapAuthenticationProviderConfigurer ldapAuthenticationProviderConfigurer;
-        private final LocalUserProperties localUserProperties;
-        private final PasswordEncoder passwordEncoder;
+        http.authenticationProvider(this.dbAuthenticationProvider);
+        this.ldapAuthenticationProviderConfigurer.configure(http);
 
-        /**
-         * This is a global configuration, will be applied to all oder configurer adapters
-         *
-         * @param auth
-         * @throws Exception
-         */
-        @Autowired
-        public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception
-        {
-            SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+        http.addFilterAfter(new PostAuthenticationFilter(), Role2PermissionMapperFilter.class);
 
-            // Local users for test reasons
-            for (Map.Entry<String, LocalUserProperties.User> userEntry : localUserProperties.getLocaluser().entrySet())
-            {
-
-                log.warn(String.format("local user name: '%s'", userEntry.getKey()));
-
-                String password = null;
-                if (userEntry.getValue().getEncryptedPassword() != null)
-                {
-                    CryptoUtil crypto = new CryptoUtil();
-
-                    password = crypto.decrypt(SysConfig.getCryptoProperties().getSecret(), userEntry.getValue().getEncryptedPassword());
-                }
-                else
-                {
-                    password = userEntry.getValue().getPassword();
-                }
-
-                auth.inMemoryAuthentication() //
-                        .withUser(userEntry.getKey()) //
-                        .password(passwordEncoder.encode(password)) //
-                        .authorities("ROLE_" + Role.EMPTY.name());
-            }
-
-            // Ldap
-            this.ldapAuthenticationProviderConfigurer.configure(auth);
-
-            // Here we have to add the DbAuthenticationProvider
-            auth.authenticationProvider(this.dbAuthenticationProvider);
-        }
-
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception
-        {
-            SimpleHttpSecurityBuilder.newInstance(http) //
-                .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**") //
-                .basicAuthWithSession();
-
-            http.addFilterAfter(new Role2PermissionMapperFilter(), SessionManagementFilter.class);
-            http.addFilterAfter(new PostAuthenticationFilter(), Role2PermissionMapperFilter.class);
-        }
+        return http.build();
     }
 
 
-    /*
-     * ============== Order(2) =========================================================================================
-     */
-    @Configuration
+    @Bean
     @Order(2)
-    public static class Order2 extends WebSecurityConfigurerAdapter
+    public SecurityFilterChain configureTokenSecuredEndpoints(HttpSecurity http) throws Exception
     {
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope(UserApi.BASE_URL_USERS + "/**")
+                // we do not use secure sessions here: each endpoint has to be authenticated again and again
+                .ignorePersistedSecurity()
+                .authorizeRequests(r -> r.anyRequest().authenticated())
+                .jwtAuth();
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception
-        {
-            SimpleHttpSecurityBuilder.newInstance(http) //
-                .scope(UserApi.BASE_URL_USERS + "/**") //
-                .basicAuth(Role.ADMIN.name());
-
-            http.addFilterAfter(new Role2PermissionMapperFilter(), SessionManagementFilter.class);
-            http.addFilterAfter(new PostAuthenticationFilter(), Role2PermissionMapperFilter.class);
-        }
+        return http.build();
     }
 }

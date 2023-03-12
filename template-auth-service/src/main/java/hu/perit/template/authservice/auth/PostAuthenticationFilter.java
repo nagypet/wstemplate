@@ -20,13 +20,13 @@ import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import hu.perit.template.authservice.services.UserService;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -41,8 +41,7 @@ public class PostAuthenticationFilter extends OncePerRequestFilter
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException
     {
-
-        log.debug("PostAuthenticationFilter called.");
+        log.debug("{} called", this.getClass().getName());
 
         AuthorizationService authorizationService = SpringContext.getBean(AuthorizationService.class);
 

@@ -74,6 +74,15 @@ if (project.hasProperty('application')) {
 		doLast { dockerImageInputsChanged = true }
 	}
 
+	task dockerCopyConfig(type: Copy) {
+		dependsOn 'installDist'
+
+		from 'config'
+		into "$dockerBuildDir/bin"
+
+		doLast { dockerImageInputsChanged = true }
+	}
+
 	task dockerCopyApplication(type: Copy) {
 		dependsOn 'installDist'
 		
@@ -94,6 +103,7 @@ if (project.hasProperty('application')) {
 		dependsOn 'dockerCopySnapshotDependencies'
 		dependsOn 'dockerCopyDockerfile'
 		dependsOn 'dockerCopyBin'
+		dependsOn 'dockerCopyConfig'
 		dependsOn 'dockerCopyApplication'
 		
 		doFirst {

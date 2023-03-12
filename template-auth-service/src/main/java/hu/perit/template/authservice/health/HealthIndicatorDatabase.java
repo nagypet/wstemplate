@@ -5,6 +5,7 @@ import hu.perit.spvitamin.spring.config.Constants;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.metrics.AsyncExecutor;
 import hu.perit.template.authservice.db.demodb.repo.NativeQueryRepo;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
@@ -12,7 +13,6 @@ import org.springframework.boot.actuate.health.Health;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

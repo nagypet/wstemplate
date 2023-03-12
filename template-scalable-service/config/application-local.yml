@@ -14,10 +14,26 @@
 # limitations under the License.
 #
 
+#-----------------------------------------------------------------------------------------------------------------------
+# Security settings
+#-----------------------------------------------------------------------------------------------------------------------
+#Security settings
+#security.allowed-origins=http://localhost:1337
+#security.allowed-headers
+#security.allowed-methods
+# * or comma separated roles (e.g. ADMIN)
+security:
+  swagger-access: "*"
+  management-endpoints-access: ADMIN
+  admin-gui-access: "*"
+  admin-endpoints-access: "*"
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Microservice environment
 #-----------------------------------------------------------------------------------------------------------------------
-#eureka.client.enabled=false
-#spring.cloud.loadbalancer.ribbon.enabled=false
-#microservices.auth-service.url=https://localhost:8410
+microservices:
+  auth-service.url: https://auth-service.wstemplate.k8s-test.perit.local
+
+logging:
+  config: classpath:logback-local.xml

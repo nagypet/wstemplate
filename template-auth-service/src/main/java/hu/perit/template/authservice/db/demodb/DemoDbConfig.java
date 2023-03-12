@@ -19,9 +19,7 @@ package hu.perit.template.authservice.db.demodb;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
+import jakarta.persistence.EntityManagerFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -42,6 +40,8 @@ import hu.perit.spvitamin.spring.data.config.DatasourceCollectionProperties;
 import hu.perit.spvitamin.spring.data.dynamicdatasource.ConnectionParam;
 import hu.perit.spvitamin.spring.data.dynamicdatasource.DynamicDataSource;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.sql.DataSource;
 
 /**
  * #know-how:hibernate-configuration
@@ -102,7 +102,7 @@ public class DemoDbConfig
         properties.put(AvailableSettings.ORDER_INSERTS, "true");
         properties.put(AvailableSettings.ORDER_UPDATES, "true");
         //properties.put(AvailableSettings.BATCH_VERSIONED_DATA, "true");
-        properties.put(AvailableSettings.JPA_LOCK_TIMEOUT, "3000");
+        properties.put(AvailableSettings.JAKARTA_LOCK_TIMEOUT, "3000");
 
         return builder.dataSource(dataSource).packages(PACKAGES).persistenceUnit(PERSISTENCE_UNIT).properties(properties).build();
     }

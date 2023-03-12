@@ -367,12 +367,14 @@ if (project.hasProperty('startScripts')) {
 task prepareRunInIDEA(type: Copy) {
     group 'fmake'
     from "src/main/dist/bin"
+	from "config"
     into "${projectDir}/out/production/resources"
 }
 
 task prepareRunInIDEA2021(type: Copy) {
 	group 'fmake'
 	from "src/main/dist/bin"
+	from "config"
 	into "${projectDir}/build/resources/main"
 }
 
@@ -384,6 +386,7 @@ task prepareRunInIDEA2021(type: Copy) {
 task prepareRunInEclipse(type: Copy) {
     group 'fmake'
     from "src/main/dist/bin"
+	from "config"
     into "${projectDir}/bin/main"
 }
 

@@ -1,2 +1,0 @@
-HOSTNAME: localhost
-EUREKA_SERVER: http://localhost:8400/eureka

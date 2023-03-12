@@ -74,41 +74,33 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // Guava
-    implementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
+    implementation 'com.google.guava:guava:30.1.1-jre'
 
     // JJWT
-    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
     // JAXB (JDK > 8 miatt)
-    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime'
-
-    // javax.validation
-    implementation group: 'javax.validation', name: 'validation-api'
-
-    // Test framework
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
+    implementation 'javax.xml.bind:jaxb-api:2.3.0'
+    implementation 'org.glassfish.jaxb:jaxb-runtime'
 
     testImplementation 'org.springframework.security:spring-security-test'
 
     // Swagger
-    implementation "io.springfox:springfox-boot-starter:3.0.0"
-    implementation "io.springfox:springfox-swagger-ui:3.0.0"
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.3'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.0.3'
 
     // apache.commons
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
-    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+    implementation 'org.apache.commons:commons-lang3:3.10'
+    implementation 'org.apache.commons:commons-collections4:4.3'
 
     // ModelMapper
-    implementation group: 'org.modelmapper.extensions', name: 'modelmapper-spring', version: '2.3.5'
+    implementation 'org.modelmapper.extensions:modelmapper-spring:2.3.5'
 
     // OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
     //implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.12'
 
     //------------------------------------------------------------------------------------------------------------------
@@ -119,18 +111,23 @@ dependencies {
 
     // Micrometer Prometheus plugin
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Test dependencies
+    //------------------------------------------------------------------------------------------------------------------
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 
 dependencyManagement {
     imports {
-        mavenBom "hu.perit.spvitamin:spvitamin-dependencies:${spvitaminVersion}"
+        //mavenBom "hu.perit.spvitamin:spvitamin-dependencies:${spvitaminVersion}"
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
 }
 
 
-test {
+tasks.named('test') {
     useJUnitPlatform()
 }
 

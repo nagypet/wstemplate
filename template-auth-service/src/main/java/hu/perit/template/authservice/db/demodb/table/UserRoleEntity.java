@@ -16,11 +16,12 @@
 
 package hu.perit.template.authservice.db.demodb.table;
 
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.persistence.*;
 
 /**
  * This class would not be necessary, because the @Jointable annotation creates the join table. There is a bug in H2 database

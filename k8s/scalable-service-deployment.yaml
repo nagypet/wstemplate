@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: scalable-service
-          image: docker-registry:5000/wstemplate-template-scalable-service:1.0.15-SNAPSHOT
+          image: docker-registry:5000/wstemplate-template-scalable-service:1.0.16-SNAPSHOT
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3

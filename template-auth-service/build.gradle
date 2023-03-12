@@ -74,38 +74,38 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.security:spring-security-ldap'
+    implementation 'org.springframework.security:spring-security-config'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // JJWT
-    implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
     // JAXB (JDK > 8 miatt)
-    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
-    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime'
+    implementation 'javax.xml.bind:jaxb-api:2.3.0'
+    implementation 'org.glassfish.jaxb:jaxb-runtime'
 
-    // javax.validation
-    implementation group: 'javax.validation', name: 'validation-api'
-    implementation group: 'org.hibernate', name: 'hibernate-validator', version: '6.1.5.Final'
+    // Validation
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+    implementation 'org.hibernate:hibernate-validator:6.1.5.Final'
 
     // Swagger
-    implementation "io.springfox:springfox-boot-starter:3.0.0"
-    implementation "io.springfox:springfox-swagger-ui:3.0.0"
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.3'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.0.3'
 
     // apache.commons
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
-    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+    implementation 'org.apache.commons:commons-lang3:3.10'
+    implementation 'org.apache.commons:commons-collections4:4.3'
 
     // ModelMapper TODO: mapstruct
-    implementation group: 'org.modelmapper.extensions', name: 'modelmapper-spring', version: '2.3.5'
+    implementation 'org.modelmapper.extensions:modelmapper-spring:2.3.5'
 
     // OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
 
     // OpenCSV
-    implementation group: 'com.opencsv', name: 'opencsv', version: '4.0'
+    implementation 'com.opencsv:opencsv:4.0'
 
 
     //------------------------------------------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom "hu.perit.spvitamin:spvitamin-dependencies:${spvitaminVersion}"
+        //mavenBom "hu.perit.spvitamin:spvitamin-dependencies:${spvitaminVersion}"
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
 }

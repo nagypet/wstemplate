@@ -56,10 +56,10 @@ dependencies {
     implementation 'org.springframework.security:spring-security-core'
 
     // Validation
-    implementation 'javax.validation:validation-api'
+    implementation 'javax.validation:validation-api:2.0.1.Final'
 
     // Swagger
-    implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
     // Slf4J
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
@@ -72,7 +72,7 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom "hu.perit.spvitamin:spvitamin-dependencies:${spvitaminVersion}"
+        //mavenBom "hu.perit.spvitamin:spvitamin-dependencies:${spvitaminVersion}"
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
 }

@@ -16,12 +16,12 @@
 
 package hu.perit.template.authservice.db.demodb.table;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 

@@ -91,29 +91,38 @@ security:
 #-----------------------------------------------------------------------------------------------------------------------
 # Please set either password or encryptedPassword property
 localuser:
-  admin:
-    password: admin
+  admin.password: admin
+  user.password: user
 
 
 #-----------------------------------------------------------------------------------------------------------------------
 # AD group -> role mapping (all = '*')
 #-----------------------------------------------------------------------------------------------------------------------
-# admin
 roles:
   ROLE_ADMIN:
-   groups: Admin
-   #roles.ROLE_ADMIN.includes=
-   users: admin
+    #groups: Admin
+    includes: ROLE_USER
+    users: admin
+
+  ROLE_USER:
+    users: user
 
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Role -> permission mapping
 #-----------------------------------------------------------------------------------------------------------------------
 # ADMIN
-#rolemap.ROLE_ADMIN=BOOK_WRITE_ACCESS
+rolemap:
+  ROLE_USER:
+    - USER_GET_ALL_USERS
+    - USER_GET_USER
+    - USER_CREATE_USER
 
-# PUBLIC
-#rolemap.ROLE_PUBLIC=BOOK_READ_ACCESS,AUTHOR_READ_ACCESS
+  ROLE_ADMIN:
+    - USER_UPDATE_USER
+    - USER_DELETE_USER
+    - USER_ADD_ROLE
+    - USER_DELETE_ROLE
 
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -124,7 +133,7 @@ jwt:
   private-key-alias: templatekey
   private-key-encryptedPassword: jdP5CKDIu5v2VUafF33pPQ==
   public-key-alias: templatekey
-  expiration-in-minutes:  60
+  expiration-in-minutes: 60
 
 
 #-----------------------------------------------------------------------------------------------------------------------

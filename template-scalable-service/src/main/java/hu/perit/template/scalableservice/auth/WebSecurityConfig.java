@@ -16,20 +16,19 @@
 
 package hu.perit.template.scalableservice.auth;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
+import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.EnableLocalUserAuthProvider;
 import hu.perit.spvitamin.spring.security.authservice.provider.AuthServiceAuthenticationProviderWithRestTemplate;
 import hu.perit.template.scalableservice.rest.api.ServiceApi;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * #know-how:simple-httpsecurity-builder
@@ -37,47 +36,43 @@ import hu.perit.template.scalableservice.rest.api.ServiceApi;
  * @author Peter Nagy
  */
 
+@Slf4j
+@Configuration
+@RequiredArgsConstructor
 @EnableWebSecurity
+@EnableLocalUserAuthProvider
 public class WebSecurityConfig
 {
 
-    /*
-     * ============== Order(1) =========================================================================================
-     */
-    @Configuration
+    private final AuthServiceAuthenticationProviderWithRestTemplate authServiceAuthenticationProvider;
+
+    @Bean
     @Order(1)
-    @RequiredArgsConstructor
-    public static class Order1 extends WebSecurityConfigurerAdapter
+    public SecurityFilterChain configureAuthenticateEndpoint(HttpSecurity http) throws Exception
     {
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
+                .authorizeRequests(r -> r.anyRequest().authenticated())
+                .basicAuth()
+                .jwtAuth();
 
-        private final AuthServiceAuthenticationProviderWithRestTemplate authServiceAuthenticationProvider;
+        http.authenticationProvider(this.authServiceAuthenticationProvider);
 
-        @Autowired
-        public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception
-        {
-            auth.authenticationProvider(this.authServiceAuthenticationProvider);
-        }
-
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception
-        {
-            SimpleHttpSecurityBuilder.newInstance(http).scope(AuthApi.BASE_URL_AUTHENTICATE).basicAuth();
-        }
+        return http.build();
     }
 
-    /*
-     * ============== Order(2) =========================================================================================
-     */
-    @Configuration
-    @Order(2)
-    public static class Order2 extends WebSecurityConfigurerAdapter
-    {
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception
-        {
-            SimpleHttpSecurityBuilder.newInstance(http).scope(ServiceApi.BASE_URL_SERVICE + "/**").jwtAuth();
-        }
+    @Bean
+    @Order(2)
+    public SecurityFilterChain configureTokenSecuredEndpoints(HttpSecurity http) throws Exception
+    {
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope(ServiceApi.BASE_URL_SERVICE + "/**")
+                // we do not use secure sessions here: each endpoint has to be authenticated again and again
+                .ignorePersistedSecurity()
+                .authorizeRequests(r -> r.anyRequest().authenticated())
+                .jwtAuth();
+
+        return http.build();
     }
 }
