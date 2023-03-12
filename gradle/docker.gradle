@@ -20,118 +20,116 @@
  *******************************************************************************************************/
 if (project.hasProperty('application')) {
 
-	ext {
-		if (project.hasProperty('imagePrefix')) {
-			dockerImageName = "${imagePrefix}-" + applicationName.toLowerCase()
-		}
-		else {
-			dockerImageName = applicationName.toLowerCase()
-		}
-		dockerBuildDir = new File(buildDir, 'docker').getAbsolutePath()
-		dockerImageInputsChanged = false
-	}
-			
-	task dockerCopyDependencies(type: Copy) {
-		dependsOn 'installDist'
-		
-		from("$installDist.destinationDir/lib") {
-			exclude jar.archiveName, '*SNAPSHOT*'
-		}
-		into "$dockerBuildDir/dependencies"
-		
-		doLast { dockerImageInputsChanged = true }
-	}
+    ext {
+        if (project.hasProperty('imagePrefix')) {
+            dockerImageName = "${imagePrefix}-" + applicationName.toLowerCase()
+        } else {
+            dockerImageName = applicationName.toLowerCase()
+        }
+        dockerBuildDir = new File(buildDir, 'docker').getAbsolutePath()
+        dockerImageInputsChanged = false
+    }
 
-	task dockerCopySnapshotDependencies(type: Copy) {
-		dependsOn 'installDist'
-		
-		from("$installDist.destinationDir/lib") {
-			exclude jar.archiveName
-			include '*SNAPSHOT*'
-		}
-		into "$dockerBuildDir/snapshot-dependencies"
-		
-		doLast { dockerImageInputsChanged = true }
-	}
+    task dockerCopyDependencies(type: Copy) {
+        dependsOn 'installDist'
 
-	task dockerCopyDockerfile(type: Copy) {
-		dependsOn 'installDist'
-		
-		from 'docker'
-		into dockerBuildDir
-		
-		doLast { dockerImageInputsChanged = true }
-	}
+        from("$installDist.destinationDir/lib") {
+            exclude jar.archiveName, '*SNAPSHOT*'
+        }
+        into "$dockerBuildDir/dependencies"
 
-	task dockerCopyBin(type: Copy) {
-		dependsOn 'installDist'
-		
-		from ("$installDist.destinationDir/bin") {
-			exclude '*.bat'
-		}
-		into "$dockerBuildDir/bin"
-		
-		doLast { dockerImageInputsChanged = true }
-	}
+        doLast { dockerImageInputsChanged = true }
+    }
 
-	task dockerCopyConfig(type: Copy) {
-		dependsOn 'installDist'
+    task dockerCopySnapshotDependencies(type: Copy) {
+        dependsOn 'installDist'
 
-		from 'config'
-		into "$dockerBuildDir/bin"
+        from("$installDist.destinationDir/lib") {
+            exclude jar.archiveName
+            include '*SNAPSHOT*'
+        }
+        into "$dockerBuildDir/snapshot-dependencies"
 
-		doLast { dockerImageInputsChanged = true }
-	}
+        doLast { dockerImageInputsChanged = true }
+    }
 
-	task dockerCopyApplication(type: Copy) {
-		dependsOn 'installDist'
-		
-		from("$installDist.destinationDir/lib") {
-			include jar.archiveName
-		}
-		into "$dockerBuildDir/application"
-		
-		doLast { dockerImageInputsChanged = true }
-	}
+    task dockerCopyDockerfile(type: Copy) {
+        dependsOn 'installDist'
 
-	task dockerBackendImage() {
-		group 'docker'
-		description 'Builds docker image based on the installation'
+        from 'docker'
+        into dockerBuildDir
 
-		dependsOn 'installDist'
-		dependsOn 'dockerCopyDependencies'
-		dependsOn 'dockerCopySnapshotDependencies'
-		dependsOn 'dockerCopyDockerfile'
-		dependsOn 'dockerCopyBin'
-		dependsOn 'dockerCopyConfig'
-		dependsOn 'dockerCopyApplication'
-		
-		doFirst {
-			logger.quiet "Building docker image: ${dockerImageName}"			
-		}
-		doLast {
-			exec {
-				workingDir dockerBuildDir
-				commandLine 'docker', 'build', '-t', "${dockerImageName}", '.'
-			}
-			if (project.hasProperty('dockerRegistry')) {
-				exec {
-					workingDir dockerBuildDir
-					commandLine 'docker', 'tag', "${dockerImageName}", "${dockerRegistry}/${dockerImageName}:${version}"
-				}
-				exec {
-					workingDir dockerBuildDir
-					commandLine 'docker', 'push', "${dockerRegistry}/${dockerImageName}:${version}"
-				}
-			}
-		}
-		
-		outputs.upToDateWhen { !dockerImageInputsChanged }
-	}
-}
-else {
-	task dockerBuildBackend() {
-	}
+        doLast { dockerImageInputsChanged = true }
+    }
+
+    task dockerCopyBin(type: Copy) {
+        dependsOn 'installDist'
+
+        from("$installDist.destinationDir/bin") {
+            exclude '*.bat'
+        }
+        into "$dockerBuildDir/bin"
+
+        doLast { dockerImageInputsChanged = true }
+    }
+
+    task dockerCopyConfig(type: Copy) {
+        dependsOn 'installDist'
+
+        from 'config'
+        into "$dockerBuildDir/bin"
+
+        doLast { dockerImageInputsChanged = true }
+    }
+
+    task dockerCopyApplication(type: Copy) {
+        dependsOn 'installDist'
+
+        from("$installDist.destinationDir/lib") {
+            include jar.archiveName
+        }
+        into "$dockerBuildDir/application"
+
+        doLast { dockerImageInputsChanged = true }
+    }
+
+    task dockerBackendImage() {
+        group 'docker'
+        description 'Builds docker image based on the installation'
+
+        dependsOn 'installDist'
+        dependsOn 'dockerCopyDependencies'
+        dependsOn 'dockerCopySnapshotDependencies'
+        dependsOn 'dockerCopyDockerfile'
+        dependsOn 'dockerCopyBin'
+        dependsOn 'dockerCopyConfig'
+        dependsOn 'dockerCopyApplication'
+
+        doFirst {
+            logger.quiet "Building docker image: ${dockerImageName}"
+        }
+        doLast {
+            exec {
+                workingDir dockerBuildDir
+                commandLine 'docker', 'build', '-t', "${dockerImageName}", '.'
+            }
+            if (project.hasProperty('dockerRegistry')) {
+                exec {
+                    workingDir dockerBuildDir
+                    commandLine 'docker', 'tag', "${dockerImageName}", "${dockerRegistry}/${dockerImageName}:${version}"
+                }
+                exec {
+                    workingDir dockerBuildDir
+                    commandLine 'docker', 'push', "${dockerRegistry}/${dockerImageName}:${version}"
+                }
+            }
+        }
+
+        outputs.upToDateWhen { !dockerImageInputsChanged }
+    }
+} else {
+    task dockerBuildBackend() {
+    }
 }
 
 
@@ -140,5 +138,5 @@ else {
  *******************************************************************************************************/
 task dockerImage() {
     group 'docker'
-	description 'Builds docker image.'
+    description 'Builds docker image.'
 }

@@ -16,8 +16,11 @@
 
 package hu.perit.template.authservice.rest.api;
 
-import java.util.List;
-
+import hu.perit.spvitamin.spring.auth.AuthorizationToken;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
+import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +31,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ActiveProfiles;
 
-import hu.perit.spvitamin.spring.auth.AuthorizationToken;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
-import hu.perit.template.authservice.auth.Role;
-import io.jsonwebtoken.Claims;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
 
 /**
  * @author Peter Nagy
@@ -59,7 +57,7 @@ class AuthControllerTest {
         log.debug("testRestController()");
 
         // Beállítunk egy usert a SecurityContext-be
-        List<SimpleGrantedAuthority> simpleGrantedAuthorities = List.of(new SimpleGrantedAuthority(Role.ADMIN.name()));
+        List<SimpleGrantedAuthority> simpleGrantedAuthorities = List.of(new SimpleGrantedAuthority("ADMIN"));
         UserDetails userDetails =
                 AuthenticatedUser.builder()
                         .username("nagy_peter")

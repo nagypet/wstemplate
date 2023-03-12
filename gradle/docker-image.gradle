@@ -15,7 +15,7 @@
  */
 
 task clean(type: Delete) {
-	delete "${dockerBuildDir}"
+    delete "${dockerBuildDir}"
 }
 
 
@@ -23,33 +23,33 @@ task dockerCreateImage() {
     group 'docker'
     description "Builds the ${dockerImageName} docker image."
 
-	dependsOn 'dockerGeatherInputs'
-	
+    dependsOn 'dockerGeatherInputs'
+
     doFirst {
         logger.quiet "Building docker image: $dockerImageName"
     }
 
-	doLast {
-		exec {
-			workingDir dockerBuildDir
-			commandLine 'docker', 'build', '-t', "${dockerImageName}", '.'
-		}
-		if (project.hasProperty('dockerRegistry')) {
-			exec {
-				workingDir dockerBuildDir
-				commandLine 'docker', 'tag', "${dockerImageName}", "${dockerRegistry}/${dockerImageName}:${version}"
-			}
-			exec {
-				workingDir dockerBuildDir
-				commandLine 'docker', 'push', "${dockerRegistry}/${dockerImageName}:${version}"
-			}
-		}
-	}
-	
-	outputs.upToDateWhen { !dockerImageInputsChanged }
+    doLast {
+        exec {
+            workingDir dockerBuildDir
+            commandLine 'docker', 'build', '-t', "${dockerImageName}", '.'
+        }
+        if (project.hasProperty('dockerRegistry')) {
+            exec {
+                workingDir dockerBuildDir
+                commandLine 'docker', 'tag', "${dockerImageName}", "${dockerRegistry}/${dockerImageName}:${version}"
+            }
+            exec {
+                workingDir dockerBuildDir
+                commandLine 'docker', 'push', "${dockerRegistry}/${dockerImageName}:${version}"
+            }
+        }
+    }
+
+    outputs.upToDateWhen { !dockerImageInputsChanged }
 }
 
 
 dockerImage() {
-	dependsOn 'dockerCreateImage'
+    dependsOn 'dockerCreateImage'
 }
