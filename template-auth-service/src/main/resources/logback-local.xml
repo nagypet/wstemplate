@@ -63,19 +63,13 @@
 	<logger name="hu.perit.spvitamin.spring.restmethodlogger" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
-	<logger name="hu.perit.spvitamin.data.dynamicdatasource" level="INFO" additivity="false">
+	<logger name="hu.perit.spvitamin.spring.data.dynamicdatasource" level="INFO" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
 	<logger name="hu.perit.spvitamin.spring.security" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
-	<logger name="hu.perit.spvitamin.spring.security.auth.filter" level="DEBUG" additivity="false">
-		<appender-ref ref="application-message"/>
-	</logger>
 	<logger name="hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover" level="INFO" additivity="false">
-		<appender-ref ref="application-message"/>
-	</logger>
-	<logger name="hu.perit.spvitamin.spring.security.ldap" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
 	<logger name="hu.perit.spvitamin.spring.config" level="DEBUG" additivity="false">
