@@ -83,7 +83,7 @@ security:
   swagger-access: "*"
   management-endpoints-access: ADMIN
   admin-gui-access: "*"
-  admin-endpoints-access: "*"
+  admin-endpoints-access: ADMIN
 
 
 #-----------------------------------------------------------------------------------------------------------------------
