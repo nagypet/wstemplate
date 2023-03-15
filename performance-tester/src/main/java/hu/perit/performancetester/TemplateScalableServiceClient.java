@@ -30,9 +30,9 @@ public interface TemplateScalableServiceClient {
     @RequestLine("GET " + TemplateScalableServiceClient.BASE_URL_SERVICE)
     @Headers({
             "Content-Type: application/json",
-            "processID: {processID}"
+            "traceId: {traceId}"
     })
     Integer makeSomeLongCalculation(
-            @Param("processID") String processID
+            @Param("traceId") String traceId
     );
 }

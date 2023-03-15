@@ -49,9 +49,9 @@ public class ScalableServiceJob extends BatchJob {
     protected Boolean execute() throws Exception {
         try (Took took = new Took(false))
         {
-            String processID = UUID.randomUUID().toString();
+            String traceId = UUID.randomUUID().toString();
 
-            Integer retval = this.serviceClient.makeSomeLongCalculation(processID);
+            Integer retval = this.serviceClient.makeSomeLongCalculation(traceId);
 
             this.stats.incrementSuccessCount();
             this.stats.pushExecTimeMillis(took.getDuration());

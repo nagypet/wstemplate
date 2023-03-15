@@ -55,6 +55,6 @@ public interface ServiceApi
     @ResponseStatus(value = HttpStatus.OK)
     @EventLogId(eventId = 1)
     Integer makeSomeLongCalculationUsingGET(
-            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID
+            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId
     ) throws InterruptedException;
 }

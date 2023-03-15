@@ -41,7 +41,7 @@ public class AuthController implements AuthApi {
 
     @Override
     @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
-    public AuthorizationToken authenticateUsingGET(String processID) {
+    public AuthorizationToken authenticateUsingGET(String traceId) {
         AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
 
         return tokenProvider.generateToken(authenticatedUser.getUsername(),

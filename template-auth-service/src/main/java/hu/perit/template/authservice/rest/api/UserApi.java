@@ -72,7 +72,7 @@ public interface UserApi
     )
     @ResponseStatus(value = HttpStatus.OK)
     @EventLogId(eventId = 1)
-    List<UserDTOFiltered> getAllUsersUsingGET(@RequestHeader(value = "processID", required = false) String processID);
+    List<UserDTOFiltered> getAllUsersUsingGET(@RequestHeader(value = "traceId", required = false) String traceId);
 
 
     /*
@@ -92,7 +92,7 @@ public interface UserApi
     @ResponseStatus(value = HttpStatus.OK)
     @EventLogId(eventId = 2)
     UserDTO getUserByIdUsingGET(
-            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
+            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId,
             @Parameter(name = "User ID", required = true) @PathVariable("id") Long id) throws ResourceNotFoundException;
 
 
@@ -114,7 +114,7 @@ public interface UserApi
     @ResponseStatus(value = HttpStatus.CREATED)
     @EventLogId(eventId = 3)
     ResponseUri createUserUsingPOST(
-            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
+            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId,
             @Parameter(name = "User properties", required = true) @Valid @RequestBody CreateUserParams createUserParams);
 
 
@@ -136,7 +136,7 @@ public interface UserApi
     @ResponseStatus(value = HttpStatus.OK)
     @EventLogId(eventId = 4)
     void updateUserUsingPUT(
-            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
+            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId,
             @Parameter(name = "User ID", required = true) @PathVariable("id") Long id,
             @Parameter(name = "User properties", required = true) @Valid @RequestBody UpdateUserParams updateUserParams)
             throws ResourceNotFoundException;
@@ -160,7 +160,7 @@ public interface UserApi
     @ResponseStatus(value = HttpStatus.OK)
     @EventLogId(eventId = 5)
     void deleteUserUsingDELETE(
-            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
+            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId,
             @Parameter(name = "User ID", required = true) @PathVariable("id") Long id) throws ResourceNotFoundException;
 
 
@@ -182,7 +182,7 @@ public interface UserApi
     @ResponseStatus(value = HttpStatus.CREATED)
     @EventLogId(eventId = 6)
     void addRoleUsingPOST(
-            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
+            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId,
             @Parameter(name = "User ID", required = true) @PathVariable("id") Long id,
             @Parameter(name = "Set of roles", required = true) @Valid @RequestBody RoleSet roleSet) throws ResourceNotFoundException;
 
@@ -205,7 +205,7 @@ public interface UserApi
     @ResponseStatus(value = HttpStatus.OK)
     @EventLogId(eventId = 7)
     void deleteRoleUsingDELETE(
-            @Parameter(name = "ProcessID", required = false) @RequestHeader(value = "processID", required = false) String processID,
+            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId,
             @Parameter(name = "User ID", required = true) @PathVariable("id") Long id,
             @Parameter(name = "Set of roles", required = true) @Valid @RequestBody RoleSet roleSet) throws ResourceNotFoundException;
 }

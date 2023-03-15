@@ -49,7 +49,7 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_GET_ALL, subsystem = Constants.SUBSYSTEM_NAME)
-    public List<UserDTOFiltered> getAllUsersUsingGET(String processID)
+    public List<UserDTOFiltered> getAllUsersUsingGET(String traceId)
     {
         return this.userService.getAll();
     }
@@ -60,7 +60,7 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_GET_BY_ID, subsystem = Constants.SUBSYSTEM_NAME)
-    public UserDTO getUserByIdUsingGET(String processID, Long id) throws ResourceNotFoundException
+    public UserDTO getUserByIdUsingGET(String traceId, Long id) throws ResourceNotFoundException
     {
         return this.userService.getUserDTOById(id);
     }
@@ -71,7 +71,7 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_CREATE, subsystem = Constants.SUBSYSTEM_NAME)
-    public ResponseUri createUserUsingPOST(String processID, @Valid CreateUserParams createUserParams)
+    public ResponseUri createUserUsingPOST(String traceId, @Valid CreateUserParams createUserParams)
     {
         long newUserId = this.userService.create(createUserParams);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newUserId).toUri();
@@ -84,7 +84,7 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_UPDATE, subsystem = Constants.SUBSYSTEM_NAME)
-    public void updateUserUsingPUT(String processID, Long id, @Valid UpdateUserParams updateUserParams) throws ResourceNotFoundException
+    public void updateUserUsingPUT(String traceId, Long id, @Valid UpdateUserParams updateUserParams) throws ResourceNotFoundException
     {
         this.userService.update(id, updateUserParams);
     }
@@ -95,7 +95,7 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_DELETE, subsystem = Constants.SUBSYSTEM_NAME)
-    public void deleteUserUsingDELETE(String processID, Long id) throws ResourceNotFoundException
+    public void deleteUserUsingDELETE(String traceId, Long id) throws ResourceNotFoundException
     {
         this.userService.delete(id);
     }
@@ -106,7 +106,7 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_ADD_ROLE, subsystem = Constants.SUBSYSTEM_NAME)
-    public void addRoleUsingPOST(String processID, Long id, @Valid RoleSet roleSet) throws ResourceNotFoundException
+    public void addRoleUsingPOST(String traceId, Long id, @Valid RoleSet roleSet) throws ResourceNotFoundException
     {
         this.userService.addRole(id, roleSet);
     }
@@ -117,7 +117,7 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_DELETE_ROLE, subsystem = Constants.SUBSYSTEM_NAME)
-    public void deleteRoleUsingDELETE(String processID, Long id, @Valid RoleSet roleSet) throws ResourceNotFoundException
+    public void deleteRoleUsingDELETE(String traceId, Long id, @Valid RoleSet roleSet) throws ResourceNotFoundException
     {
         this.userService.deleteRole(id, roleSet);
     }

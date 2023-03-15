@@ -43,11 +43,11 @@ public class ServiceController implements ServiceApi
      */
     @Override
     @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
-    public Integer makeSomeLongCalculationUsingGET(String processID) throws InterruptedException
+    public Integer makeSomeLongCalculationUsingGET(String traceId) throws InterruptedException
     {
         this.micrometerMetricsService.incrementWsCall();
 
-        try (Took took = new TookWithMetric(this.micrometerMetricsService.getMetricService(), processID, false))
+        try (Took took = new TookWithMetric(this.micrometerMetricsService.getMetricService(), traceId, false))
         {
             TimeUnit.MILLISECONDS.sleep(2000);
             return 12;

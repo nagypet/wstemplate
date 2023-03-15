@@ -12,7 +12,7 @@ WORKDIR /usr/src/auth-service
 
 EXPOSE 8410
 
-COPY ./dependencies ./snapshot-dependencies* ./lib
+COPY ./dependencies ./snapshot-dependencies* ./lib/
 COPY ./bin ./bin
 COPY ./application ./lib
 

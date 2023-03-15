@@ -16,7 +16,7 @@
 
 package hu.perit.template.authservice.rest.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ResponseUri
 {
-    @ApiModelProperty(example = "https://localhost:8400/users/12")
+    @Schema(example = "https://localhost:8400/users/12")
     private String location;
 
     public ResponseUri location(String location)

@@ -35,7 +35,7 @@ public class AuthController implements AuthApi
 {
     @Override
     @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
-    public AuthorizationToken authenticateUsingGET(String processID)
+    public AuthorizationToken authenticateUsingGET(String traceId)
     {
         if (SecurityContextUtil.getToken() instanceof AuthorizationToken)
         {

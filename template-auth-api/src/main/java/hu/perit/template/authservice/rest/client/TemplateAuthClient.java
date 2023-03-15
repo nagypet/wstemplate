@@ -47,10 +47,10 @@ public interface TemplateAuthClient
     @RequestLine("GET " + BASE_URL_AUTHENTICATE)
     @Headers({
             "Content-Type: application/json",
-            "processID: {processID}"
+            "traceId: {traceId}"
     })
     AuthorizationToken authenticate(
-            @Param("processID") String processID
+            @Param("traceId") String traceId
     );
 
 
@@ -60,10 +60,10 @@ public interface TemplateAuthClient
     @RequestLine("GET " + BASE_URL_USERS)
     @Headers({
             "Content-Type: application/json",
-            "processID: {processID}"
+            "traceId: {traceId}"
     })
     List<UserDTOFiltered> getAllUsers(
-            @Param("processID") String processID
+            @Param("traceId") String traceId
     );
 
 
@@ -73,10 +73,10 @@ public interface TemplateAuthClient
     @RequestLine("GET " + BASE_URL_USERS + "/{id}")
     @Headers({
             "Content-Type: application/json",
-            "processID: {processID}"
+            "traceId: {traceId}"
     })
     UserDTO getUserById(
-            @Param("processID") String processID,
+            @Param("traceId") String traceId,
             @Param("id") long userId
     );
 
@@ -87,10 +87,10 @@ public interface TemplateAuthClient
     @RequestLine("POST " + BASE_URL_USERS)
     @Headers({
             "Content-Type: application/json",
-            "processID: {processID}"
+            "traceId: {traceId}"
     })
     ResponseUri createUser(
-            @Param("processID") String processID,
+            @Param("traceId") String traceId,
             @RequestBody CreateUserParams createUserParams
     );
 
@@ -101,10 +101,10 @@ public interface TemplateAuthClient
     @RequestLine("PUT " + BASE_URL_USERS + "/{id}")
     @Headers({
             "Content-Type: application/json",
-            "processID: {processID}"
+            "traceId: {traceId}"
     })
     void updateUser(
-            @Param("processID") String processID,
+            @Param("traceId") String traceId,
             @Param("id") long userId,
             @RequestBody UpdateUserParams updateUserParams
     );
@@ -116,10 +116,10 @@ public interface TemplateAuthClient
     @RequestLine("DELETE " + BASE_URL_USERS + "/{id}")
     @Headers({
             "Content-Type: application/json",
-            "processID: {processID}"
+            "traceId: {traceId}"
     })
     void deleteUser(
-            @Param("processID") String processID,
+            @Param("traceId") String traceId,
             @Param("id") long userId
     );
 
@@ -130,10 +130,10 @@ public interface TemplateAuthClient
     @RequestLine("PUT " + BASE_URL_USERS + "/{id}" + PATH_ROLES)
     @Headers({
             "Content-Type: application/json",
-            "processID: {processID}"
+            "traceId: {traceId}"
     })
     void addRole(
-            @Param("processID") String processID,
+            @Param("traceId") String traceId,
             @Param("id") long userId,
             @RequestBody RoleSet roleSet
     );
@@ -145,10 +145,10 @@ public interface TemplateAuthClient
     @RequestLine("DELETE " + BASE_URL_USERS + "/{id}" + PATH_ROLES)
     @Headers({
             "Content-Type: application/json",
-            "processID: {processID}"
+            "traceId: {traceId}"
     })
     void deleteRole(
-            @Param("processID") String processID,
+            @Param("traceId") String traceId,
             @Param("id") long userId,
             @RequestBody RoleSet roleSet
     );
