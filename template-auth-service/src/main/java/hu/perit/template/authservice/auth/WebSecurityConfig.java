@@ -56,7 +56,8 @@ public class WebSecurityConfig
                 .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
                 .authorizeRequests(r -> r.anyRequest().authenticated())
                 .basicAuth()
-                .jwtAuth();
+                .jwtAuth()
+                .createSession();
 
         http.authenticationProvider(this.dbAuthenticationProvider);
         this.ldapAuthenticationProviderConfigurer.configure(http);
