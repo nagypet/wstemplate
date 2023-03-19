@@ -57,10 +57,10 @@
 	<logger name="hu.perit.spvitamin.spring.logging" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
-	<logger name="hu.perit.spvitamin.spring.restmethodlogger" level="DEBUG" additivity="false">
+	<logger name="hu.perit.spvitamin.spring.httplogging" level="INFO" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
-	<logger name="hu.perit.spvitamin.spring.security" level="DEBUG" additivity="false">
+	<logger name="hu.perit.spvitamin.spring.security" level="WARN" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
 
