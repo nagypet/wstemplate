@@ -46,14 +46,16 @@ import java.util.stream.Collectors;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = UserEntity.TABLE_NAME, schema = Constants.SCHEMA, indexes = {
-        @Index(columnList = "username", name = Constants.INDEXNAME_USERNAME, unique = true)
+        @Index(columnList = "username", name = UserEntity.IX_USERNAME, unique = true)
 })
 public class UserEntity
 {
     public static final String TABLE_NAME = "user";
+    public static final String IX_USERNAME = "ix_user_01";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_generator")
+    @SequenceGenerator(name = "user_generator", sequenceName = "user_seq", schema = Constants.SCHEMA, allocationSize = 200)
     @Column(name = "userid", nullable = false)
     private Long userId;
 

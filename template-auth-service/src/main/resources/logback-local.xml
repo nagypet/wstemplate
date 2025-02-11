@@ -43,6 +43,7 @@
 	-->
 	<!-- flooding the log -->
 	<logger name="com.netflix.discovery" level="ERROR"/>
+	<logger name="liquibase.changelog" level="INFO"/>
 
 	<!-- Spvitamin loggers -->
 	<logger name="hu.perit.spvitamin" level="INFO" additivity="false">

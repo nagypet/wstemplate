@@ -16,23 +16,17 @@
 
 package hu.perit.template.scalableservice.rest.api;
 
-import feign.Param;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
-import hu.perit.spvitamin.spring.logging.EventLogId;
-import hu.perit.template.authservice.rest.model.UserDTO;
+import hu.perit.template.authservice.model.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * @author Peter Nagy

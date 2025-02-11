@@ -3,7 +3,7 @@ package hu.perit.template.authservice.services.api;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.template.authservice.db.demodb.table.UserEntity;
-import hu.perit.template.authservice.rest.model.*;
+import hu.perit.template.authservice.model.*;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.Lock;
 

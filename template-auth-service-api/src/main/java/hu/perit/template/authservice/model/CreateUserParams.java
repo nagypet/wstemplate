@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package hu.perit.template.authservice.rest.model;
+package hu.perit.template.authservice.model;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,13 +31,23 @@ import java.util.Set;
 
 @Data
 @NoArgsConstructor
-public class UserDTOFiltered {
+@AllArgsConstructor
+@Builder
+public class CreateUserParams {
 
-    // Properties for /user GET
-    private Long userId;
+    @NotEmpty
     private String userName;
+    @NotEmpty
+    private String password;
+    @NotEmpty
     private String displayName;
     private Set<String> roles;
-    private Boolean external;
+    @NotNull
     private Boolean active;
+    private String address;
+    @NotEmpty
+    private String email;
+    private String phone;
+    @NotNull
+    private Boolean nextLoginChangePwd;
 }

@@ -52,7 +52,7 @@ dependencies {
     implementation project(':spvitamin-spring-security-ldap')
     implementation project(':spvitamin-spring-server')
     implementation project(':spvitamin-spring-data')
-    implementation project(':template-auth-api')
+    implementation project(':template-auth-service-api')
 
 //    implementation 'hu.perit.spvitamin:spvitamin-core'
 //    implementation 'hu.perit.spvitamin:spvitamin-spring-admin'

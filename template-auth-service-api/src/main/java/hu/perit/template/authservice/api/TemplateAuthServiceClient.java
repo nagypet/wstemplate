@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package hu.perit.template.authservice.rest.client;
+package hu.perit.template.authservice.api;
 
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
-import hu.perit.template.authservice.rest.model.CreateUserParams;
-import hu.perit.template.authservice.rest.model.ResponseUri;
-import hu.perit.template.authservice.rest.model.RoleSet;
-import hu.perit.template.authservice.rest.model.UpdateUserParams;
-import hu.perit.template.authservice.rest.model.UserDTO;
-import hu.perit.template.authservice.rest.model.UserDTOFiltered;
+import hu.perit.template.authservice.model.CreateUserParams;
+import hu.perit.template.authservice.model.ResponseUri;
+import hu.perit.template.authservice.model.RoleSet;
+import hu.perit.template.authservice.model.UpdateUserParams;
+import hu.perit.template.authservice.model.UserDTO;
+import hu.perit.template.authservice.model.UserDTOFiltered;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -35,7 +35,7 @@ import java.util.List;
  * @author Peter Nagy
  */
 
-public interface TemplateAuthClient
+public interface TemplateAuthServiceClient
 {
 
     String BASE_URL_AUTHENTICATE = "/api/spvitamin/authenticate";

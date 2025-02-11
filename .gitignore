@@ -31,7 +31,7 @@ polc
 distributions
 application-dev_private.properties
 performance-tester/bin
-template-auth-api/bin
+template-auth-service-api/bin
 template-auth-service/bin
 template-eureka/bin
 template-gateway/bin

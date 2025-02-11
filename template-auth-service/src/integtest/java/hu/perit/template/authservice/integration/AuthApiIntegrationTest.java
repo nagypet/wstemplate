@@ -23,7 +23,7 @@ import hu.perit.spvitamin.spring.config.LocalUserProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
-import hu.perit.template.authservice.rest.client.TemplateAuthClient;
+import hu.perit.template.authservice.api.TemplateAuthServiceClient;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import org.springframework.test.context.ActiveProfiles;
  * @author Peter Nagy
  */
 
-@ActiveProfiles({"local", "integtest", "h2", "spvitamin-defaults"})
+@ActiveProfiles({"integtest"})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Slf4j
 class AuthApiIntegrationTest
@@ -51,13 +51,13 @@ class AuthApiIntegrationTest
         {
             LocalUserProperties localUserProperties = SpringContext.getBean(LocalUserProperties.class);
 
-            TemplateAuthClient templateAuthClient = SimpleFeignClientBuilder.newInstance()
+            TemplateAuthServiceClient templateAuthServiceClient = SimpleFeignClientBuilder.newInstance()
                     .requestInterceptor(new BasicAuthRequestInterceptor(
                             "admin", localUserProperties.getLocaluser().get("admin").getPassword()))
-                    .build(TemplateAuthClient.class, SysConfig.getServerProperties().getServiceUrl());
+                    .build(TemplateAuthServiceClient.class, SysConfig.getServerProperties().getServiceUrl());
 
             // Calling the authentication endpoint
-            AuthorizationToken authentication = templateAuthClient.authenticate(null);
+            AuthorizationToken authentication = templateAuthServiceClient.authenticate(null);
             log.debug(authentication.getJwt());
         }
         catch (Exception e)
@@ -74,13 +74,13 @@ class AuthApiIntegrationTest
         log.debug("-----------------------------------------------------------------------------------------------------");
         log.debug("testRestEndpoint_withIncorrectUsername_whenUsing_DaoAuthenticationProvider()");
 
-        TemplateAuthClient templateAuthClient = SimpleFeignClientBuilder.newInstance()
+        TemplateAuthServiceClient templateAuthServiceClient = SimpleFeignClientBuilder.newInstance()
                 .requestInterceptor(new BasicAuthRequestInterceptor(
                         "valami_nem_letezo_username", "password"))
-                .build(TemplateAuthClient.class, SysConfig.getServerProperties().getServiceUrl());
+                .build(TemplateAuthServiceClient.class, SysConfig.getServerProperties().getServiceUrl());
 
         // Calling the authentication endpoint
-        Assertions.assertThrows(BadCredentialsException.class, () -> templateAuthClient.authenticate(null));
+        Assertions.assertThrows(BadCredentialsException.class, () -> templateAuthServiceClient.authenticate(null));
     }
 
 
@@ -90,13 +90,13 @@ class AuthApiIntegrationTest
         log.debug("-----------------------------------------------------------------------------------------------------");
         log.debug("testRestEndpoint_withIncorrectPassword_whenUsing_DaoAuthenticationProvider()");
 
-        TemplateAuthClient templateAuthClient = SimpleFeignClientBuilder.newInstance()
+        TemplateAuthServiceClient templateAuthServiceClient = SimpleFeignClientBuilder.newInstance()
                 .requestInterceptor(new BasicAuthRequestInterceptor(
                         "admin", "wrong_password"))
-                .build(TemplateAuthClient.class, SysConfig.getServerProperties().getServiceUrl());
+                .build(TemplateAuthServiceClient.class, SysConfig.getServerProperties().getServiceUrl());
 
         // Calling the authentication endpoint
-        Assertions.assertThrows(BadCredentialsException.class, () -> templateAuthClient.authenticate(null));
+        Assertions.assertThrows(BadCredentialsException.class, () -> templateAuthServiceClient.authenticate(null));
     }
 
 }

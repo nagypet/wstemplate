@@ -17,12 +17,7 @@
 package hu.perit.template.authservice.db.demodb.table;
 
 import hu.perit.template.authservice.config.Constants;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -48,8 +43,9 @@ public class RoleEntity
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "roleid", nullable = false, columnDefinition = "bigserial")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_generator")
+    @SequenceGenerator(name = "role_generator", sequenceName = "role_seq", schema = Constants.SCHEMA, allocationSize = 200)
+    @Column(name = "roleid", nullable = false)
     private Long roleId;
 
     @Column(name = "role")

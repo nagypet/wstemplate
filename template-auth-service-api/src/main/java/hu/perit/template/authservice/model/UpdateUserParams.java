@@ -14,26 +14,34 @@
  * limitations under the License.
  */
 
-package hu.perit.template.authservice.rest.model;
+package hu.perit.template.authservice.model;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 /**
+ * Each field may be null. Only valid fields will be updated.
+ *
  * @author Peter Nagy
  */
 
 @Data
 @NoArgsConstructor
-public class ResponseUri
-{
-    @Schema(example = "https://localhost:8400/users/12")
-    private String location;
+@AllArgsConstructor
+@Builder
+public class UpdateUserParams {
 
-    public ResponseUri location(String location)
-    {
-        this.location = location;
-        return this;
-    }
+    private String userName;
+    private String password;
+    private String displayName;
+    private Set<String> roles;
+    private Boolean active;
+    private String address;
+    private String email;
+    private String phone;
+    private Boolean nextLoginChangePwd;
 }

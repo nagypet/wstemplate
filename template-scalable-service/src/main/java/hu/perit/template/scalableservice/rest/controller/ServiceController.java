@@ -20,7 +20,7 @@ import hu.perit.spvitamin.core.took.Took;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.metrics.TookWithMetric;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
-import hu.perit.template.authservice.rest.model.UserDTO;
+import hu.perit.template.authservice.model.UserDTO;
 import hu.perit.template.scalableservice.config.Constants;
 import hu.perit.template.scalableservice.metrics.MicrometerMetricsService;
 import hu.perit.template.scalableservice.rest.api.ServiceApi;

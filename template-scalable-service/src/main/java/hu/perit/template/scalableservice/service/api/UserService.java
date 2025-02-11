@@ -1,7 +1,7 @@
 package hu.perit.template.scalableservice.service.api;
 
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
-import hu.perit.template.authservice.rest.model.UserDTO;
+import hu.perit.template.authservice.model.UserDTO;
 
 public interface UserService
 {

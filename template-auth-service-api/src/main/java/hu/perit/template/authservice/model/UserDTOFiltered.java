@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
-package hu.perit.template.authservice.auth;
+package hu.perit.template.authservice.model;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Configuration
-@EnableMethodSecurity(securedEnabled = true)
-public class MethodSecurityConfig
-{
+import java.util.Set;
+
+/**
+ * @author Peter Nagy
+ */
+
+@Data
+@NoArgsConstructor
+public class UserDTOFiltered {
+
+    // Properties for /user GET
+    private Long userId;
+    private String userName;
+    private String displayName;
+    private Set<String> roles;
+    private Boolean external;
+    private Boolean active;
 }

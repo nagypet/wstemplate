@@ -36,17 +36,15 @@ import org.springframework.test.context.ActiveProfiles;
 
 import feign.auth.BasicAuthRequestInterceptor;
 import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.crypto.CryptoUtil;
-import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.exception.CannotProcessException;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
-import hu.perit.template.authservice.rest.client.TemplateAuthClient;
-import hu.perit.template.authservice.rest.model.CreateUserParams;
-import hu.perit.template.authservice.rest.model.ResponseUri;
-import hu.perit.template.authservice.rest.model.UpdateUserParams;
-import hu.perit.template.authservice.rest.model.UserDTO;
-import hu.perit.template.authservice.rest.model.UserDTOFiltered;
+import hu.perit.template.authservice.api.TemplateAuthServiceClient;
+import hu.perit.template.authservice.model.CreateUserParams;
+import hu.perit.template.authservice.model.ResponseUri;
+import hu.perit.template.authservice.model.UpdateUserParams;
+import hu.perit.template.authservice.model.UserDTO;
+import hu.perit.template.authservice.model.UserDTOFiltered;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -66,7 +64,7 @@ public class UserApiIntegrationTest
     @Autowired
     private InputUserList inputUserListFromCSV;
 
-    private TemplateAuthClient templateAuthClient;
+    private TemplateAuthServiceClient templateAuthServiceClient;
 
     @BeforeEach
     void setUp()
@@ -75,11 +73,11 @@ public class UserApiIntegrationTest
         {
             LocalUserProperties localUserProperties = SpringContext.getBean(LocalUserProperties.class);
 
-            this.templateAuthClient = SimpleFeignClientBuilder.newInstance()
+            this.templateAuthServiceClient = SimpleFeignClientBuilder.newInstance()
                     .requestInterceptor(new BasicAuthRequestInterceptor(
                             "admin",
                             localUserProperties.getLocaluser().get("admin").getPassword()))
-                    .build(TemplateAuthClient.class, SysConfig.getServerProperties().getServiceUrl());
+                    .build(TemplateAuthServiceClient.class, SysConfig.getServerProperties().getServiceUrl());
         }
         catch (RuntimeException e)
         {
@@ -118,19 +116,19 @@ public class UserApiIntegrationTest
                 inputUsers.put(createUserParams.getUserName(), createUserParams);
 
                 // Calling the createUser endpoint
-                ResponseUri newUser = templateAuthClient.createUser("123", createUserParams);
+                ResponseUri newUser = templateAuthServiceClient.createUser("123", createUserParams);
                 log.debug(newUser.getLocation());
             }
 
             // Retrieving the list of users
-            List<UserDTOFiltered> allUsers = this.templateAuthClient.getAllUsers("123");
+            List<UserDTOFiltered> allUsers = this.templateAuthServiceClient.getAllUsers("123");
             log.debug(allUsers.toString());
             Assertions.assertTrue(allUsers.size() >= 3 && allUsers.size() <= 4);
 
             // Retrieving user details
             for (UserDTOFiltered item : allUsers)
             {
-                UserDTO userById = this.templateAuthClient.getUserById("123", item.getUserId());
+                UserDTO userById = this.templateAuthServiceClient.getUserById("123", item.getUserId());
                 log.debug(userById.toString());
 
                 CreateUserParams inputUser = inputUsers.get(userById.getUserName());
@@ -150,7 +148,7 @@ public class UserApiIntegrationTest
             for (UserDTOFiltered item : allUsers)
             {
                 // get original user
-                UserDTO originalUser = this.templateAuthClient.getUserById("123", item.getUserId());
+                UserDTO originalUser = this.templateAuthServiceClient.getUserById("123", item.getUserId());
                 log.debug("original: " + originalUser.toString());
 
                 // We only update the displayName
@@ -159,9 +157,9 @@ public class UserApiIntegrationTest
                         .build();
                 if (!item.getExternal())
                 {
-                    this.templateAuthClient.updateUser("123", item.getUserId(), updateUserParams);
+                    this.templateAuthServiceClient.updateUser("123", item.getUserId(), updateUserParams);
 
-                    UserDTO updatedUser = this.templateAuthClient.getUserById("123", item.getUserId());
+                    UserDTO updatedUser = this.templateAuthServiceClient.getUserById("123", item.getUserId());
                     log.debug("updated: " + updatedUser.toString());
                     // Check if this has been changed
                     Assertions.assertEquals("alma", updatedUser.getDisplayName());
@@ -171,7 +169,7 @@ public class UserApiIntegrationTest
                 }
                 else
                 {
-                    Assertions.assertThrows(CannotProcessException.class, () -> this.templateAuthClient.updateUser("123", item.getUserId(), updateUserParams));
+                    Assertions.assertThrows(CannotProcessException.class, () -> this.templateAuthServiceClient.updateUser("123", item.getUserId(), updateUserParams));
                 }
             }
 
@@ -180,16 +178,16 @@ public class UserApiIntegrationTest
             {
                 if (!item.getExternal())
                 {
-                    this.templateAuthClient.deleteUser("123", item.getUserId());
+                    this.templateAuthServiceClient.deleteUser("123", item.getUserId());
                 }
                 else
                 {
-                    Assertions.assertThrows(CannotProcessException.class, () -> this.templateAuthClient.deleteUser("123", item.getUserId()));
+                    Assertions.assertThrows(CannotProcessException.class, () -> this.templateAuthServiceClient.deleteUser("123", item.getUserId()));
                 }
             }
 
             // Checking the remaining count
-            allUsers = this.templateAuthClient.getAllUsers("123");
+            allUsers = this.templateAuthServiceClient.getAllUsers("123");
             Assertions.assertEquals(1, allUsers.size());
         }
         catch (RuntimeException | ResourceNotFoundException e)

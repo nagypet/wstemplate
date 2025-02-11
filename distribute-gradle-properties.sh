@@ -23,7 +23,7 @@ copyTo() {
 copyTo performance-tester
 copyTo prometheus
 copyTo grafana
-copyTo template-auth-api
+copyTo template-auth-service-api
 copyTo template-auth-service
 copyTo template-eureka
 copyTo template-gateway

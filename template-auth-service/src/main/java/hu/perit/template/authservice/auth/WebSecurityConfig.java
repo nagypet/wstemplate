@@ -75,9 +75,10 @@ public class WebSecurityConfig
     public SecurityFilterChain configureTokenSecuredEndpoints(HttpSecurity http) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)
-                .scope(UserApi.BASE_URL_USERS + "/**")
+                .scope(UserApi.BASE_URL_USERS + "/**", "/h2/**")
                 // we do not use secure sessions here: each endpoint has to be authenticated again and again
                 .ignorePersistedSecurity()
+                .h2()
                 .authorizeRequests(r -> r.anyRequest().authenticated())
                 .jwtAuth();
 

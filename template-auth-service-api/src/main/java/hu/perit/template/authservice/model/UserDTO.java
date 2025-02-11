@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.template.authservice.rest.model;
+package hu.perit.template.authservice.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

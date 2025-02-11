@@ -15,13 +15,31 @@
 #
 
 #-----------------------------------------------------------------------------------------------------------------------
-# datasource postgres on postgres
+# datasource postgres
+#-----------------------------------------------------------------------------------------------------------------------
+#    host: k8s-test.perit.local
+#    port: 31900
+#datasource:
+#  demodb:
+#    db-type: postgresql
+#    host: localhost
+#    db-name: testdb
+#    username: postgres
+#    encrypted-password: 1tvmTu8Ya8A=
+#    ddl-auto: none
+
+#-----------------------------------------------------------------------------------------------------------------------
+# datasource h2
 #-----------------------------------------------------------------------------------------------------------------------
 datasource:
   demodb:
-#    host: k8s-test.perit.local
-#    port: 31900
-    host: localhost
+    db-type: h2
+    host: mem
+    db-name: test
+    username: sa
+    password:
+    ddl-auto: none
+    options: INIT=CREATE SCHEMA IF NOT EXISTS dbo\;SET SCHEMA dbo
 
 
 #-----------------------------------------------------------------------------------------------------------------------

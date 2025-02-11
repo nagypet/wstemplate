@@ -23,7 +23,8 @@ spring:
     name: template-auth-service
   h2:
     console:
-      enabled: false
+      enabled: true
+      path: /h2
 
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -134,19 +135,6 @@ jwt:
   private-key-encryptedPassword: jdP5CKDIu5v2VUafF33pPQ==
   public-key-alias: templatekey
   expiration-in-minutes: 60
-
-
-#-----------------------------------------------------------------------------------------------------------------------
-# datasource postgres on postgres
-#-----------------------------------------------------------------------------------------------------------------------
-datasource:
-  demodb:
-    db-type: postgresql
-    host: postgres
-    db-name: testdb
-    username: postgres
-    encrypted-password: 1tvmTu8Ya8A=
-    ddl-auto: none
 
 
 #-----------------------------------------------------------------------------------------------------------------------

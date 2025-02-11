@@ -19,7 +19,7 @@ package hu.perit.template.authservice.rest.api;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.logging.EventLogId;
-import hu.perit.template.authservice.rest.model.*;
+import hu.perit.template.authservice.model.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

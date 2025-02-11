@@ -45,7 +45,7 @@ dependencies {
     implementation platform(libs.spvitamin)
     implementation platform(libs.spring.cloud)
 
-    implementation project(':template-auth-api')
+    implementation project(':template-auth-service-api')
 
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-spring-admin')

@@ -1,33 +1,51 @@
 databaseChangeLog:
   - changeSet:
-      id: 1739256382069-1
+      id: 1739278625398-1
+      author: np
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createSequence:
+            incrementBy: 200
+            schemaName: dbo
+            sequenceName: role_seq
+            startValue: 1
+  - changeSet:
+      id: 1739278625398-2
+      author: np
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createSequence:
+            incrementBy: 200
+            schemaName: dbo
+            sequenceName: user_seq
+            startValue: 1
+  - changeSet:
+      id: 1739278625398-3
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - createTable:
             columns:
               - column:
-                  autoIncrement: true
                   constraints:
                     nullable: false
                     primaryKey: true
                     primaryKeyName: pk_role
                   name: roleid
-                  type: bigserial
+                  type: BIGINT
               - column:
                   name: role
                   type: VARCHAR(255)
             schemaName: dbo
             tableName: role
   - changeSet:
-      id: 1739256382069-2
+      id: 1739278625398-4
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - createTable:
             columns:
               - column:
-                  autoIncrement: true
                   constraints:
                     nullable: false
                     primaryKey: true
@@ -105,7 +123,7 @@ databaseChangeLog:
             schemaName: dbo
             tableName: user
   - changeSet:
-      id: 1739256382069-3
+      id: 1739278625398-5
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -128,7 +146,7 @@ databaseChangeLog:
             schemaName: dbo
             tableName: userxrole
   - changeSet:
-      id: 1739256382069-4
+      id: 1739278625398-6
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -136,7 +154,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: username
-            indexName: user_ix_username
+            indexName: ix_user_01
             schemaName: dbo
             tableName: user
             unique: true

@@ -21,16 +21,11 @@ import hu.perit.spvitamin.spring.exception.CannotProcessException;
 import hu.perit.spvitamin.spring.exception.ResourceAlreadyExistsException;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.template.authservice.config.Constants;
 import hu.perit.template.authservice.db.demodb.repo.RoleRepo;
 import hu.perit.template.authservice.db.demodb.repo.UserRepo;
 import hu.perit.template.authservice.db.demodb.table.RoleEntity;
 import hu.perit.template.authservice.db.demodb.table.UserEntity;
-import hu.perit.template.authservice.rest.model.CreateUserParams;
-import hu.perit.template.authservice.rest.model.RoleSet;
-import hu.perit.template.authservice.rest.model.UpdateUserParams;
-import hu.perit.template.authservice.rest.model.UserDTO;
-import hu.perit.template.authservice.rest.model.UserDTOFiltered;
+import hu.perit.template.authservice.model.*;
 import hu.perit.template.authservice.services.api.UserService;
 import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
@@ -145,7 +140,7 @@ public class UserServiceImpl implements UserService
                 if (fromCauseChain.isPresent())
                 {
                     if (((ConstraintViolationException) fromCauseChain.get()).getConstraintName().equalsIgnoreCase(
-                            Constants.INDEXNAME_USERNAME))
+                            UserEntity.IX_USERNAME))
                     {
                         throw new ResourceAlreadyExistsException(
                                 String.format("A user with username '%s' already exists!", createUserParams.getUserName()), ex);

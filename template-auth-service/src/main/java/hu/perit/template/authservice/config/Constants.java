@@ -26,8 +26,6 @@ public class Constants {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String INDEXNAME_USERNAME = "user_ix_username";
-
     public static final int USER_API_GET_ALL = 1;
     public static final int USER_API_GET_BY_ID = 2;
     public static final int USER_API_CREATE = 3;
