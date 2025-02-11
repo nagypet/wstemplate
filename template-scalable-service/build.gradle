@@ -15,8 +15,8 @@
  */
 
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
+    alias libs.plugins.org.springframework.boot
+    alias libs.plugins.io.spring.dependency.management
     id 'application'
     id 'jacoco'
     id "com.github.ManifestClasspath" version "0.1.0-RELEASE"
@@ -26,7 +26,6 @@ apply from: '../gradle/docker.gradle'
 
 
 repositories {
-    jcenter()
     mavenCentral()
     mavenLocal()
     flatDir {
@@ -43,6 +42,9 @@ application {
 
 
 dependencies {
+    implementation platform(libs.spvitamin)
+    implementation platform(libs.spring.cloud)
+
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-spring-admin')
     implementation project(':spvitamin-spring-cloud-client')
@@ -62,12 +64,12 @@ dependencies {
 //    implementation 'hu.perit.spvitamin:spvitamin-spring-server'
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
-    integtestCompileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-    integtestAnnotationProcessor 'org.projectlombok:lombok'
+    compileOnly libs.lombok
+    testCompileOnly libs.lombok
+    integtestCompileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testAnnotationProcessor libs.lombok
+    integtestAnnotationProcessor libs.lombok
 
     // Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -77,24 +79,20 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // Guava
-    implementation 'com.google.guava:guava:30.1.1-jre'
+    implementation libs.guava
 
     // JJWT
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
-
-    // JAXB (JDK > 8 miatt)
-    implementation 'javax.xml.bind:jaxb-api:2.3.0'
-    implementation 'org.glassfish.jaxb:jaxb-runtime'
+    implementation libs.bundles.jsonwebtoken
 
     testImplementation 'org.springframework.security:spring-security-test'
 
     // Swagger
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.3'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.0.3'
+    implementation libs.openapi.ui
+    implementation libs.openapi.api
 
     // apache.commons
-    implementation 'org.apache.commons:commons-lang3:3.10'
-    implementation 'org.apache.commons:commons-collections4:4.3'
+    implementation libs.commons.lang3
+    implementation libs.commons.collections4
 
     // ModelMapper
     implementation 'org.modelmapper.extensions:modelmapper-spring:2.3.5'
@@ -116,14 +114,6 @@ dependencies {
     // Test dependencies
     //------------------------------------------------------------------------------------------------------------------
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-}
-
-
-dependencyManagement {
-    imports {
-        //mavenBom "hu.perit.spvitamin:spvitamin-dependencies:${spvitaminVersion}"
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,22 +30,24 @@ if (project.hasProperty('application')) {
         dockerImageInputsChanged = false
     }
 
-    task dockerCopyDependencies(type: Copy) {
+    tasks.register('dockerCopyDependencies', Copy) {
         dependsOn 'installDist'
+        dependsOn 'finalizeInstallDist'
 
         from("$installDist.destinationDir/lib") {
-            exclude jar.archiveName, '*SNAPSHOT*'
+            exclude jar.archiveFileName.get(), '*SNAPSHOT*'
         }
         into "$dockerBuildDir/dependencies"
 
         doLast { dockerImageInputsChanged = true }
     }
 
-    task dockerCopySnapshotDependencies(type: Copy) {
+    tasks.register('dockerCopySnapshotDependencies', Copy) {
         dependsOn 'installDist'
+        dependsOn 'finalizeInstallDist'
 
         from("$installDist.destinationDir/lib") {
-            exclude jar.archiveName
+            exclude jar.archiveFileName.get()
             include '*SNAPSHOT*'
         }
         into "$dockerBuildDir/snapshot-dependencies"
@@ -53,7 +55,7 @@ if (project.hasProperty('application')) {
         doLast { dockerImageInputsChanged = true }
     }
 
-    task dockerCopyDockerfile(type: Copy) {
+    tasks.register('dockerCopyDockerfile', Copy) {
         dependsOn 'installDist'
 
         from 'docker'
@@ -62,8 +64,9 @@ if (project.hasProperty('application')) {
         doLast { dockerImageInputsChanged = true }
     }
 
-    task dockerCopyBin(type: Copy) {
+    tasks.register('dockerCopyBin', Copy) {
         dependsOn 'installDist'
+        dependsOn 'finalizeInstallDist'
 
         from("$installDist.destinationDir/bin") {
             exclude '*.bat'
@@ -73,27 +76,34 @@ if (project.hasProperty('application')) {
         doLast { dockerImageInputsChanged = true }
     }
 
-    task dockerCopyConfig(type: Copy) {
+    tasks.register('dockerCopyConfig', Copy) {
         dependsOn 'installDist'
+        dependsOn 'finalizeInstallDist'
 
-        from 'config'
         into "$dockerBuildDir/bin"
+        into("/config") {
+            from "config"
+        }
+        into(".") {
+            from "../deployment/${project.name}"
+        }
 
         doLast { dockerImageInputsChanged = true }
     }
 
-    task dockerCopyApplication(type: Copy) {
+    tasks.register('dockerCopyApplication', Copy) {
         dependsOn 'installDist'
+        dependsOn 'finalizeInstallDist'
 
         from("$installDist.destinationDir/lib") {
-            include jar.archiveName
+            include jar.archiveFileName.get()
         }
         into "$dockerBuildDir/application"
 
         doLast { dockerImageInputsChanged = true }
     }
 
-    task dockerBackendImage() {
+    tasks.register('dockerBackendImage') {
         group 'docker'
         description 'Builds docker image based on the installation'
 
@@ -128,7 +138,7 @@ if (project.hasProperty('application')) {
         outputs.upToDateWhen { !dockerImageInputsChanged }
     }
 } else {
-    task dockerBuildBackend() {
+    tasks.register('dockerBuildBackend') {
     }
 }
 
@@ -136,7 +146,7 @@ if (project.hasProperty('application')) {
 /********************************************************************************************************
  * Placeholder task
  *******************************************************************************************************/
-task dockerImage() {
+tasks.register('dockerImage') {
     group 'docker'
     description 'Builds docker image.'
 }

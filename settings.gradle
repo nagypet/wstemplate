@@ -1,4 +1,11 @@
-// include-subprojects.gradle contains this constant: COMPILE_SPVITAMIN
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            from(files("gradle/version-catalog.toml"))
+        }
+    }
+}
+
 
 apply from: 'gradle/include-subprojects.gradle' 
 

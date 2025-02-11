@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.opencsv.exceptions.CsvException;
 import hu.perit.spvitamin.spring.config.LocalUserProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import org.junit.jupiter.api.Assertions;
@@ -88,7 +89,7 @@ public class UserApiIntegrationTest
 
 
     @Test
-    void testUserMgmtEndpoints() throws IOException
+    void testUserMgmtEndpoints() throws IOException, CsvException
     {
         log.debug("-----------------------------------------------------------------------------------------------------");
         log.debug("testUserMgmtEndpoints()");

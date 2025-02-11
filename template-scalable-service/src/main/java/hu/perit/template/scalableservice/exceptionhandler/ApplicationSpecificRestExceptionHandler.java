@@ -18,8 +18,8 @@ package hu.perit.template.scalableservice.exceptionhandler;
 
 import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.exception.ExceptionWrapper;
+import hu.perit.spvitamin.spring.exceptionhandler.DefaultRestExceptionResponseHandler;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
-import hu.perit.spvitamin.spring.exceptionhandler.RestResponseEntityExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -38,10 +38,10 @@ import java.io.IOException;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 @Slf4j
-public class ApplicationSpecificRestExceptionHandler extends RestResponseEntityExceptionHandler
+public class ApplicationSpecificRestExceptionHandler extends DefaultRestExceptionResponseHandler
 {
     @ExceptionHandler({Exception.class})
-    public ResponseEntity<Object> applicationSpecificExceptionHandler(Exception ex, WebRequest request)
+    public ResponseEntity<RestExceptionResponse> applicationSpecificExceptionHandler(Exception ex, WebRequest request)
     {
         String path = request != null ? request.getDescription(false) : "";
 

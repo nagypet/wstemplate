@@ -46,7 +46,7 @@ public class ScalableServiceJob extends BatchJob {
     }
 
     @Override
-    protected Boolean execute() throws Exception {
+    protected Void execute() throws Exception {
         try (Took took = new Took(false))
         {
             String traceId = UUID.randomUUID().toString();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,50 +20,54 @@ group = 'hu.perit'
 
 
 tasks.withType(Copy) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     eachFile { println it.file }
 }
 
 
-/********************************************************************************************************
- * BuildTime
- *******************************************************************************************************/
-if (project.hasProperty('compileJava')) {
-    task createBuildTimeTxt() {
-        outputs.file("${buildDir}/buildtime.txt")
-        doLast {
-            new File(buildDir, "buildtime.txt").text = """Buildtime: ${new Date().format('yyyy-MM-dd HH:mm:ss')}"""
-        }
-    }
-    compileJava.finalizedBy createBuildTimeTxt
-}
+//----------------------------------------------------------------------------------------------------------------------
+// defaultTasks
+//----------------------------------------------------------------------------------------------------------------------
+defaultTasks 'dist'
 
 
-/********************************************************************************************************
- * JDK > 1.8
- *******************************************************************************************************/
-if (project.hasProperty('java') && project.hasProperty('compileJava')) {
-    sourceCompatibility = jvmVersion
-    println "sourceCompatibility: " + sourceCompatibility
-    compileJava {
-        options.encoding = 'UTF-8'
-    }
-    if (jvmVersion != '1.8') {
-        compileJava {
-            options.compilerArgs << '--add-exports'
-            options.compilerArgs << 'java.base/sun.security.ssl=ALL-UNNAMED'
-        }
-    }
-}
-
-
-/********************************************************************************************************
- * Finalize installDist
- *******************************************************************************************************/
-
-if (project.hasProperty('archivesBaseName')) {
-    task finalizeInstallDist(type: Copy) {
+if (!project.tasks.findByName('dist')) {
+    tasks.register('dist') {
         group 'fmake'
-        into "${buildDir}/install/${archivesBaseName}"
+    }
+}
+
+
+tasks.named('dist') {
+    if (project.hasProperty('test')) {
+        dependsOn 'test'
+    }
+
+    if (project.hasProperty('installBootDist')) {
+        dependsOn 'installBootDist'
+    } else if (project.hasProperty('shadowJar')) {
+        dependsOn 'shadowJar'
+        dependsOn 'installDist'
+    } else if (project.hasProperty('installDist')) {
+        dependsOn 'installDist'
+    } else if (project.hasProperty('jar')) {
+        dependsOn 'jar'
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// installDist
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('installDist')) {
+    tasks.named('installDist') {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        finalizedBy 'finalizeInstallDist'
+    }
+
+    tasks.register('finalizeInstallDist', Copy) {
+        group 'fmake'
+        into "${buildDir}/install/${project.name}"
         // This will be copied by the distribution plugin
         /*
         into (".") {
@@ -77,43 +81,68 @@ if (project.hasProperty('archivesBaseName')) {
 }
 
 
-/********************************************************************************************************
- * Finalize installBootDist
- *******************************************************************************************************/
-
-if (project.hasProperty('archivesBaseName')) {
-    task finalizeInstallBootDist(type: Copy) {
+//----------------------------------------------------------------------------------------------------------------------
+// installBootDist
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('installBootDist')) {
+    tasks.named('installBootDist') {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        finalizedBy 'finalizeInstallBootDist'
+    }
+    tasks.register('finalizeInstallBootDist', Copy) {
         group 'fmake'
-        into "${buildDir}/install/${archivesBaseName}-boot"
+        into "${buildDir}/install/${project.name}-boot"
         into(".") {
             from "src/main/dist"
         }
         into("bin/config") {
             from "config"
         }
+        into("bin") {
+            from "../deployment/${project.name}"
+        }
     }
 }
 
 
-/********************************************************************************************************
- * Default task
- *******************************************************************************************************/
-defaultTasks 'dist'
+//----------------------------------------------------------------------------------------------------------------------
+// bootJar
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('bootJar')) {
+    tasks.named('bootJar') {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+}
 
 
-if (!project.tasks.findByName('dist')) {
-    task dist {
-        group 'fmake'
-
-        if (project.hasProperty('test')) {
-            dependsOn 'test'
+//----------------------------------------------------------------------------------------------------------------------
+// BuildTime
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('compileJava')) {
+    task createBuildTimeTxt() {
+        outputs.file("${buildDir}/buildtime.txt")
+        doLast {
+            new File(buildDir, "buildtime.txt").text = """Buildtime: ${new Date().format('yyyy-MM-dd HH:mm:ss')}"""
         }
+    }
+    compileJava.finalizedBy createBuildTimeTxt
 
-        if (project.hasProperty('installDist')) {
-            dependsOn 'installDist'
-            installDist.finalizedBy finalizeInstallDist
-        } else if (project.hasProperty('jar')) {
-            dependsOn 'jar'
+    compileJava {
+        options.encoding = "UTF-8"
+    }
+}
+
+
+//----------------------------------------------------------------------------------------------------------------------
+// JDK > 1.8
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('java') && project.hasProperty('compileJava')) {
+    sourceCompatibility = jvmVersion
+    println "sourceCompatibility: " + sourceCompatibility
+    if (jvmVersion != '1.8') {
+        compileJava {
+            options.compilerArgs << '--add-exports'
+            options.compilerArgs << 'java.base/sun.security.ssl=ALL-UNNAMED'
         }
     }
 }
@@ -128,15 +157,16 @@ task distWindowsService {
 
     if (project.hasProperty('installBootDist')) {
         dependsOn 'installBootDist'
+        dependsOn 'finalizeInstallBootDist'
         dependsOn 'updateServiceXml'
-        installBootDist.finalizedBy finalizeInstallBootDist
+        //installBootDist.finalizedBy finalizeInstallBootDist
     }
 }
 
 
-/********************************************************************************************************
- * Layered bootJar
- *******************************************************************************************************/
+//----------------------------------------------------------------------------------------------------------------------
+// Layered bootJar
+//----------------------------------------------------------------------------------------------------------------------
 if (project.hasProperty('bootJar')) {
     bootJar {
         layered {
@@ -146,9 +176,9 @@ if (project.hasProperty('bootJar')) {
 }
 
 
-/********************************************************************************************************
- * Version information
- *******************************************************************************************************/
+//----------------------------------------------------------------------------------------------------------------------
+// Version information
+//----------------------------------------------------------------------------------------------------------------------
 if (new File("${projectDir}/version.ver").exists()) {
     version = rootProject.file("${projectDir}/version.ver").text.trim()
 } else if (new File("${projectDir}/../version.ver").exists()) {
@@ -160,10 +190,9 @@ if (new File("${projectDir}/version.ver").exists()) {
 }
 
 
-/********************************************************************************************************
- * Test support
- *******************************************************************************************************/
-
+//----------------------------------------------------------------------------------------------------------------------
+// Test support
+//----------------------------------------------------------------------------------------------------------------------
 task prepareTest(type: Copy) {
     group 'fmake'
     from "src/main/dist/bin"
@@ -177,9 +206,9 @@ if (project.hasProperty('test')) {
 }
 
 
-/********************************************************************************************************
- * Integration test support
- *******************************************************************************************************/
+//----------------------------------------------------------------------------------------------------------------------
+// Integration test support
+//----------------------------------------------------------------------------------------------------------------------
 if (project.hasProperty('sourceSets')) {
     sourceSets {
         integtest {
@@ -221,7 +250,11 @@ task integtest(type: Test) {
     }
 }
 
-integtest {
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.named('integtest') {
     useJUnitPlatform()
 }
 
@@ -232,17 +265,17 @@ if (project.hasProperty('processIntegtestResources')) {
 }
 
 
-/********************************************************************************************************
- * MANIFEST
- *******************************************************************************************************/
+//----------------------------------------------------------------------------------------------------------------------
+// MANIFEST
+//----------------------------------------------------------------------------------------------------------------------
 if (project.hasProperty('jar')) {
-    jar {
+    tasks.named('jar') {
         dependsOn 'createBuildTimeTxt'
         enabled = true
         doFirst {
             manifest {
                 attributes(
-                        'Implementation-Vendor': 'perit.hu',
+                        'Implementation-Vendor': project.group,
                         'Build-Time': new File("${buildDir}/buildtime.txt").text.replace('Buildtime: ', '').trim(),
                         'Implementation-Version': project.version
                 )
@@ -258,12 +291,13 @@ if (project.hasProperty('jar')) {
 }
 
 if (project.hasProperty('bootJar')) {
-    bootJar {
+    tasks.named('bootJar') {
+        dependsOn 'createBuildTimeTxt'
         doFirst {
             manifest {
                 attributes(
-                        'Implementation-Vendor': 'perit.hu',
-                        'Build-Time': new File("${buildDir}/buildtime.txt").text.trim(),
+                        'Implementation-Vendor': project.group,
+                        'Build-Time': new File("${buildDir}/buildtime.txt").text.replace('Buildtime: ', '').trim(),
                         'Implementation-Version': version
                 )
                 if (project.hasProperty('application')) {
@@ -278,17 +312,17 @@ if (project.hasProperty('bootJar')) {
 }
 
 
-/********************************************************************************************************
- * updateServiceXml
- *******************************************************************************************************/
-if (project.hasProperty('archivesBaseName') && project.tasks.findByName('installBootDist')) {
-    task updateServiceXml() {
+//----------------------------------------------------------------------------------------------------------------------
+// updateServiceXml
+//----------------------------------------------------------------------------------------------------------------------
+if (project.tasks.findByName('installBootDist')) {
+    tasks.register('updateServiceXml') {
         group 'fmake'
         description 'Update service xml'
 
         dependsOn 'installBootDist'
 
-        def serviceFile = new File("${buildDir}/install/${archivesBaseName}-boot/${project.name}.xml")
+        def serviceFile = new File("${buildDir}/install/${project.name}-boot/bin/${project.name}.xml")
         def serviceFileName = serviceFile.toString()
 
         doFirst {
@@ -316,9 +350,9 @@ if (project.hasProperty('archivesBaseName') && project.tasks.findByName('install
 }
 
 
-/********************************************************************************************************
- * Application
- *******************************************************************************************************/
+//----------------------------------------------------------------------------------------------------------------------
+// Application
+//----------------------------------------------------------------------------------------------------------------------
 if (project.hasProperty('application')) {
     application {
         if (applicationDefaultJvmArgs.isEmpty()) {
@@ -337,10 +371,9 @@ task configurations() {
 }
 
 
-/********************************************************************************************************
- * Start scripts
- *******************************************************************************************************/
-
+//----------------------------------------------------------------------------------------------------------------------
+// Start scripts
+//----------------------------------------------------------------------------------------------------------------------
 if (project.hasProperty('startScripts')) {
     startScripts {
         doLast {
@@ -351,41 +384,41 @@ if (project.hasProperty('startScripts')) {
 }
 
 
-/********************************************************************************************************
- * IntelliJ IDEA
- *******************************************************************************************************/
-
+//----------------------------------------------------------------------------------------------------------------------
+// IntelliJ IDEA
+//----------------------------------------------------------------------------------------------------------------------
 task prepareRunInIDEA(type: Copy) {
     group 'fmake'
+    into "${projectDir}/out/production/resources"
     from "src/main/dist/bin"
     from "config"
-    into "${projectDir}/out/production/resources"
+    from "../deployment/${project.name}"
 }
 
 task prepareRunInIDEA2021(type: Copy) {
     group 'fmake'
+    into "${projectDir}/build/resources/main"
     from "src/main/dist/bin"
     from "config"
-    into "${projectDir}/build/resources/main"
+    from "../deployment/${project.name}"
 }
 
 
-/********************************************************************************************************
- * Eclipse
- *******************************************************************************************************/
-
+//----------------------------------------------------------------------------------------------------------------------
+// Eclipse
+//----------------------------------------------------------------------------------------------------------------------
 task prepareRunInEclipse(type: Copy) {
     group 'fmake'
+    into "${projectDir}/bin/main"
     from "src/main/dist/bin"
     from "config"
-    into "${projectDir}/bin/main"
+    from "../deployment/${project.name}"
 }
 
 
-/********************************************************************************************************
- * RUN
- *******************************************************************************************************/
-
+//----------------------------------------------------------------------------------------------------------------------
+// RUN
+//----------------------------------------------------------------------------------------------------------------------
 task prepareRun(type: Copy) {
     group 'fmake'
     into "${projectDir}/build"
@@ -395,14 +428,17 @@ task prepareRun(type: Copy) {
     into("bin/config") {
         from "config"
     }
+    into("bin") {
+        from "../deployment/${project.name}"
+    }
 }
 
 if (project.hasProperty('run')) {
     run {
         dependsOn prepareRun
-        doFirst {
-            applicationDefaultJvmArgs += ['-Dspring.profiles.active=default,dev']
-        }
+//        doFirst {
+//            applicationDefaultJvmArgs += ['-Dspring.profiles.active=default,dev']
+//        }
         workingDir = "${projectDir}/build/bin"
     }
 }
@@ -410,9 +446,9 @@ if (project.hasProperty('run')) {
 if (project.hasProperty('bootRun')) {
     bootRun {
         dependsOn prepareRun
-        doFirst {
-            applicationDefaultJvmArgs += ['-Dspring.profiles.active=default,dev']
-        }
+//        doFirst {
+//            applicationDefaultJvmArgs += ['-Dspring.profiles.active=default,dev']
+//        }
         workingDir = "${projectDir}/build/bin"
     }
 }
@@ -420,9 +456,58 @@ if (project.hasProperty('bootRun')) {
 
 if (project.hasProperty('jacocoTestReport')) {
     jacocoTestReport {
+        dependsOn test
         reports {
-            xml.enabled true
+            xml.required = true
         }
     }
 }
 
+
+//----------------------------------------------------------------------------------------------------------------------
+// Publishing with source and javadoc
+//----------------------------------------------------------------------------------------------------------------------
+if (project.hasProperty('java')) {
+    java {
+        withSourcesJar()
+    }
+    java {
+        withJavadocJar()
+    }
+    tasks.withType(Javadoc) {
+        failOnError false
+        options.addStringOption('Xdoclint:none', '-quiet')
+        options.addStringOption('encoding', 'UTF-8')
+        options.addStringOption('charSet', 'UTF-8')
+    }
+}
+
+
+pluginManager.withPlugin('maven-publish') {
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                groupId = "${project.group}"
+                artifactId = "${project.name}"
+                version = "${version}"
+                from components.java
+                pom {
+                    name = "${project.group}:${project.name}"
+                    description = 'MicroDMS project'
+                    developers {
+                        developer {
+                            id = 'nagypet'
+                            name = 'Peter Nagy'
+                            email = 'peter.nagy@perit.hu'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+tasks.named("jar") {
+    archiveClassifier = ''
+}

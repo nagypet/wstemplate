@@ -19,18 +19,13 @@ package hu.perit.template.authservice.rest.api;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.template.authservice.config.Constants;
-import hu.perit.template.authservice.rest.model.CreateUserParams;
-import hu.perit.template.authservice.rest.model.ResponseUri;
-import hu.perit.template.authservice.rest.model.RoleSet;
-import hu.perit.template.authservice.rest.model.UpdateUserParams;
-import hu.perit.template.authservice.rest.model.UserDTO;
-import hu.perit.template.authservice.rest.model.UserDTOFiltered;
+import hu.perit.template.authservice.rest.model.*;
 import hu.perit.template.authservice.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 

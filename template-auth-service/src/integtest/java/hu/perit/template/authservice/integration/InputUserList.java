@@ -16,41 +16,38 @@
 
 package hu.perit.template.authservice.integration;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Spliterator;
-import java.util.function.Consumer;
-
-import org.springframework.stereotype.Component;
-
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.RFC4180Parser;
 import com.opencsv.RFC4180ParserBuilder;
-
+import com.opencsv.exceptions.CsvException;
 import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * @author Peter Nagy
  */
 
 @Component
-public class InputUserList implements Iterable<Map<String, String>> {
+public class InputUserList implements Iterable<Map<String, String>>
+{
 
     private static final String USERLIST_CSV = "Userlist.csv";
     private final List<Map<String, String>> csvContent = new ArrayList<>();
 
-    public void loadFromFile() throws IOException {
-
-        try (InputStream userListStream = InputUserList.class.getClassLoader().getResourceAsStream(USERLIST_CSV)) {
-            if (userListStream == null || userListStream.available() == 0) {
+    public void loadFromFile() throws IOException, CsvException
+    {
+        try (InputStream userListStream = InputUserList.class.getClassLoader().getResourceAsStream(USERLIST_CSV))
+        {
+            if (userListStream == null || userListStream.available() == 0)
+            {
                 throw new UnexpectedConditionException(String.format("There is no ressource with name '%s'!", USERLIST_CSV));
             }
 
@@ -63,12 +60,15 @@ public class InputUserList implements Iterable<Map<String, String>> {
                     .withCSVParser(rfc4180Parser);
             try (
                     CSVReader csvReader = csvReaderBuilder.build()
-            ) {
+            )
+            {
                 List<String[]> records = csvReader.readAll();
 
-                for (int i = 1; i < records.size(); i++) {
+                for (int i = 1; i < records.size(); i++)
+                {
                     Map<String, String> row = new HashMap<>();
-                    for (int j = 0; j < records.get(i).length; j++ ) {
+                    for (int j = 0; j < records.get(i).length; j++)
+                    {
                         row.put(records.get(0)[j], records.get(i)[j].strip());
                     }
                     this.csvContent.add(row);
@@ -79,17 +79,20 @@ public class InputUserList implements Iterable<Map<String, String>> {
     }
 
     @Override
-    public Iterator<Map<String, String>> iterator() {
+    public Iterator<Map<String, String>> iterator()
+    {
         return this.csvContent.iterator();
     }
 
     @Override
-    public void forEach(Consumer<? super Map<String, String>> action) {
+    public void forEach(Consumer<? super Map<String, String>> action)
+    {
         this.csvContent.forEach(action);
     }
 
     @Override
-    public Spliterator<Map<String, String>> spliterator() {
+    public Spliterator<Map<String, String>> spliterator()
+    {
         return this.csvContent.spliterator();
     }
 }

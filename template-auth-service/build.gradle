@@ -15,8 +15,8 @@
  */
 
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
+    alias libs.plugins.org.springframework.boot
+    alias libs.plugins.io.spring.dependency.management
     id 'application'
     id 'jacoco'
     id "com.github.ManifestClasspath" version "0.1.0-RELEASE"
@@ -39,6 +39,9 @@ application {
 
 
 dependencies {
+    implementation platform(libs.spvitamin)
+    implementation platform(libs.spring.cloud)
+
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-spring-admin')
     implementation project(':spvitamin-spring-cloud-client')
@@ -63,12 +66,12 @@ dependencies {
 //    implementation 'hu.perit.spvitamin:spvitamin-spring-data'
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
-    integtestCompileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-    integtestAnnotationProcessor 'org.projectlombok:lombok'
+    compileOnly libs.lombok
+    testCompileOnly libs.lombok
+    integtestCompileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testAnnotationProcessor libs.lombok
+    integtestAnnotationProcessor libs.lombok
 
     // Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -80,23 +83,18 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // JJWT
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
-
-    // JAXB (JDK > 8 miatt)
-    implementation 'javax.xml.bind:jaxb-api:2.3.0'
-    implementation 'org.glassfish.jaxb:jaxb-runtime'
+    implementation libs.bundles.jsonwebtoken
 
     // Validation
-    implementation 'javax.validation:validation-api:2.0.1.Final'
-    implementation 'org.hibernate:hibernate-validator:6.1.5.Final'
+    implementation libs.hibernate.validator
 
     // Swagger
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.3'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.0.3'
+    implementation libs.openapi.ui
+    implementation libs.openapi.api
 
     // apache.commons
-    implementation 'org.apache.commons:commons-lang3:3.10'
-    implementation 'org.apache.commons:commons-collections4:4.3'
+    implementation libs.commons.lang3
+    implementation libs.commons.collections4
 
     // ModelMapper TODO: mapstruct
     implementation 'org.modelmapper.extensions:modelmapper-spring:2.3.5'
@@ -105,7 +103,7 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 
     // OpenCSV
-    implementation 'com.opencsv:opencsv:4.0'
+    implementation libs.opencsv
 
 
     //------------------------------------------------------------------------------------------------------------------
@@ -117,7 +115,7 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
 
     // Logging in json format
-    runtimeOnly 'net.logstash.logback:logstash-logback-encoder:7.2'
+    runtimeOnly libs.logstash.logback.encoder
 
     // Micrometer Prometheus plugin
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
@@ -131,14 +129,6 @@ dependencies {
 
     integtestRuntimeOnly 'com.h2database:h2'
     integtestRuntimeOnly 'org.postgresql:postgresql'
-}
-
-
-dependencyManagement {
-    imports {
-        //mavenBom "hu.perit.spvitamin:spvitamin-dependencies:${spvitaminVersion}"
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
 }
 
 

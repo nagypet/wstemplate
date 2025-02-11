@@ -17,6 +17,7 @@
 package hu.perit.template.authservice.admin;
 
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
+import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,7 @@ class SpecialServerParameters
     @Bean(name = "SpecialServerParameters")
     public ServerParameterList getParameterList()
     {
-        ServerParameterList params = new ServerParameterList();
+        ServerParameterList params = new ServerParameterListImpl();
 
         // add sepcial server parameters
 

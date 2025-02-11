@@ -15,8 +15,8 @@
  */
 
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
+    alias libs.plugins.org.springframework.boot
+    alias libs.plugins.io.spring.dependency.management
     id 'java-library'
     id 'jacoco'
 }
@@ -40,6 +40,9 @@ bootJar {
 }
 
 dependencies {
+    implementation platform(libs.spvitamin)
+    implementation platform(libs.spring.cloud)
+
     implementation project(':spvitamin-spring-admin')
     implementation project(':spvitamin-spring-security')
 
@@ -47,19 +50,17 @@ dependencies {
 //    implementation 'hu.perit.spvitamin:spvitamin-spring-security'
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
 
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework:spring-web'
     implementation 'org.springframework.security:spring-security-core'
 
-    // Validation
-    implementation 'javax.validation:validation-api:2.0.1.Final'
-
     // Swagger
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.0.3'
+    implementation libs.openapi.ui
+    implementation libs.openapi.api
 
     // Slf4J
     implementation 'org.slf4j:slf4j-api:1.7.30'
@@ -69,11 +70,3 @@ dependencies {
     // OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 }
-
-dependencyManagement {
-    imports {
-        //mavenBom "hu.perit.spvitamin:spvitamin-dependencies:${spvitaminVersion}"
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
-}
-

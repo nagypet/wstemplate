@@ -15,8 +15,8 @@
  */
 
 plugins {
-    id 'org.springframework.boot' version "${springBootVersion}"
-    id 'io.spring.dependency-management' version "${dependencyManagementVersion}"
+    alias libs.plugins.org.springframework.boot
+    alias libs.plugins.io.spring.dependency.management
     id 'application'
     id 'jacoco'
 	id "com.github.ManifestClasspath" version "0.1.0-RELEASE"
@@ -39,6 +39,9 @@ application {
 
 
 dependencies {
+    implementation platform(libs.spvitamin)
+    implementation platform(libs.spring.cloud)
+
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-spring-security-authservice-api')
     implementation project(':spvitamin-spring-general')
@@ -50,16 +53,16 @@ dependencies {
 //    implementation 'hu.perit.spvitamin:spvitamin-spring-cloud-feign'
 
     // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
-    integtestCompileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
-    integtestAnnotationProcessor 'org.projectlombok:lombok'
+    compileOnly libs.lombok
+    testCompileOnly libs.lombok
+    integtestCompileOnly libs.lombok
+    annotationProcessor libs.lombok
+    testAnnotationProcessor libs.lombok
+    integtestAnnotationProcessor libs.lombok
 
     // apache.commons
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
-    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.3'
+    implementation libs.commons.lang3
+    implementation libs.commons.collections4
 
     // OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
@@ -68,13 +71,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-        //mavenBom "hu.perit.spvitamin:spvitamin-dependencies:${spvitaminVersion}"
-    }
-}
 
 tasks.named('test') {
     useJUnitPlatform()
