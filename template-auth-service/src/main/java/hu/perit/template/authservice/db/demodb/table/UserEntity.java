@@ -50,8 +50,9 @@ import java.util.stream.Collectors;
 })
 public class UserEntity
 {
-    public static final String TABLE_NAME = "user";
-    public static final String IX_USERNAME = "ix_user_01";
+    // 'user' is reserved for tablename
+    public static final String TABLE_NAME = "usertable";
+    public static final String IX_USERNAME = "ix_usertable_01";
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_generator")

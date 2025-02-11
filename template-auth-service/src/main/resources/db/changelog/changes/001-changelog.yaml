@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 1739278625398-1
+      id: 1739279736715-1
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -10,7 +10,7 @@ databaseChangeLog:
             sequenceName: role_seq
             startValue: 1
   - changeSet:
-      id: 1739278625398-2
+      id: 1739279736715-2
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -20,7 +20,7 @@ databaseChangeLog:
             sequenceName: user_seq
             startValue: 1
   - changeSet:
-      id: 1739278625398-3
+      id: 1739279736715-3
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -39,7 +39,7 @@ databaseChangeLog:
             schemaName: dbo
             tableName: role
   - changeSet:
-      id: 1739278625398-4
+      id: 1739279736715-4
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -49,7 +49,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    primaryKeyName: pk_user
+                    primaryKeyName: pk_usertable
                   name: userid
                   type: BIGINT
               - column:
@@ -121,9 +121,9 @@ databaseChangeLog:
                   name: passwordexpired
                   type: BOOLEAN
             schemaName: dbo
-            tableName: user
+            tableName: usertable
   - changeSet:
-      id: 1739278625398-5
+      id: 1739279736715-5
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -146,7 +146,7 @@ databaseChangeLog:
             schemaName: dbo
             tableName: userxrole
   - changeSet:
-      id: 1739278625398-6
+      id: 1739279736715-6
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -154,8 +154,8 @@ databaseChangeLog:
             columns:
               - column:
                   name: username
-            indexName: ix_user_01
+            indexName: ix_usertable_01
             schemaName: dbo
-            tableName: user
+            tableName: usertable
             unique: true
 
