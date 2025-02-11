@@ -18,6 +18,7 @@ package hu.perit.template.authservice;
 
 import hu.perit.spvitamin.spring.SpvitaminApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
 import org.springframework.retry.annotation.EnableRetry;
@@ -30,6 +31,7 @@ import org.springframework.retry.annotation.EnableRetry;
 @SpringBootApplication
 @ComponentScan(basePackages = {"hu.perit.spvitamin", "hu.perit.template.authservice"})
 @EnableRetry
+@EnableFeignClients(basePackages = {"hu.perit.template.authservice"})
 public class AuthServiceApplication
 {
     public static void main(String[] args)

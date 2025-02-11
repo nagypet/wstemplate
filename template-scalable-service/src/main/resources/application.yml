@@ -21,12 +21,15 @@
 spring:
   application:
     name: template-scalable-service
-  cloud:
-    openfeign:
-      client:
-        config:
-          default:
-            logger-level: FULL
+
+
+spvitamin:
+  feign:
+    logger-level: FULL
+    retry:
+      max-attempts: 3
+      max-period: 2000
+      period: 500
 
 
 #-----------------------------------------------------------------------------------------------------------------------

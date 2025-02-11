@@ -16,18 +16,9 @@
 
 package hu.perit.template.authservice.api;
 
-import feign.Headers;
-import feign.Param;
-import feign.RequestLine;
-import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
-import hu.perit.template.authservice.model.CreateUserParams;
-import hu.perit.template.authservice.model.ResponseUri;
-import hu.perit.template.authservice.model.RoleSet;
-import hu.perit.template.authservice.model.UpdateUserParams;
-import hu.perit.template.authservice.model.UserDTO;
-import hu.perit.template.authservice.model.UserDTOFiltered;
-import org.springframework.web.bind.annotation.RequestBody;
+import hu.perit.template.authservice.model.*;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,63 +26,37 @@ import java.util.List;
  * @author Peter Nagy
  */
 
-public interface TemplateAuthServiceClient
+public interface TemplateAuthServiceClient extends TemplateAuthServiceApi
 {
 
-    String BASE_URL_AUTHENTICATE = "/api/spvitamin/authenticate";
     String BASE_URL_USERS = "/api/users";
     String PATH_ROLES = "/roles";
-
-    /*
-     * ============== authenticate =====================================================================================
-     */
-    @RequestLine("GET " + BASE_URL_AUTHENTICATE)
-    @Headers({
-            "Content-Type: application/json",
-            "traceId: {traceId}"
-    })
-    AuthorizationToken authenticate(
-            @Param("traceId") String traceId
-    );
 
 
     /*
      * ============== getAllUsers ======================================================================================
      */
-    @RequestLine("GET " + BASE_URL_USERS)
-    @Headers({
-            "Content-Type: application/json",
-            "traceId: {traceId}"
-    })
-    List<UserDTOFiltered> getAllUsers(
-            @Param("traceId") String traceId
-    );
+    @GetMapping(BASE_URL_USERS)
+    @Override
+    List<UserDTOFiltered> getAllUsers();
 
 
     /*
      * ============== getUserById ======================================================================================
      */
-    @RequestLine("GET " + BASE_URL_USERS + "/{id}")
-    @Headers({
-            "Content-Type: application/json",
-            "traceId: {traceId}"
-    })
+    @GetMapping(BASE_URL_USERS + "/{userId}")
+    @Override
     UserDTO getUserById(
-            @Param("traceId") String traceId,
-            @Param("id") long userId
+            @PathVariable Long userId
     ) throws ResourceNotFoundException;
 
 
     /*
      * ============== createUser =======================================================================================
      */
-    @RequestLine("POST " + BASE_URL_USERS)
-    @Headers({
-            "Content-Type: application/json",
-            "traceId: {traceId}"
-    })
+    @PostMapping(BASE_URL_USERS)
+    @Override
     ResponseUri createUser(
-            @Param("traceId") String traceId,
             @RequestBody CreateUserParams createUserParams
     );
 
@@ -99,58 +64,42 @@ public interface TemplateAuthServiceClient
     /*
      * ============== updateUser =======================================================================================
      */
-    @RequestLine("PUT " + BASE_URL_USERS + "/{id}")
-    @Headers({
-            "Content-Type: application/json",
-            "traceId: {traceId}"
-    })
+    @PutMapping(BASE_URL_USERS + "/{userId}")
+    @Override
     void updateUser(
-            @Param("traceId") String traceId,
-            @Param("id") long userId,
+            @PathVariable Long userId,
             @RequestBody UpdateUserParams updateUserParams
-    );
+    ) throws ResourceNotFoundException;
 
 
     /*
      * ============== deleteUser =======================================================================================
      */
-    @RequestLine("DELETE " + BASE_URL_USERS + "/{id}")
-    @Headers({
-            "Content-Type: application/json",
-            "traceId: {traceId}"
-    })
+    @DeleteMapping(BASE_URL_USERS + "/{userId}")
+    @Override
     void deleteUser(
-            @Param("traceId") String traceId,
-            @Param("id") long userId
-    );
+            @PathVariable Long userId
+    ) throws ResourceNotFoundException;
 
 
     /*
      * ============== addRole ==========================================================================================
      */
-    @RequestLine("PUT " + BASE_URL_USERS + "/{id}" + PATH_ROLES)
-    @Headers({
-            "Content-Type: application/json",
-            "traceId: {traceId}"
-    })
+    @PutMapping(BASE_URL_USERS + "/{userId}" + PATH_ROLES)
+    @Override
     void addRole(
-            @Param("traceId") String traceId,
-            @Param("id") long userId,
+            @PathVariable Long userId,
             @RequestBody RoleSet roleSet
-    );
+    ) throws ResourceNotFoundException;
 
 
     /*
      * ============== deleteRole =======================================================================================
      */
-    @RequestLine("DELETE " + BASE_URL_USERS + "/{id}" + PATH_ROLES)
-    @Headers({
-            "Content-Type: application/json",
-            "traceId: {traceId}"
-    })
+    @DeleteMapping(BASE_URL_USERS + "/{userId}" + PATH_ROLES)
+    @Override
     void deleteRole(
-            @Param("traceId") String traceId,
-            @Param("id") long userId,
+            @PathVariable Long userId,
             @RequestBody RoleSet roleSet
-    );
+    ) throws ResourceNotFoundException;
 }

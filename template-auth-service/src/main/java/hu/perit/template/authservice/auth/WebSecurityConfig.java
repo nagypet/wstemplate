@@ -21,7 +21,7 @@ import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
 import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
 import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.EnableLocalUserAuthProvider;
 import hu.perit.spvitamin.spring.security.ldap.LdapAuthenticationProviderConfigurer;
-import hu.perit.template.authservice.rest.api.UserApi;
+import hu.perit.template.authservice.rest.api.TemplateAuthServiceControllerApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -75,7 +75,7 @@ public class WebSecurityConfig
     public SecurityFilterChain configureTokenSecuredEndpoints(HttpSecurity http) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)
-                .scope(UserApi.BASE_URL_USERS + "/**", "/h2/**")
+                .scope(TemplateAuthServiceControllerApi.BASE_URL_USERS + "/**", "/h2/**")
                 // we do not use secure sessions here: each endpoint has to be authenticated again and again
                 .ignorePersistedSecurity()
                 .h2()

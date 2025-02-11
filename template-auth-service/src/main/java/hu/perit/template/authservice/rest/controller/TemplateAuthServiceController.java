@@ -20,9 +20,8 @@ import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.template.authservice.config.Constants;
 import hu.perit.template.authservice.model.*;
-import hu.perit.template.authservice.rest.api.UserApi;
+import hu.perit.template.authservice.rest.api.TemplateAuthServiceControllerApi;
 import hu.perit.template.authservice.services.impl.user.UserServiceImpl;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -36,7 +35,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class UserController implements UserApi
+public class TemplateAuthServiceController implements TemplateAuthServiceControllerApi
 {
     private final UserServiceImpl userService;
 
@@ -45,7 +44,7 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_GET_ALL, subsystem = Constants.SUBSYSTEM_NAME)
-    public List<UserDTOFiltered> getAllUsersUsingGET(String traceId)
+    public List<UserDTOFiltered> getAllUsers()
     {
         return this.userService.getAll();
     }
@@ -56,9 +55,9 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_GET_BY_ID, subsystem = Constants.SUBSYSTEM_NAME)
-    public UserDTO getUserByIdUsingGET(String traceId, Long id) throws ResourceNotFoundException
+    public UserDTO getUserById(Long userId) throws ResourceNotFoundException
     {
-        return this.userService.getUserDTOById(id);
+        return this.userService.getUserDTOById(userId);
     }
 
 
@@ -67,7 +66,7 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_CREATE, subsystem = Constants.SUBSYSTEM_NAME)
-    public ResponseUri createUserUsingPOST(String traceId, @Valid CreateUserParams createUserParams)
+    public ResponseUri createUser(CreateUserParams createUserParams)
     {
         long newUserId = this.userService.create(createUserParams);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newUserId).toUri();
@@ -80,9 +79,9 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_UPDATE, subsystem = Constants.SUBSYSTEM_NAME)
-    public void updateUserUsingPUT(String traceId, Long id, @Valid UpdateUserParams updateUserParams) throws ResourceNotFoundException
+    public void updateUser(Long userId, UpdateUserParams updateUserParams) throws ResourceNotFoundException
     {
-        this.userService.update(id, updateUserParams);
+        this.userService.update(userId, updateUserParams);
     }
 
 
@@ -91,9 +90,9 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_DELETE, subsystem = Constants.SUBSYSTEM_NAME)
-    public void deleteUserUsingDELETE(String traceId, Long id) throws ResourceNotFoundException
+    public void deleteUser(Long userId) throws ResourceNotFoundException
     {
-        this.userService.delete(id);
+        this.userService.delete(userId);
     }
 
 
@@ -102,9 +101,9 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_ADD_ROLE, subsystem = Constants.SUBSYSTEM_NAME)
-    public void addRoleUsingPOST(String traceId, Long id, @Valid RoleSet roleSet) throws ResourceNotFoundException
+    public void addRole(Long userId, RoleSet roleSet) throws ResourceNotFoundException
     {
-        this.userService.addRole(id, roleSet);
+        this.userService.addRole(userId, roleSet);
     }
 
 
@@ -113,8 +112,8 @@ public class UserController implements UserApi
      */
     @Override
     @LoggedRestMethod(eventId = Constants.USER_API_DELETE_ROLE, subsystem = Constants.SUBSYSTEM_NAME)
-    public void deleteRoleUsingDELETE(String traceId, Long id, @Valid RoleSet roleSet) throws ResourceNotFoundException
+    public void deleteRole(Long userId, RoleSet roleSet) throws ResourceNotFoundException
     {
-        this.userService.deleteRole(id, roleSet);
+        this.userService.deleteRole(userId, roleSet);
     }
 }

@@ -32,6 +32,6 @@ public class UserServiceImpl implements UserService
     @Override
     public UserDTO getUserById(long userId) throws ResourceNotFoundException
     {
-        return this.templateAuthServiceClient.getUserById(null, userId);
+        return this.templateAuthServiceClient.getUserById(userId);
     }
 }

@@ -18,7 +18,7 @@ package hu.perit.template.authservice.rest.api;
 
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
-import hu.perit.spvitamin.spring.logging.EventLogId;
+import hu.perit.template.authservice.api.TemplateAuthServiceApi;
 import hu.perit.template.authservice.model.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,7 +39,7 @@ import java.util.List;
  */
 
 @Tag(name = "user-api-controller", description = "User management")
-public interface UserApi
+public interface TemplateAuthServiceControllerApi extends TemplateAuthServiceApi
 {
 
     String BASE_URL_USERS = "/api/users";
@@ -59,14 +59,14 @@ public interface UserApi
             }
     )
     @ResponseStatus(value = HttpStatus.OK)
-    @EventLogId(eventId = 1)
-    List<UserDTOFiltered> getAllUsersUsingGET(@RequestHeader(value = "traceId", required = false) String traceId);
+    @Override
+    List<UserDTOFiltered> getAllUsers();
 
 
     /*
      * ============== getUserById ======================================================================================
      */
-    @GetMapping(BASE_URL_USERS + "/{id}")
+    @GetMapping(BASE_URL_USERS + "/{userId}")
     @Secured("USER_GET_USER")
     @Operation(summary = "getUserById() - Retrieves a user by ID",
             security = {@SecurityRequirement(name = "bearer")},
@@ -77,11 +77,10 @@ public interface UserApi
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
             }
     )
-    @ResponseStatus(value = HttpStatus.OK)
-    @EventLogId(eventId = 2)
-    UserDTO getUserByIdUsingGET(
-            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId,
-            @Parameter(name = "User ID", required = true) @PathVariable("id") Long id) throws ResourceNotFoundException;
+    @Override
+    UserDTO getUserById(
+            @Parameter(name = "User ID", required = true) @PathVariable Long userId
+    ) throws ResourceNotFoundException;
 
 
     /*
@@ -99,17 +98,16 @@ public interface UserApi
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
             }
     )
-    @ResponseStatus(value = HttpStatus.CREATED)
-    @EventLogId(eventId = 3)
-    ResponseUri createUserUsingPOST(
-            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId,
-            @Parameter(name = "User properties", required = true) @Valid @RequestBody CreateUserParams createUserParams);
+    @Override
+    ResponseUri createUser(
+            @Parameter(name = "User properties", required = true) @Valid @RequestBody CreateUserParams createUserParams
+    );
 
 
     /*
      * ============== updateUser =======================================================================================
      */
-    @PutMapping(BASE_URL_USERS + "/{id}")
+    @PutMapping(BASE_URL_USERS + "/{userId}")
     @Secured("USER_UPDATE_USER")
     @Operation(summary = "updateUser() - Updates a user by ID",
             security = {@SecurityRequirement(name = "bearer")},
@@ -121,19 +119,17 @@ public interface UserApi
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
             }
     )
-    @ResponseStatus(value = HttpStatus.OK)
-    @EventLogId(eventId = 4)
-    void updateUserUsingPUT(
-            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId,
-            @Parameter(name = "User ID", required = true) @PathVariable("id") Long id,
-            @Parameter(name = "User properties", required = true) @Valid @RequestBody UpdateUserParams updateUserParams)
-            throws ResourceNotFoundException;
+    @Override
+    void updateUser(
+            @Parameter(name = "User ID", required = true) @PathVariable Long userId,
+            @Parameter(name = "User properties", required = true) @Valid @RequestBody UpdateUserParams updateUserParams
+    ) throws ResourceNotFoundException;
 
 
     /*
      * ============== deleteUser =======================================================================================
      */
-    @DeleteMapping(BASE_URL_USERS + "/{id}")
+    @DeleteMapping(BASE_URL_USERS + "/{userId}")
     @Secured("USER_DELETE_USER")
     @Operation(summary = "deleteUser() - removes a user by ID",
             security = {@SecurityRequirement(name = "bearer")},
@@ -145,17 +141,16 @@ public interface UserApi
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
             }
     )
-    @ResponseStatus(value = HttpStatus.OK)
-    @EventLogId(eventId = 5)
-    void deleteUserUsingDELETE(
-            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId,
-            @Parameter(name = "User ID", required = true) @PathVariable("id") Long id) throws ResourceNotFoundException;
+    @Override
+    void deleteUser(
+            @Parameter(name = "User ID", required = true) @PathVariable Long userId
+    ) throws ResourceNotFoundException;
 
 
     /*
      * ============== addRole ==========================================================================================
      */
-    @PutMapping(BASE_URL_USERS + "/{id}" + PATH_ROLES)
+    @PutMapping(BASE_URL_USERS + "/{userId}" + PATH_ROLES)
     @Secured("USER_ADD_ROLE")
     @Operation(summary = "addRole() - adds a new role to the user",
             security = {@SecurityRequirement(name = "bearer")},
@@ -167,18 +162,17 @@ public interface UserApi
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
             }
     )
-    @ResponseStatus(value = HttpStatus.CREATED)
-    @EventLogId(eventId = 6)
-    void addRoleUsingPOST(
-            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId,
-            @Parameter(name = "User ID", required = true) @PathVariable("id") Long id,
-            @Parameter(name = "Set of roles", required = true) @Valid @RequestBody RoleSet roleSet) throws ResourceNotFoundException;
+    @Override
+    void addRole(
+            @Parameter(name = "User ID", required = true) @PathVariable Long userId,
+            @Parameter(name = "Set of roles", required = true) @Valid @RequestBody RoleSet roleSet
+    ) throws ResourceNotFoundException;
 
 
     /*
      * ============== deleteRole =======================================================================================
      */
-    @DeleteMapping(BASE_URL_USERS + "/{id}" + PATH_ROLES)
+    @DeleteMapping(BASE_URL_USERS + "/{userId}" + PATH_ROLES)
     @Secured("USER_DELETE_ROLE")
     @Operation(summary = "deleteRole() - removes a user role",
             security = {@SecurityRequirement(name = "bearer")},
@@ -190,10 +184,8 @@ public interface UserApi
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
             }
     )
-    @ResponseStatus(value = HttpStatus.OK)
-    @EventLogId(eventId = 7)
-    void deleteRoleUsingDELETE(
-            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId,
-            @Parameter(name = "User ID", required = true) @PathVariable("id") Long id,
+    @Override
+    void deleteRole(
+            @Parameter(name = "User ID", required = true) @PathVariable Long userId,
             @Parameter(name = "Set of roles", required = true) @Valid @RequestBody RoleSet roleSet) throws ResourceNotFoundException;
 }
