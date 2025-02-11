@@ -16,6 +16,7 @@
 
 package hu.perit.template.authservice.db.demodb.table;
 
+import hu.perit.template.authservice.config.Constants;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,6 +27,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.management.relation.Role;
+
 /**
  * @author Peter Nagy
  */
@@ -34,10 +37,13 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "role", schema = "dbo")
-public class RoleEntity {
+@Table(name = RoleEntity.TABLE_NAME, schema = Constants.SCHEMA)
+public class RoleEntity
+{
+    public static final String TABLE_NAME = "role";
 
-    public RoleEntity(String role) {
+    public RoleEntity(String role)
+    {
         this.role = role;
     }
 

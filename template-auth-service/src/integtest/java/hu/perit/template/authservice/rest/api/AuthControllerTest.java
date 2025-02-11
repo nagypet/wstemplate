@@ -19,6 +19,7 @@ package hu.perit.template.authservice.rest.api;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
+import hu.perit.template.authservice.rest.controller.AuthController;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;

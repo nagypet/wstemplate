@@ -14,24 +14,29 @@
  * limitations under the License.
  */
 
-package hu.perit.template.authservice;
+package hu.perit.template.authservice.db.demodb.table;
 
-import hu.perit.spvitamin.spring.SpvitaminApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Profile;
+import hu.perit.template.authservice.config.Constants;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * @author Peter Nagy
  */
 
-@Profile("!unittest")
-@SpringBootApplication
-@ComponentScan(basePackages = {"hu.perit.spvitamin", "hu.perit.template.authservice"})
-public class Application
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@Table(name = UserXRoleEntity.TABLE_NAME, schema = Constants.SCHEMA)
+public class UserXRoleEntity
 {
-    public static void main(String[] args)
-    { // NOSONAR
-        SpvitaminApplication.run(Application.class, args);
-    }
+    public static final String TABLE_NAME = "userxrole";
+
+    @EmbeddedId
+    private UserXRoleEntityPK pk;
 }

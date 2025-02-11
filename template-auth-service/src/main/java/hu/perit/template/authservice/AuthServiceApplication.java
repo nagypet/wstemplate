@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package hu.perit.template.scalableservice;
+package hu.perit.template.authservice;
 
 import hu.perit.spvitamin.spring.SpvitaminApplication;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
+import org.springframework.retry.annotation.EnableRetry;
 
 /**
  * @author Peter Nagy
@@ -28,13 +28,12 @@ import org.springframework.context.annotation.Profile;
 
 @Profile("!unittest")
 @SpringBootApplication
-@ComponentScan(basePackages = {"hu.perit.spvitamin", "hu.perit.template.scalableservice"})
-@Slf4j
-public class Application
+@ComponentScan(basePackages = {"hu.perit.spvitamin", "hu.perit.template.authservice"})
+@EnableRetry
+public class AuthServiceApplication
 {
-
     public static void main(String[] args)
     { // NOSONAR
-        SpvitaminApplication.run(Application.class, args);
+        SpvitaminApplication.run(AuthServiceApplication.class, args);
     }
 }

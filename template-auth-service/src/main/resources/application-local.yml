@@ -19,16 +19,17 @@
 #-----------------------------------------------------------------------------------------------------------------------
 datasource:
   demodb:
-    host: k8s-test.perit.local
-    port: 31900
+#    host: k8s-test.perit.local
+#    port: 31900
+    host: localhost
 
 
 #-----------------------------------------------------------------------------------------------------------------------
 # AD settings
 #-----------------------------------------------------------------------------------------------------------------------
-ldaps:
-  ad1:
-    url: ldap://ldap.wstemplate.k8s-test.perit.local:31901
+#ldaps:
+#  ad1:
+#    url: ldap://ldap.wstemplate.k8s-test.perit.local:31901
 
 logging:
   config: classpath:logback-local.xml

@@ -19,7 +19,8 @@ package hu.perit.template.authservice.auth;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
-import hu.perit.template.authservice.services.UserService;
+import hu.perit.template.authservice.services.api.UserService;
+import hu.perit.template.authservice.services.impl.user.UserServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,7 +50,7 @@ public class PostAuthenticationFilter extends OncePerRequestFilter
 
         if (!authenticatedUser.isAnonymous() && authenticatedUser.getUserId() < 0)
         {
-            UserService userService = SpringContext.getBean(UserService.class);
+            UserService userService = SpringContext.getBean(UserServiceImpl.class);
             authenticatedUser.setUserId(userService.createAtLogin(authenticatedUser));
 
             // store in the security context

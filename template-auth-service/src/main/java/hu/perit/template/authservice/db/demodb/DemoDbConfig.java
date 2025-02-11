@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jakarta.persistence.EntityManagerFactory;
-import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.cfg.*;
 import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
@@ -94,13 +94,13 @@ public class DemoDbConfig
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder, @Qualifier(DATASOURCE) DataSource dataSource)
     {
         Map<String, String> properties = new HashMap<>();
-        properties.put(AvailableSettings.DIALECT, this.connectionParam.getDialect());
-        properties.put(AvailableSettings.CONNECTION_HANDLING, PhysicalConnectionHandlingMode.DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION.name());
-        properties.put(AvailableSettings.HBM2DDL_AUTO, this.connectionParam.getDdlAuto());
-        properties.put(AvailableSettings.ENABLE_LAZY_LOAD_NO_TRANS, "true");
-        properties.put(AvailableSettings.STATEMENT_BATCH_SIZE, "100");
-        properties.put(AvailableSettings.ORDER_INSERTS, "true");
-        properties.put(AvailableSettings.ORDER_UPDATES, "true");
+        properties.put(JdbcSettings.DIALECT, this.connectionParam.getDialect());
+        properties.put(JdbcSettings.CONNECTION_HANDLING, PhysicalConnectionHandlingMode.DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION.name());
+        properties.put(SchemaToolingSettings.HBM2DDL_AUTO, this.connectionParam.getDdlAuto());
+        properties.put(TransactionSettings.ENABLE_LAZY_LOAD_NO_TRANS, "true");
+        properties.put(BatchSettings.STATEMENT_BATCH_SIZE, "100");
+        properties.put(BatchSettings.ORDER_INSERTS, "true");
+        properties.put(BatchSettings.ORDER_UPDATES, "true");
         //properties.put(AvailableSettings.BATCH_VERSIONED_DATA, "true");
         properties.put(AvailableSettings.JAKARTA_LOCK_TIMEOUT, "3000");
 

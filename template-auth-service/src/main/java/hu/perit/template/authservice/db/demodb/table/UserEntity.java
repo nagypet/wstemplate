@@ -45,12 +45,12 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = UserEntity.TABLE_NAME, schema = "dbo", indexes = {
+@Table(name = UserEntity.TABLE_NAME, schema = Constants.SCHEMA, indexes = {
         @Index(columnList = "username", name = Constants.INDEXNAME_USERNAME, unique = true)
 })
 public class UserEntity
 {
-    public static final String TABLE_NAME = "users";
+    public static final String TABLE_NAME = "user";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,7 +66,7 @@ public class UserEntity
     private String displayName;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "userrole", schema = "dbo",
+    @JoinTable(name = UserXRoleEntity.TABLE_NAME, schema = Constants.SCHEMA,
             joinColumns = {@JoinColumn(name = "userid")},
             inverseJoinColumns = {@JoinColumn(name = "roleid")}
     )

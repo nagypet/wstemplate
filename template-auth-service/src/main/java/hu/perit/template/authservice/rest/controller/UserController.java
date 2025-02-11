@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package hu.perit.template.authservice.rest.api;
+package hu.perit.template.authservice.rest.controller;
 
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
 import hu.perit.template.authservice.config.Constants;
+import hu.perit.template.authservice.rest.api.UserApi;
 import hu.perit.template.authservice.rest.model.*;
-import hu.perit.template.authservice.services.UserService;
+import hu.perit.template.authservice.services.impl.user.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,7 +38,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController implements UserApi
 {
-    private final UserService userService;
+    private final UserServiceImpl userService;
 
     /*
      * ============== getAllUsers ======================================================================================

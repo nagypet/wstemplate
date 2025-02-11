@@ -1,0 +1,143 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1739256382069-1
+      author: np
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_role
+                  name: roleid
+                  type: bigserial
+              - column:
+                  name: role
+                  type: VARCHAR(255)
+            schemaName: dbo
+            tableName: role
+  - changeSet:
+      id: 1739256382069-2
+      author: np
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_user
+                  name: userid
+                  type: BIGINT
+              - column:
+                  name: username
+                  type: VARCHAR(25)
+              - column:
+                  name: displayname
+                  type: VARCHAR(100)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: external
+                  type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                  name: active
+                  type: BOOLEAN
+              - column:
+                  name: address
+                  type: VARCHAR(250)
+              - column:
+                  name: email
+                  type: VARCHAR(100)
+              - column:
+                  name: phone
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: next_login_change_pwd
+                  type: BOOLEAN
+              - column:
+                  constraints:
+                    nullable: false
+                  name: createdbyid
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: createdat
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updatedbyid
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: updatedat
+                  type: DATETIME
+              - column:
+                  name: deletedbyid
+                  type: BIGINT
+              - column:
+                  name: deletedat
+                  type: DATETIME
+              - column:
+                  name: deletedflag
+                  type: BOOLEAN
+              - column:
+                  name: lastlogintime
+                  type: DATETIME
+              - column:
+                  name: encryptedpassword
+                  type: VARCHAR(250)
+              - column:
+                  name: passwordexpired
+                  type: BOOLEAN
+            schemaName: dbo
+            tableName: user
+  - changeSet:
+      id: 1739256382069-3
+      author: np
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_userxrole
+                  name: userid
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_userxrole
+                  name: roleid
+                  type: BIGINT
+            schemaName: dbo
+            tableName: userxrole
+  - changeSet:
+      id: 1739256382069-4
+      author: np
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: username
+            indexName: user_ix_username
+            schemaName: dbo
+            tableName: user
+            unique: true
+

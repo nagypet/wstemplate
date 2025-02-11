@@ -37,4 +37,5 @@ public class Constants {
     public static final int USER_API_DELETE_ROLE = 7;
 
     public static final String SUBSYSTEM_NAME = "template-auth-service";
+    public static final String SCHEMA = "dbo";
 }

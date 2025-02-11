@@ -24,7 +24,7 @@
 # * or comma separated roles (e.g. ADMIN)
 security:
   swagger-access: "*"
-  management-endpoints-access: ADMIN
+  management-endpoints-access: "*"
   admin-gui-access: "*"
   admin-endpoints-access: "*"
 
@@ -33,7 +33,8 @@ security:
 # Microservice environment
 #-----------------------------------------------------------------------------------------------------------------------
 microservices:
-  auth-service.url: https://auth-service.wstemplate.k8s-test.perit.local
+  #auth-service.url: https://auth-service.wstemplate.k8s-test.perit.local
+  auth-service.url: http://localhost:8410
 
 logging:
   config: classpath:logback-local.xml

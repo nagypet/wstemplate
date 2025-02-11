@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.template.authservice.db.demodb.table.UserEntity;
-import hu.perit.template.authservice.services.UserService;
+import hu.perit.template.authservice.services.api.UserService;
 import lombok.extern.slf4j.Slf4j;
 
 /**

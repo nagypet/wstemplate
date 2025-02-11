@@ -30,7 +30,7 @@ import java.io.Serializable;
  */
 
 @Embeddable
-public class UserRoleEntityPK implements Serializable, Comparable<UserRoleEntityPK> {
+public class UserXRoleEntityPK implements Serializable, Comparable<UserXRoleEntityPK> {
 
     @Column(name = "userid", nullable = false)
     @NotNull
@@ -46,11 +46,11 @@ public class UserRoleEntityPK implements Serializable, Comparable<UserRoleEntity
             return true;
         }
 
-        if (!(o instanceof UserRoleEntityPK)) {
+        if (!(o instanceof UserXRoleEntityPK)) {
             return false;
         }
 
-        UserRoleEntityPK that = (UserRoleEntityPK) o;
+        UserXRoleEntityPK that = (UserXRoleEntityPK) o;
 
         return new EqualsBuilder()
                 .append(userId, that.userId)
@@ -69,7 +69,7 @@ public class UserRoleEntityPK implements Serializable, Comparable<UserRoleEntity
 
 
     @Override
-    public int compareTo(UserRoleEntityPK other) {
+    public int compareTo(UserXRoleEntityPK other) {
         if (other == this) { return 0; }
         return new CompareToBuilder()
                 .append(this.userId, other.userId)

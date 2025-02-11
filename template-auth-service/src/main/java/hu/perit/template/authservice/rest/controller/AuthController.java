@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.template.authservice.rest.api;
+package hu.perit.template.authservice.rest.controller;
 
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;

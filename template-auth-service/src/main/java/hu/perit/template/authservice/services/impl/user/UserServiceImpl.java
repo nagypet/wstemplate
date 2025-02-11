@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package hu.perit.template.authservice.services;
+package hu.perit.template.authservice.services.impl.user;
 
 import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.spring.exception.CannotProcessException;
-import hu.perit.spvitamin.spring.exception.InvalidInputException;
 import hu.perit.spvitamin.spring.exception.ResourceAlreadyExistsException;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
@@ -32,9 +31,11 @@ import hu.perit.template.authservice.rest.model.RoleSet;
 import hu.perit.template.authservice.rest.model.UpdateUserParams;
 import hu.perit.template.authservice.rest.model.UserDTO;
 import hu.perit.template.authservice.rest.model.UserDTOFiltered;
+import hu.perit.template.authservice.services.api.UserService;
 import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.exception.ConstraintViolationException;
 import org.modelmapper.ModelMapper;
@@ -58,7 +59,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class UserService
+public class UserServiceImpl implements UserService
 {
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
@@ -67,18 +68,20 @@ public class UserService
     /*
      * ============== getAll ===========================================================================================
      */
+    @Override
     public List<UserDTOFiltered> getAll()
     {
         List<UserEntity> all = this.userRepo.findAll();
 
         ModelMapper modelMapper = new ModelMapper();
-        return all.stream().map(i -> modelMapper.map(i, UserDTOFiltered.class)).collect(Collectors.toList());
+        return all.stream().map(i -> modelMapper.map(i, UserDTOFiltered.class)).toList();
     }
 
 
     /*
      * ============== getUserDTOById ===================================================================================
      */
+    @Override
     public UserDTO getUserDTOById(long userId) throws ResourceNotFoundException
     {
         Optional<UserEntity> byId = this.userRepo.findById(userId);
@@ -97,12 +100,14 @@ public class UserService
     /*
      * ============== create ===========================================================================================
      */
+    @Override
     public long create(CreateUserParams createUserParams)
     {
         return this.create(createUserParams, false);
     }
 
 
+    @Override
     public long create(CreateUserParams createUserParams, Boolean external)
     {
         try
@@ -161,6 +166,7 @@ public class UserService
     /*
      * ============== createAtLogin ====================================================================================
      */
+    @Override
     public long createAtLogin(AuthenticatedUser authenticatedUser)
     {
         if (authenticatedUser.getUserId() >= 0)
@@ -196,6 +202,7 @@ public class UserService
      * ============== update ===========================================================================================
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Override
     public void update(long userId, UpdateUserParams updateUserParams) throws ResourceNotFoundException
     {
         Optional<UserEntity> byId = this.userRepo.findById(userId);
@@ -205,7 +212,7 @@ public class UserService
             modelMapper.getConfiguration().setSkipNullEnabled(true);
 
             UserEntity userEntity = byId.get();
-            if (userEntity.getExternal())
+            if (BooleanUtils.isTrue(userEntity.getExternal()))
             {
                 throw new CannotProcessException("External user cannot be updated!");
             }
@@ -261,6 +268,7 @@ public class UserService
     /*
      * ============== getUserEntity ====================================================================================
      */
+    @Override
     public UserEntity getUserEntity(String userName, boolean filterInternal) throws ResourceNotFoundException
     {
         Optional<UserEntity> byUserName = this.userRepo.findByUserName(userName);
@@ -287,6 +295,7 @@ public class UserService
     /*
      * ============== getUserIdByName ==================================================================================
      */
+    @Override
     public long getUserIdByName(String userName)
     {
         Optional<UserEntity> byUserName = this.userRepo.findByUserName(userName);
@@ -304,6 +313,7 @@ public class UserService
     /*
      * ============== updateLoginTime ==================================================================================
      */
+    @Override
     public void updateLoginTime(long userId)
     {
         this.userRepo.updateLastLoginTime(userId, LocalDateTime.now());
@@ -314,6 +324,7 @@ public class UserService
      * ============== addRole ==========================================================================================
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Override
     public void addRole(Long userId, RoleSet roleSet) throws ResourceNotFoundException
     {
         Optional<UserEntity> byId = this.userRepo.findById(userId);
@@ -360,6 +371,7 @@ public class UserService
      * ============== deleteRole =======================================================================================
      */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Override
     public void deleteRole(Long userId, RoleSet roleSet) throws ResourceNotFoundException
     {
         Optional<UserEntity> byId = this.userRepo.findById(userId);
