@@ -44,6 +44,7 @@ dependencies {
     implementation platform(libs.spring.cloud)
 
     implementation project(':spvitamin-spring-admin')
+    implementation project(':spvitamin-spring-general')
     implementation project(':spvitamin-spring-security')
 
 //    implementation 'hu.perit.spvitamin:spvitamin-spring-admin'

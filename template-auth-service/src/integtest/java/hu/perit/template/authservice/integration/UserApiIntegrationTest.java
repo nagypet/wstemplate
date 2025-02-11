@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import com.opencsv.exceptions.CsvException;
 import hu.perit.spvitamin.spring.config.LocalUserProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -191,7 +192,7 @@ public class UserApiIntegrationTest
             allUsers = this.templateAuthClient.getAllUsers("123");
             Assertions.assertEquals(1, allUsers.size());
         }
-        catch (RuntimeException e)
+        catch (RuntimeException | ResourceNotFoundException e)
         {
             log.error(StackTracer.toString(e));
             Assertions.fail(e.toString());

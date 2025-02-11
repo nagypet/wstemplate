@@ -21,6 +21,12 @@
 spring:
   application:
     name: template-scalable-service
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            logger-level: FULL
 
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -56,7 +62,7 @@ server:
 
   error:
     includeException: true
-    includeStacktrace: ALWAYS
+    includeStacktrace: NEVER
     includeMessage: ALWAYS
 
 #-----------------------------------------------------------------------------------------------------------------------

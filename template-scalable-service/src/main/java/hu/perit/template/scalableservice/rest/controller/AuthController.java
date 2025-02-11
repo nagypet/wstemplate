@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.template.scalableservice.rest.api;
+package hu.perit.template.scalableservice.rest.controller;
 
 import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;

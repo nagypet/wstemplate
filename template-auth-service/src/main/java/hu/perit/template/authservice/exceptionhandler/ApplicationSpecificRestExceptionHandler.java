@@ -16,20 +16,18 @@
 
 package hu.perit.template.authservice.exceptionhandler;
 
-import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.spring.exceptionhandler.DefaultRestExceptionResponseHandler;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
+import io.micrometer.tracing.Span;
+import io.micrometer.tracing.Tracer;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-
-import java.io.IOException;
 
 /**
  * @author Peter Nagy
@@ -38,26 +36,24 @@ import java.io.IOException;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 @Slf4j
+@RequiredArgsConstructor
 public class ApplicationSpecificRestExceptionHandler extends DefaultRestExceptionResponseHandler
 {
+    private final Tracer tracer;
+
+    private String getTraceId()
+    {
+        final Span span = tracer.currentSpan();
+        return span != null
+                ? span.context().traceId()
+                : null;
+    }
+
+
     @ExceptionHandler({Exception.class})
     public ResponseEntity<RestExceptionResponse> applicationSpecificExceptionHandler(Exception ex, WebRequest request)
     {
-        String path = request != null ? request.getDescription(false) : "";
-
-        ExceptionWrapper exception = ExceptionWrapper.of(ex);
-
-        if (exception.instanceOf(IOException.class))
-        {
-            log.error(StackTracer.toString(ex));
-            RestExceptionResponse exceptionResponse = new RestExceptionResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex, path);
-            return new ResponseEntity<>(exceptionResponse, HttpStatus.valueOf(exceptionResponse.getStatus()));
-        }
-        else
-        {
-            return super.exceptionHandler(ex, request);
-        }
+        return super.exceptionHandler(ex, request, getTraceId());
     }
-
 
 }

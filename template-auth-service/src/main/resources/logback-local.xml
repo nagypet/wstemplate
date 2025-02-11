@@ -17,13 +17,13 @@
 <configuration>
 	<appender name="spring-message" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p SPR [%-15.15t] %-30.30c{1}%4L : %m %n</pattern>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%32X{traceId:-}] %-5p SPR [%-15.15t] %-30.30c{1}%4L : %m %n</pattern>
 		</encoder>
 	</appender>
 
 	<appender name="application-message" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p --- [%-15.15t] %-30.30c{1}%4L : %m %n</pattern>
+			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%32X{traceId:-}] %-5p --- [%-15.15t] %-30.30c{1}%4L : %m %n</pattern>
 		</encoder>
 	</appender>
 
@@ -54,13 +54,22 @@
 	<logger name="hu.perit.spvitamin.spring.keystore" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
-	<logger name="hu.perit.spvitamin.spring.logging" level="DEBUG" additivity="false">
+	<logger name="hu.perit.spvitamin.spring.httplogging" level="OFF" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
-	<logger name="hu.perit.spvitamin.spring.httplogging" level="INFO" additivity="false">
+	<logger name="hu.perit.spvitamin.spring.restmethodlogger" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
-	<logger name="hu.perit.spvitamin.spring.security" level="WARN" additivity="false">
+	<logger name="hu.perit.spvitamin.spring.security" level="INFO" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
+	<logger name="hu.perit.spvitamin.spring.connectablecontext" level="DEBUG" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
+	<logger name="hu.perit.spvitamin.spring.SpvitaminApplication" level="DEBUG" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
+	<logger name="hu.perit.spvitamin.spring.exceptionhandler" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
 

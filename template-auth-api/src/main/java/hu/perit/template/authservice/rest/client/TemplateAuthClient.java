@@ -20,6 +20,7 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
+import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.template.authservice.rest.model.CreateUserParams;
 import hu.perit.template.authservice.rest.model.ResponseUri;
 import hu.perit.template.authservice.rest.model.RoleSet;
@@ -78,7 +79,7 @@ public interface TemplateAuthClient
     UserDTO getUserById(
             @Param("traceId") String traceId,
             @Param("id") long userId
-    );
+    ) throws ResourceNotFoundException;
 
 
     /*

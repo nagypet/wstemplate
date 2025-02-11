@@ -16,8 +16,11 @@
 
 package hu.perit.template.scalableservice.rest.api;
 
+import feign.Param;
+import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.exceptionhandler.RestExceptionResponse;
 import hu.perit.spvitamin.spring.logging.EventLogId;
+import hu.perit.template.authservice.rest.model.UserDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,6 +30,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -40,9 +44,9 @@ public interface ServiceApi
 
     String BASE_URL_SERVICE = "/api/service";
 
-    /*
-     * ============== getAllUsers ======================================================================================
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // makeSomeLongCalculation()
+    //------------------------------------------------------------------------------------------------------------------
     @GetMapping(BASE_URL_SERVICE)
     @Operation(summary = "makeSomeLongCalculation() - Makes some time consuming calculation",
             security = {@SecurityRequirement(name = "bearer")},
@@ -52,9 +56,22 @@ public interface ServiceApi
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
             }
     )
-    @ResponseStatus(value = HttpStatus.OK)
-    @EventLogId(eventId = 1)
-    Integer makeSomeLongCalculationUsingGET(
-            @Parameter(name = "traceId", required = false) @RequestHeader(value = "traceId", required = false) String traceId
-    ) throws InterruptedException;
+    Integer makeSomeLongCalculation() throws InterruptedException;
+
+
+    //------------------------------------------------------------------------------------------------------------------
+    // getUserById
+    //------------------------------------------------------------------------------------------------------------------
+    @GetMapping(BASE_URL_SERVICE + "/users/{userId}")
+    @Operation(summary = "getUserById() - Returns a user by id",
+            security = {@SecurityRequirement(name = "bearer")},
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Success"),
+                    @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(implementation = RestExceptionResponse.class)))
+            }
+    )
+    UserDTO getUserById(
+            @PathVariable("userId") long userId
+    ) throws ResourceNotFoundException;
 }

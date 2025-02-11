@@ -60,7 +60,7 @@ server:
 
   error:
     includeException: true
-    includeStacktrace: ALWAYS
+    includeStacktrace: NEVER
     includeMessage: ALWAYS
 
 
