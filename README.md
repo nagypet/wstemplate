@@ -285,3 +285,8 @@ Calling `System.gc()` is generally not recommended. But my applications have sma
 | JVM Total | G1 Eden Space |
 | ------ | ------ |
 | ![image](https://github.com/nagypet/wstemplate/blob/master/docs/images/jvm_total_memory.jpg) | ![image](https://github.com/nagypet/wstemplate/blob/master/docs/images/g1_eden_space.jpg) |
+
+
+## Open issues
+- Hogyan kezeljük a service-ekben a tanusítványokat? Kívülről https-en keresztül kell őket elérni, ehhez kell egy keystore.jks és egy trustrore.jks, amelyik rendszeresen, automatikusan frissítve van.
+- Hogyan oldjuk meg az authentikációt, hogy függetlenek legyünk az adott szervezet konkrét authentikációs mechanizmusaitól?
