@@ -1,26 +1,10 @@
 # wstemplate
 
-This project implements a small, but _complete_ solution using the Spring framework and a microservice architecture for demonstration purposes. This is actually the test environment of the [spvitamin](https://github.com/nagypet/spvitamin) project. 
+This is a sample project for the [Microservice Development Guideline](https://github.com/nagypet/wstemplate/wiki).
 
-The first version was a standalone docker-compose deployment, with an API gateway and a Eureka discovery service. Then I have reworked the project using Kubernetes as the deployment target. So the `template-gateway` project was replaced by an nginx ingress-controller and the `template-eureka` project is not used anymore.
+## Building and running the samples 
 
-Also, besides the performance-tester project there is now a JMeter performance test.
-
-What makes this solution complete?
-- scalability and high availability with redundant services
-- https communication
-- secured webservice endpoints
-- unit tests
-- integration tests
-- Swagger online documentation and test UI
-- sonarqube
-- (Eureka, Spring Cloud Gateway, Hystrix with fault tolerance)
-- deployment in Kubernetes
-- monitoring with Prometheus/Grafana
-
-The project can be used as a basis for further POC projects as a fully containerized microservice environment.
-
-## Architecture
+### Architecture
 ![architecture](docs/images/wstemplate_architecture-K8s.jpg)
 
 There are 3 main components of the system:
@@ -28,7 +12,6 @@ There are 3 main components of the system:
 - template-scalable-service: 3 instances of the service are installed to achieve scalability and high availability.
 - performance-tester: to generate a simulated load for the system
 
-## Build and run
 ### Prerequisits
 Install AdoptOpenJDK 11
 ```
@@ -88,52 +71,18 @@ This chapter is not up-to-date!
 
 Find the tags in the source code to see how it was made.
 
-| Tag | Description |
-| ------ | ------ |
-| #know-how:access-spring-managed-beans-from-outside | How can we access beans managed within the application context from outside of the context |
-| #know-how:custom-authentication-provider |  |
-| #know-how:simple-httpsecurity-builder | The WebSecurityConfigurerAdapter is a real pain in the ... We have SimpleHttpSecurityBuilder to simplify the security configuration. |
-| [#know-how:custom-rest-error-response](#custom-rest-error-response) | In case of any exception in the server side we want to provide a useful HTTP body in Json form. This can be converted back to an Exception on the client side. |
-| #know-how:hibernate-configuration | How to configure hibernate in the most flexible way? |
-| #know-how:jpa-auditing | How to configure custom auditing features to track creation/modification of entities? |
-| [#know-how:disable-ssl-certificate-validation](#disable-ssl-certificate-validation) | How to completely disable SSL certificate validation in the development environment? |
-| [#know-how:custom-zuul-error-filter](#custom-zuul-error-filter) | Custom Zuul error filter |
-| [#know-how:gc-timer](#gc-timer) | Forced garbage collection |
+| Tag                                                                                 | Description                                                                                                                                                    |
+|-------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| #know-how:access-spring-managed-beans-from-outside                                  | How can we access beans managed within the application context from outside of the context                                                                     |
+| #know-how:custom-authentication-provider                                            |                                                                                                                                                                |
+| #know-how:simple-httpsecurity-builder                                               | The WebSecurityConfigurerAdapter is a real pain in the ... We have SimpleHttpSecurityBuilder to simplify the security configuration.                           |
+| [#know-how:custom-rest-error-response](#custom-rest-error-response)                 | In case of any exception in the server side we want to provide a useful HTTP body in Json form. This can be converted back to an Exception on the client side. |
+| #know-how:hibernate-configuration                                                   | How to configure hibernate in the most flexible way?                                                                                                           |
+| #know-how:jpa-auditing                                                              | How to configure custom auditing features to track creation/modification of entities?                                                                          |
+| [#know-how:disable-ssl-certificate-validation](#disable-ssl-certificate-validation) | How to completely disable SSL certificate validation in the development environment?                                                                           |
+| [#know-how:custom-zuul-error-filter](#custom-zuul-error-filter)                     | Custom Zuul error filter                                                                                                                                       |
+| [#know-how:gc-timer](#gc-timer)                                                     | Forced garbage collection                                                                                                                                      |
 
-### <a name="custom-rest-error-response"></a> #know-how:custom-rest-error-response
-I am a big fan of propagating as much information as possible in an exception thrown on the server side. It would be great if we could catch exceptions on the client side in the same way as on the server side. There are two major problems with is:
-- Exceptions cannot be deserialized from Json
-- On the client side exception classes might not be known. As an example, imagine, the server throws a SqlServerException, but we do not include any Sql-Server dependency on the client side, still we want to be able to catch SqlServerException in the client.
-
-To overcome those two issues I have implemented `ServerExceptionProperties`. This peace of information will be sent over the webservice boundaries; it contains each information of the original exception and therefore can be turned back to the proper exception on the client side. If the original exception class is not available on the client side, an instance of `ServerException` will be thrown. If you only want to log the exception, our `ServerException` behaves like the original exception. The method `toString()` provides the very same output as the original exception.
-
-```java
-public interface ServerExceptionInterface {
-    String getClassName();
-    boolean instanceOf(Class anExceptionClass);
-    boolean instanceOf(String anExceptionClassName);
-    List<String> getSuperClassNames();
-    Annotation[] getAnnotations();
-}
-```
-
-There is a wrapper class `ExceptionWrapper` which can be created out of a `Throwable`. No matter if the `Throwable` was a `ServerException` or a regular exception, the wrapper handles both types identically.
-```java
-    @Override
-    public boolean isFatalException(Throwable ex) {
-        ExceptionWrapper exception = ExceptionWrapper.of(ex);
-
-        if (exception.causedBy("org.apache.http.conn.ConnectTimeoutException")
-                || exception.causedBy("org.apache.http.NoHttpResponseException")
-                || exception.causedBy("org.apache.http.conn.HttpHostConnectException")
-        ) {
-            return false;
-        }
-
-        return true;
-    }
-```
-The method `causedBy` is more advanced than `instanceof` because the first returns true if the exception itself is an instance of the parameter, or the parameter is anywhere in the cause chain.
 
 ### <a name="disable-ssl-certificate-validation"></a> #know-how:disable-ssl-certificate-validation
 In a development environment often we do not have a signed certificate. We generate a self-signed one, just for encryption and do not want a validation. As long as only Feign or RestTemplate is in use for building a HTTP request, we can easily customize both of them to ignore certificate validation. But if many spring cloud services are in use, like Eureka, Ribbon, Zuul, etc., each and every of them have an own way of creating the request. We simply do not have as many time to switch off validation at all the components we have. So we need a general solution which grabs the problem at a lower layer: at the layer of `java.security.Provider`. We can easiliy implement a `NullSecurityProvider`, which points to our own factory methods to instantiate a `NullTrustManager`.
