@@ -1,0 +1,78 @@
+<!--
+  ~ Copyright 2020-2025 the original author or authors.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      https://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<div>
+  <!--  @if (authService.isAuthenticated() === true) {-->
+  <div class="row">
+
+    <div class="col-sm-6">
+      <h2>Server {{ keystoreType }}</h2>
+      <app-keystore [Keystore]="keystoreEntries" (OnDelete)="onDelete($event)"></app-keystore>
+      <hr>
+    </div>
+
+    <div class="col-sm-6">
+      <h2>{{ certFileName }}</h2>
+
+      @if (isCertFileOpen() !== true) {
+        <div autocomplete="off" spellcheck="false">
+
+          <input
+            type="file"
+            class="file-input"
+            #certSelectInput
+            (change)="onFileSelected($event)"
+          >
+          <button mat-raised-button color="primary" class="no-margin" (click)="certSelectInput.click()">
+            Browse
+          </button>
+          <label>{{ certFileName }}</label>
+
+          <hr>
+
+          <div>
+            <mat-form-field class="password-input">
+              <mat-label>Password</mat-label>
+              <input matInput type="password" placeholder="Password" #passwordInput>
+            </mat-form-field>
+          </div>
+
+          <button mat-raised-button color="primary" (click)="onOpen()">Open</button>
+
+        </div>
+      } @else {
+        <app-keystore [Keystore]="certFileEntries" [DeleteAllowed]="false"
+                      (Selected)="onCertSelected($event)"></app-keystore>
+        <hr>
+        @if (selectedCertFileEntry !== null) {
+          <button mat-raised-button color="primary" (click)="onImport()">
+            Import
+          </button>
+        }
+        <button mat-raised-button (click)="onClose()">Close</button>
+      }
+    </div>
+  </div>
+  <!--  } @else {-->
+  <!--    <div class="row">-->
+  <!--      <div class="col-sm-12">-->
+  <!--        <div style="padding: 15px 0 0 0">-->
+  <!--          <p>Please log in!</p>-->
+  <!--        </div>-->
+  <!--      </div>-->
+  <!--    </div>-->
+  <!--  }-->
+</div>

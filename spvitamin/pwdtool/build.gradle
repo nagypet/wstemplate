@@ -1,0 +1,53 @@
+/*
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+plugins {
+    id 'application'
+    id 'jacoco'
+}
+apply from: '../gradle/common.gradle'
+
+repositories {
+    mavenCentral()
+}
+
+
+application {
+    mainClassName = 'hu.perit.crypto.PwdToolApplication'
+    // Some JVM options already set in common.gradle
+    applicationDefaultJvmArgs += ['-Xmx256m', '-Xms32m']
+}
+
+
+dependencies {
+    // -----------------------------------------------------------------------------------------------------------------
+    // Compile dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    implementation project(':spvitamin-core')
+
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
+
+    implementation libs.commons.lang3
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Test dependencies
+    // -----------------------------------------------------------------------------------------------------------------
+    // Slf4J
+    implementation libs.slf4j.api
+    implementation libs.logback.classic
+    implementation libs.logback.core
+}
