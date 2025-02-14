@@ -6,7 +6,7 @@ metadata:
 spec:
   ports:
     - protocol: TCP
-      port: 5050
+      port: 80
       targetPort: http
   selector:
     component: pgadmin
@@ -41,14 +41,16 @@ spec:
     spec:
       containers:
         - name: pgadmin
-          image: thajeztah/pgadmin4
+          image: dpage/pgadmin4:9.0.0
           ports:
             - name: http
-              containerPort: 5050
+              containerPort: 80
               protocol: TCP
           env:
-            - name: POSTGRES_PASSWORD
-              value: "sa"
+            - name: PGADMIN_DEFAULT_EMAIL
+              value: peter.nagy@perit.hu
+            - name: PGADMIN_DEFAULT_PASSWORD
+              value: sa
           volumeMounts:
             - name: pgadmin-volume
               mountPath: /pgadmin

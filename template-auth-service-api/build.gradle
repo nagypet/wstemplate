@@ -40,7 +40,7 @@ bootJar {
 }
 
 dependencies {
-    implementation platform(libs.spvitamin)
+    //implementation platform(libs.spvitamin)
     implementation platform(libs.spring.cloud)
 
     implementation project(':spvitamin-spring-admin')

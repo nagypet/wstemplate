@@ -35,14 +35,14 @@ repositories {
 
 
 application {
-    mainClassName = 'hu.perit.template.scalableservice.Application'
+    mainClassName = 'hu.perit.template.scalableservice.ScalableServiceApplication'
     // Some JVM options already set in common.gradle
     applicationDefaultJvmArgs += ['-Xmx512m', '-Xms32m']
 }
 
 
 dependencies {
-    implementation platform(libs.spvitamin)
+    //implementation platform(libs.spvitamin)
     implementation platform(libs.spring.cloud)
 
     implementation project(':template-auth-service-api')

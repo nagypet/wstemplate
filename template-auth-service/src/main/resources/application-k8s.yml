@@ -22,3 +22,17 @@ server:
   port: 80
   external-url: ${PROTOCOL}://${APP}.${NAMESPACE}.${DOMAIN}
   ssl.enabled: false
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+# datasource postgres
+#-----------------------------------------------------------------------------------------------------------------------
+datasource:
+  demodb:
+    db-type: postgresql
+    host: k8s-test.perit.local
+    port: 31900
+    db-name: testdb
+    username: postgres
+    encrypted-password: 1tvmTu8Ya8A=
+    ddl-auto: none
