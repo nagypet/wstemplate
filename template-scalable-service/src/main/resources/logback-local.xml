@@ -95,12 +95,6 @@
 	<logger name="org.springframework.security.web.util.matcher" level="DEBUG"/>
 	<logger name="org.springframework" level="DEBUG"/>
 	<logger name="org.hibernate.resource.jdbc.internal" level="TRACE"/>
-
-	#logging.level.org.springframework.web=OFF
-	#logging.level.org.hibernate=TRACE
-	#logging.level.org.hibernate.SQL=DEBUG
-	#logging.level.org.springframework.ws.transport.http=DEBUG
-	#logging.level.org.springframework.ws=DEBUG
 	-->
 
 	<root level="WARN">
