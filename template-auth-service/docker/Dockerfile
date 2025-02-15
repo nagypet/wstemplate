@@ -1,4 +1,4 @@
-FROM bellsoft/liberica-openjdk-alpine:17.0.6
+FROM bellsoft/liberica-openjdk-alpine:17
 VOLUME /tmp
 
 RUN apk add mc --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
@@ -8,7 +8,7 @@ RUN apk add --no-cache tzdata
 ENV TZ Europe/Budapest
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-WORKDIR /usr/src/auth-service
+WORKDIR /app/auth-service
 
 EXPOSE 8410
 
@@ -16,6 +16,6 @@ COPY ./dependencies ./snapshot-dependencies* ./lib/
 COPY ./bin ./bin
 COPY ./application ./lib
 
-WORKDIR /usr/src/auth-service/bin
+WORKDIR /app/auth-service/bin
 
 CMD ["sh", "./template-auth-service"]

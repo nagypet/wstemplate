@@ -1,4 +1,4 @@
-FROM bellsoft/liberica-openjdk-alpine:17.0.6
+FROM bellsoft/liberica-openjdk-alpine:17
 VOLUME /tmp
 
 RUN apk add mc --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
@@ -8,14 +8,14 @@ RUN apk add --no-cache tzdata
 ENV TZ Europe/Budapest
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-WORKDIR /usr/src/scalable-service
+WORKDIR /app/scalable-service
 
 EXPOSE 8420
 
-COPY ./dependencies ./snapshot-dependencies* ./lib
+COPY ./dependencies ./snapshot-dependencies* ./lib/
 COPY ./bin ./bin
 COPY ./application ./lib
 
-WORKDIR /usr/src/scalable-service/bin
+WORKDIR /app/scalable-service/bin
 
 CMD ["sh", "./template-scalable-service"]

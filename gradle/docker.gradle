@@ -85,6 +85,9 @@ if (project.hasProperty('application')) {
             from "config"
         }
         into(".") {
+            from "../deployment/common"
+        }
+        into(".") {
             from "../deployment/${project.name}"
         }
 

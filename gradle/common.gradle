@@ -101,6 +101,9 @@ if (project.hasProperty('installBootDist')) {
         into("bin") {
             from "../deployment/${project.name}"
         }
+        into("bin") {
+            from "../deployment/common"
+        }
     }
 }
 
@@ -400,6 +403,7 @@ task prepareRunInIDEA2021(type: Copy) {
     into "${projectDir}/build/resources/main"
     from "src/main/dist/bin"
     from "config"
+    from "../deployment/common"
     from "../deployment/${project.name}"
 }
 
