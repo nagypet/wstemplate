@@ -44,4 +44,5 @@ public class UpdateUserParams {
     private String email;
     private String phone;
     private Boolean nextLoginChangePwd;
+    private Long recVersion;
 }

@@ -57,4 +57,5 @@ public class UserDTO
 
     private OffsetDateTime lastLoginTime;
     private Boolean passwordExpired;
+    private Long recVersion;
 }
