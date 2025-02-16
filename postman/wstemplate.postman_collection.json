@@ -10,7 +10,7 @@
 			"name": "auth-service",
 			"item": [
 				{
-					"name": "login",
+					"name": "login admin",
 					"event": [
 						{
 							"listen": "test",
@@ -54,6 +54,135 @@
 								"api",
 								"spvitamin",
 								"authenticate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login nagypet",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"var jsonData = pm.response.json();\r",
+									"postman.setGlobalVariable(\"token\", jsonData.jwt);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "alma",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "nagypet",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth-service}}/api/spvitamin/authenticate",
+							"host": [
+								"{{auth-service}}"
+							],
+							"path": [
+								"api",
+								"spvitamin",
+								"authenticate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createUser",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userName\": \"nagypet\",\r\n    \"password\": \"alma\",\r\n    \"displayName\": \"Peter Nagy\",\r\n    \"roles\": [\r\n        \"ROLE_ADMIN\"\r\n    ],\r\n    \"active\": true,\r\n    \"address\": \"1038 Budapest\",\r\n    \"email\": \"peter.nagy@perit.hu\",\r\n    \"phone\": \"+36309215098\",\r\n    \"nextLoginChangePwd\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8410/api/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8410",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateUser",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userName\": null,\r\n  \"password\": null,\r\n  \"displayName\": \"John Doe\",\r\n  \"roles\": [\r\n    \"PUBLIC\"\r\n  ],\r\n  \"active\": null,\r\n  \"address\": null,\r\n  \"email\": null,\r\n  \"phone\": null,\r\n  \"nextLoginChangePwd\": null\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8410/api/users/402",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8410",
+							"path": [
+								"api",
+								"users",
+								"402"
 							]
 						}
 					},
