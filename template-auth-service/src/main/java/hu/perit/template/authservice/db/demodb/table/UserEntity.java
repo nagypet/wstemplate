@@ -32,6 +32,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -165,4 +166,8 @@ public class UserEntity
 
     @Column(name = "passwordexpired")
     private Boolean passwordExpired;
+
+    @Version
+    @Column(name = "recversion")
+    private Long recVersion;
 }

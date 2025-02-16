@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 1739279736715-1
+      id: 1739696188838-1
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -10,7 +10,7 @@ databaseChangeLog:
             sequenceName: role_seq
             startValue: 1
   - changeSet:
-      id: 1739279736715-2
+      id: 1739696188838-2
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -20,7 +20,7 @@ databaseChangeLog:
             sequenceName: user_seq
             startValue: 1
   - changeSet:
-      id: 1739279736715-3
+      id: 1739696188838-3
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -39,7 +39,7 @@ databaseChangeLog:
             schemaName: dbo
             tableName: role
   - changeSet:
-      id: 1739279736715-4
+      id: 1739696188838-4
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -120,10 +120,13 @@ databaseChangeLog:
               - column:
                   name: passwordexpired
                   type: BOOLEAN
+              - column:
+                  name: recversion
+                  type: BIGINT
             schemaName: dbo
             tableName: usertable
   - changeSet:
-      id: 1739279736715-5
+      id: 1739696188838-5
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -146,7 +149,7 @@ databaseChangeLog:
             schemaName: dbo
             tableName: userxrole
   - changeSet:
-      id: 1739279736715-6
+      id: 1739696188838-6
       author: np
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
