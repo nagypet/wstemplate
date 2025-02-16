@@ -45,9 +45,9 @@ public interface TemplateAuthServiceControllerApi extends TemplateAuthServiceApi
     String BASE_URL_USERS = "/api/users";
     String PATH_ROLES = "/roles";
 
-    /*
-     * ============== getAllUsers ======================================================================================
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // getAllUsers
+    //------------------------------------------------------------------------------------------------------------------
     @GetMapping(BASE_URL_USERS)
     @Secured("USER_GET_ALL_USERS")
     @Operation(summary = "getAllUsers() - Retrieves all users",
@@ -63,9 +63,9 @@ public interface TemplateAuthServiceControllerApi extends TemplateAuthServiceApi
     List<UserDTOFiltered> getAllUsers();
 
 
-    /*
-     * ============== getUserById ======================================================================================
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // getUserById
+    //------------------------------------------------------------------------------------------------------------------
     @GetMapping(BASE_URL_USERS + "/{userId}")
     @Secured("USER_GET_USER")
     @Operation(summary = "getUserById() - Retrieves a user by ID",
@@ -83,9 +83,9 @@ public interface TemplateAuthServiceControllerApi extends TemplateAuthServiceApi
     ) throws ResourceNotFoundException;
 
 
-    /*
-     * ============== createUser =======================================================================================
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // createUser
+    //------------------------------------------------------------------------------------------------------------------
     @PostMapping(BASE_URL_USERS)
     @Secured("USER_CREATE_USER")
     @Operation(summary = "createUser() - creates a new user",
@@ -104,9 +104,9 @@ public interface TemplateAuthServiceControllerApi extends TemplateAuthServiceApi
     );
 
 
-    /*
-     * ============== updateUser =======================================================================================
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // updateUser
+    //------------------------------------------------------------------------------------------------------------------
     @PutMapping(BASE_URL_USERS + "/{userId}")
     @Secured("USER_UPDATE_USER")
     @Operation(summary = "updateUser() - Updates a user by ID",
@@ -126,9 +126,9 @@ public interface TemplateAuthServiceControllerApi extends TemplateAuthServiceApi
     ) throws ResourceNotFoundException;
 
 
-    /*
-     * ============== deleteUser =======================================================================================
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // deleteUser
+    //------------------------------------------------------------------------------------------------------------------
     @DeleteMapping(BASE_URL_USERS + "/{userId}")
     @Secured("USER_DELETE_USER")
     @Operation(summary = "deleteUser() - removes a user by ID",
@@ -147,9 +147,9 @@ public interface TemplateAuthServiceControllerApi extends TemplateAuthServiceApi
     ) throws ResourceNotFoundException;
 
 
-    /*
-     * ============== addRole ==========================================================================================
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // addRole
+    //------------------------------------------------------------------------------------------------------------------
     @PutMapping(BASE_URL_USERS + "/{userId}" + PATH_ROLES)
     @Secured("USER_ADD_ROLE")
     @Operation(summary = "addRole() - adds a new role to the user",
@@ -169,9 +169,9 @@ public interface TemplateAuthServiceControllerApi extends TemplateAuthServiceApi
     ) throws ResourceNotFoundException;
 
 
-    /*
-     * ============== deleteRole =======================================================================================
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // deleteRole
+    //------------------------------------------------------------------------------------------------------------------
     @DeleteMapping(BASE_URL_USERS + "/{userId}" + PATH_ROLES)
     @Secured("USER_DELETE_ROLE")
     @Operation(summary = "deleteRole() - removes a user role",

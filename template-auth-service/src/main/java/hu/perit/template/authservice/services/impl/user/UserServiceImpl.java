@@ -16,30 +16,29 @@
 
 package hu.perit.template.authservice.services.impl.user;
 
-import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.spring.exception.CannotProcessException;
 import hu.perit.spvitamin.spring.exception.ResourceAlreadyExistsException;
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.template.authservice.db.demodb.repo.RoleRepo;
-import hu.perit.template.authservice.db.demodb.repo.UserRepo;
 import hu.perit.template.authservice.db.demodb.table.RoleEntity;
 import hu.perit.template.authservice.db.demodb.table.UserEntity;
-import hu.perit.template.authservice.model.*;
+import hu.perit.template.authservice.mapper.EntityMapper;
+import hu.perit.template.authservice.model.CreateUserParams;
+import hu.perit.template.authservice.model.RoleSet;
+import hu.perit.template.authservice.model.UpdateUserParams;
+import hu.perit.template.authservice.model.UserDTO;
+import hu.perit.template.authservice.model.UserDTOFiltered;
 import hu.perit.template.authservice.services.api.UserService;
-import jakarta.persistence.LockModeType;
+import hu.perit.template.authservice.services.api.entity.RoleEntityService;
+import hu.perit.template.authservice.services.api.entity.UserEntityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.exception.ConstraintViolationException;
-import org.modelmapper.ModelMapper;
-import org.springframework.data.jpa.repository.Lock;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -56,34 +55,42 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService
 {
-    private final UserRepo userRepo;
-    private final RoleRepo roleRepo;
-    private final PasswordEncoder passwordEncoder;
+    public static final String EXTERNAL_USER_CANNOT_BE_UPDATED = "External user cannot be updated!";
 
-    /*
-     * ============== getAll ===========================================================================================
-     */
+    private final UserEntityService userEntityService;
+    private final RoleEntityService roleEntityService;
+    private final PasswordEncoder passwordEncoder;
+    private final EntityMapper entityMapper;
+
+    //------------------------------------------------------------------------------------------------------------------
+    // getAll
+    //------------------------------------------------------------------------------------------------------------------
     @Override
     public List<UserDTOFiltered> getAll()
     {
-        List<UserEntity> all = this.userRepo.findAll();
+        List<UserEntity> all = this.userEntityService.findAll();
 
-        ModelMapper modelMapper = new ModelMapper();
-        return all.stream().map(i -> modelMapper.map(i, UserDTOFiltered.class)).toList();
+        return this.entityMapper.mapFilteredFromEntity(all);
     }
 
 
-    /*
-     * ============== getUserDTOById ===================================================================================
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // getUserDTOById
+    //------------------------------------------------------------------------------------------------------------------
     @Override
-    public UserDTO getUserDTOById(long userId) throws ResourceNotFoundException
+    public UserDTO getUserDTOById(Long userId) throws ResourceNotFoundException
     {
-        Optional<UserEntity> byId = this.userRepo.findById(userId);
-        if (byId.isPresent())
+        UserEntity entity = getUserEntityById(userId);
+        return this.entityMapper.mapFromEntity(entity);
+    }
+
+
+    public UserEntity getUserEntityById(Long userId) throws ResourceNotFoundException
+    {
+        UserEntity entity = this.userEntityService.findById(userId).orElse(null);
+        if (entity != null)
         {
-            ModelMapper modelMapper = new ModelMapper();
-            return modelMapper.map(byId.get(), UserDTO.class);
+            return entity;
         }
         else
         {
@@ -92,9 +99,9 @@ public class UserServiceImpl implements UserService
     }
 
 
-    /*
-     * ============== create ===========================================================================================
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // create
+    //------------------------------------------------------------------------------------------------------------------
     @Override
     public long create(CreateUserParams createUserParams)
     {
@@ -105,50 +112,35 @@ public class UserServiceImpl implements UserService
     @Override
     public long create(CreateUserParams createUserParams, Boolean external)
     {
-        try
+        UserEntity existingUser = this.userEntityService.findByUserName(createUserParams.getUserName()).orElse(null);
+        if (existingUser != null)
         {
-            ModelMapper modelMapper = new ModelMapper();
-            UserEntity userEntity = modelMapper.map(createUserParams, UserEntity.class);
-
-            // Encrypting password
-            if (StringUtils.isNotBlank(createUserParams.getPassword()))
-            {
-                userEntity.setEncryptedPassword(passwordEncoder.encode(createUserParams.getPassword()));
-            }
-
-            // Roles
-            if (createUserParams.getRoles() != null)
-            {
-                Set<RoleEntity> roles = this.getRoleEntitiesByRoleNames(createUserParams.getRoles());
-                userEntity.setRoleEntities(roles);
-            }
-
-            // External
-            userEntity.setExternal(external);
-
-            // Saving the user
-            UserEntity newUser = this.userRepo.save(userEntity);
-
-            return newUser.getUserId();
+            throw new ResourceAlreadyExistsException(
+                    String.format("A user with username '%s' already exists!", createUserParams.getUserName()));
         }
-        catch (RuntimeException ex)
+
+        UserEntity userEntity = this.entityMapper.mapFromCreateParams(createUserParams);
+
+        // Encrypting password
+        if (StringUtils.isNotBlank(createUserParams.getPassword()))
         {
-            ExceptionWrapper exception = ExceptionWrapper.of(ex);
-            if (exception.causedBy(ConstraintViolationException.class))
-            {
-                Optional<Throwable> fromCauseChain = exception.getFromCauseChain(ConstraintViolationException.class);
-                if (fromCauseChain.isPresent())
-                {
-                    if (((ConstraintViolationException) fromCauseChain.get()).getConstraintName().equalsIgnoreCase(
-                            UserEntity.IX_USERNAME))
-                    {
-                        throw new ResourceAlreadyExistsException(
-                                String.format("A user with username '%s' already exists!", createUserParams.getUserName()), ex);
-                    }
-                }
-            }
-            throw ex;
+            userEntity.setEncryptedPassword(passwordEncoder.encode(createUserParams.getPassword()));
         }
+
+        // Roles
+        if (createUserParams.getRoles() != null)
+        {
+            Set<RoleEntity> roles = this.getRoleEntitiesByRoleNames(createUserParams.getRoles());
+            userEntity.setRoleEntities(roles);
+        }
+
+        // External
+        userEntity.setExternal(external);
+
+        // Saving the user
+        UserEntity newUser = this.userEntityService.save(userEntity);
+
+        return newUser.getUserId();
     }
 
 
@@ -158,9 +150,9 @@ public class UserServiceImpl implements UserService
     }
 
 
-    /*
-     * ============== createAtLogin ====================================================================================
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // createAtLogin
+    //------------------------------------------------------------------------------------------------------------------
     @Override
     public long createAtLogin(AuthenticatedUser authenticatedUser)
     {
@@ -170,10 +162,10 @@ public class UserServiceImpl implements UserService
         }
         else
         {
-            long userId = this.getUserIdByName(authenticatedUser.getUsername());
-            if (userId >= 0)
+            UserEntity userEntity = this.userEntityService.findByUserName(authenticatedUser.getUsername()).orElse(null);
+            if (userEntity != null)
             {
-                return userId;
+                return userEntity.getUserId();
             }
             else
             {
@@ -193,80 +185,61 @@ public class UserServiceImpl implements UserService
     }
 
 
-    /*
-     * ============== update ===========================================================================================
-     */
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    //------------------------------------------------------------------------------------------------------------------
+    // update
+    //------------------------------------------------------------------------------------------------------------------
     @Override
-    public void update(long userId, UpdateUserParams updateUserParams) throws ResourceNotFoundException
+    public void update(Long userId, UpdateUserParams updateUserParams) throws ResourceNotFoundException
     {
-        Optional<UserEntity> byId = this.userRepo.findById(userId);
-        if (byId.isPresent())
+        UserEntity userEntity = getUserEntityById(userId);
+
+        if (BooleanUtils.isTrue(userEntity.getExternal()))
         {
-            ModelMapper modelMapper = new ModelMapper();
-            modelMapper.getConfiguration().setSkipNullEnabled(true);
-
-            UserEntity userEntity = byId.get();
-            if (BooleanUtils.isTrue(userEntity.getExternal()))
-            {
-                throw new CannotProcessException("External user cannot be updated!");
-            }
-
-            modelMapper.map(updateUserParams, userEntity);
-
-            // Encrypting passwords
-            if (StringUtils.isNotBlank(updateUserParams.getPassword()))
-            {
-                userEntity.setEncryptedPassword(passwordEncoder.encode(updateUserParams.getPassword()));
-            }
-
-            // Roles
-            if (updateUserParams.getRoles() != null)
-            {
-                Set<RoleEntity> roles = this.getRoleEntitiesByRoleNames(updateUserParams.getRoles());
-                userEntity.setRoleEntities(roles);
-            }
-
-            // Saving the user
-            this.userRepo.save(userEntity);
+            throw new CannotProcessException(EXTERNAL_USER_CANNOT_BE_UPDATED);
         }
-        else
+
+        this.entityMapper.update(userEntity, updateUserParams);
+
+        // Encrypting passwords
+        if (StringUtils.isNotBlank(updateUserParams.getPassword()))
         {
-            throw new ResourceNotFoundException(String.format("No user found by userId: %d", userId));
+            userEntity.setEncryptedPassword(passwordEncoder.encode(updateUserParams.getPassword()));
         }
+
+        // Roles
+        if (updateUserParams.getRoles() != null)
+        {
+            Set<RoleEntity> roles = this.getRoleEntitiesByRoleNames(updateUserParams.getRoles());
+            userEntity.setRoleEntities(roles);
+        }
+
+        // Saving the user
+        this.userEntityService.save(userEntity);
     }
 
 
-    /*
-     * ============== delete ===========================================================================================
-     */
-    public void delete(long userId) throws ResourceNotFoundException
+    //------------------------------------------------------------------------------------------------------------------
+    // delete
+    //------------------------------------------------------------------------------------------------------------------
+    public void delete(Long userId) throws ResourceNotFoundException
     {
-        Optional<UserEntity> byId = this.userRepo.findById(userId);
-        if (byId.isPresent())
+        UserEntity userEntity = getUserEntityById(userId);
+        if (Boolean.TRUE.equals(userEntity.getExternal()))
         {
-            UserEntity userEntity = byId.get();
-            if (Boolean.TRUE.equals(userEntity.getExternal()))
-            {
-                throw new CannotProcessException("External user cannot be deleted!");
-            }
+            throw new CannotProcessException("External user cannot be deleted!");
+        }
 
-            this.userRepo.deleteById(userId);
-        }
-        else
-        {
-            throw new ResourceNotFoundException(String.format("No user found by userId: %d", userId));
-        }
+        this.userEntityService.deleteById(userId);
     }
 
 
-    /*
-     * ============== getUserEntity ====================================================================================
-     */
+    //------------------------------------------------------------------------------------------------------------------
+    // getUserEntity
+    //------------------------------------------------------------------------------------------------------------------
     @Override
     public UserEntity getUserEntity(String userName, boolean filterInternal) throws ResourceNotFoundException
     {
-        Optional<UserEntity> byUserName = this.userRepo.findByUserName(userName);
+        Optional<UserEntity> byUserName = this.userEntityService.findByUserName(userName);
         if (byUserName.isPresent() && internalFilter(filterInternal, byUserName.get().getExternal()))
         {
             return byUserName.get();
@@ -287,69 +260,43 @@ public class UserServiceImpl implements UserService
         return !entityIsExternal;
     }
 
-    /*
-     * ============== getUserIdByName ==================================================================================
-     */
+
+    //------------------------------------------------------------------------------------------------------------------
+    // updateLoginTime
+    //------------------------------------------------------------------------------------------------------------------
     @Override
-    public long getUserIdByName(String userName)
+    public void updateLoginTime(Long userId)
     {
-        Optional<UserEntity> byUserName = this.userRepo.findByUserName(userName);
-        if (byUserName.isPresent())
-        {
-            return byUserName.get().getUserId();
-        }
-        else
-        {
-            return -1;
-        }
+        this.userEntityService.updateLastLoginTime(userId);
     }
 
 
-    /*
-     * ============== updateLoginTime ==================================================================================
-     */
-    @Override
-    public void updateLoginTime(long userId)
-    {
-        this.userRepo.updateLastLoginTime(userId, LocalDateTime.now());
-    }
-
-
-    /*
-     * ============== addRole ==========================================================================================
-     */
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    //------------------------------------------------------------------------------------------------------------------
+    // addRole
+    //------------------------------------------------------------------------------------------------------------------
     @Override
     public void addRole(Long userId, RoleSet roleSet) throws ResourceNotFoundException
     {
-        Optional<UserEntity> byId = this.userRepo.findById(userId);
-        if (byId.isPresent())
+        UserEntity userEntity = getUserEntityById(userId);
+        if (Boolean.TRUE.equals(userEntity.getExternal()))
         {
-            UserEntity userEntity = byId.get();
-            if (Boolean.TRUE.equals(userEntity.getExternal()))
-            {
-                throw new CannotProcessException("External user cannot be updated!");
-            }
-
-            // Roles
-            if (roleSet.getRoles() != null)
-            {
-                Set<RoleEntity> roleEntitiesToSet = this.getRoleEntitiesByRoleNames(roleSet.getRoles());
-                userEntity.getRoleEntities().addAll(roleEntitiesToSet);
-
-                this.userRepo.save(userEntity);
-            }
+            throw new CannotProcessException(EXTERNAL_USER_CANNOT_BE_UPDATED);
         }
-        else
+
+        // Roles
+        if (roleSet.getRoles() != null)
         {
-            throw new ResourceNotFoundException(String.format("No user found by userId: %d", userId));
+            Set<RoleEntity> roleEntitiesToSet = this.getRoleEntitiesByRoleNames(roleSet.getRoles());
+            userEntity.getRoleEntities().addAll(roleEntitiesToSet);
+
+            this.userEntityService.save(userEntity);
         }
     }
 
 
     private Set<RoleEntity> getRoleEntitiesByRoleNames(Set<String> roleNames)
     {
-        Set<RoleEntity> roleEntities = this.roleRepo.findByRoleIn(roleNames);
+        Set<RoleEntity> roleEntities = this.roleEntityService.findByRoleIn(roleNames);
         // Check each role found
         if (roleEntities.size() != roleNames.size())
         {
@@ -362,37 +309,28 @@ public class UserServiceImpl implements UserService
     }
 
 
-    /*
-     * ============== deleteRole =======================================================================================
-     */
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    //------------------------------------------------------------------------------------------------------------------
+    // deleteRole
+    //------------------------------------------------------------------------------------------------------------------
     @Override
     public void deleteRole(Long userId, RoleSet roleSet) throws ResourceNotFoundException
     {
-        Optional<UserEntity> byId = this.userRepo.findById(userId);
-        if (byId.isPresent())
+        UserEntity userEntity = getUserEntityById(userId);
+        if (Boolean.TRUE.equals(userEntity.getExternal()))
         {
-            UserEntity userEntity = byId.get();
-            if (Boolean.TRUE.equals(userEntity.getExternal()))
-            {
-                throw new CannotProcessException("External user cannot be updated!");
-            }
-
-            // Roles
-            if (roleSet.getRoles() != null)
-            {
-                // checking if input role names are valid
-                this.getRoleEntitiesByRoleNames(roleSet.getRoles());
-
-                Set<RoleEntity> roleEntities = userEntity.getRoleEntities();
-                roleEntities.removeIf(roleEntity -> roleSet.getRoles().contains(roleEntity.getRole()));
-
-                this.userRepo.save(userEntity);
-            }
+            throw new CannotProcessException(EXTERNAL_USER_CANNOT_BE_UPDATED);
         }
-        else
+
+        // Roles
+        if (roleSet.getRoles() != null)
         {
-            throw new ResourceNotFoundException(String.format("No user found by userId: %d", userId));
+            // checking if input role names are valid
+            this.getRoleEntitiesByRoleNames(roleSet.getRoles());
+
+            Set<RoleEntity> roleEntities = userEntity.getRoleEntities();
+            roleEntities.removeIf(roleEntity -> roleSet.getRoles().contains(roleEntity.getRole()));
+
+            this.userEntityService.save(userEntity);
         }
     }
 }

@@ -19,7 +19,7 @@ package hu.perit.template.authservice.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Set;
 
 /**
@@ -28,7 +28,8 @@ import java.util.Set;
 
 @Data
 @NoArgsConstructor
-public class UserDTO {
+public class UserDTO
+{
 
     // Properties for /users GET
     private Long userId;
@@ -46,14 +47,14 @@ public class UserDTO {
 
     // Auditing
     private Long createdById;
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
     private Long updatedById;
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
     private Long deletedById;
-    private LocalDateTime deletedAt;
+    private OffsetDateTime deletedAt;
 
     private Boolean deletedFlag;
 
-    private LocalDateTime lastLoginTime;
+    private OffsetDateTime lastLoginTime;
     private Boolean passwordExpired;
 }

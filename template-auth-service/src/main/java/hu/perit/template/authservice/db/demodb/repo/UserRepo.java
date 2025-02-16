@@ -21,9 +21,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 /**
@@ -35,7 +34,6 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByUserName(String userName);
 
     @Modifying
-    @Transactional
-    @Query("UPDATE UserEntity u SET u.lastLoginTime = :loginTime WHERE u.userId = :userId")
-    void updateLastLoginTime(@Param("userId") long userId, @Param("loginTime") LocalDateTime loginTime);
+    @Query("UPDATE UserEntity e SET e.lastLoginTime = :loginTime WHERE e.userId = :userId")
+    int updateLastLoginTime(@Param("userId") long userId, @Param("loginTime") OffsetDateTime loginTime);
 }

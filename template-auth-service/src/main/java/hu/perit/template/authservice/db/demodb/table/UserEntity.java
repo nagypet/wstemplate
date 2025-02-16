@@ -16,8 +16,22 @@
 
 package hu.perit.template.authservice.db.demodb.table;
 
+import hu.perit.spvitamin.spring.data.converter.OffsetDateTimeToUTCConverter;
 import hu.perit.template.authservice.config.Constants;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,8 +43,9 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
-import java.util.Collections;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -84,7 +99,7 @@ public class UserEntity
         }
         else
         {
-            return Collections.emptySet();
+            return new HashSet<>();
         }
     }
 
@@ -116,29 +131,33 @@ public class UserEntity
     @CreatedBy
     @Column(name = "createdbyid", nullable = false, updatable = false)
     private Long createdById;
+
+    // Use Instant to store UTC in the database
     @Column(name = "createdat", nullable = false, updatable = false)
     @CreatedDate
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @LastModifiedBy
     @Column(name = "updatedbyid", nullable = false, updatable = true)
     private Long updatedById;
+
+    // Use Instant to store UTC in the database
     @Column(name = "updatedat", nullable = false, updatable = true)
     @LastModifiedDate
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @Column(name = "deletedbyid")
     private Long deletedById;
-    @Column(name = "deletedat")
-    private LocalDateTime deletedAt;
 
+    @Column(name = "deletedat")
+    private Instant deletedAt;
 
     @Column(name = "deletedflag")
     private Boolean deletedFlag;
 
-
     @Column(name = "lastlogintime")
-    private LocalDateTime lastLoginTime;
+    @Convert(converter = OffsetDateTimeToUTCConverter.class)
+    private OffsetDateTime lastLoginTime;
 
     @Column(name = "encryptedpassword")
     @Length(max = 250)

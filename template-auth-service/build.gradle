@@ -104,8 +104,9 @@ dependencies {
     // Liquibase
     implementation libs.liquibase.core
 
-    // ModelMapper TODO: mapstruct
-    implementation 'org.modelmapper.extensions:modelmapper-spring:2.3.5'
+    // Mapstruct
+    implementation libs.mapstruct
+    annotationProcessor libs.mapstruct.processor
 
     // OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'

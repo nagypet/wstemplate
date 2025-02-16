@@ -17,27 +17,27 @@
 #-----------------------------------------------------------------------------------------------------------------------
 # datasource postgres
 #-----------------------------------------------------------------------------------------------------------------------
-#datasource:
-#  demodb:
-#    db-type: postgresql
-#    host: localhost
-#    db-name: testdb
-#    username: postgres
-#    encrypted-password: 1tvmTu8Ya8A=
-#    ddl-auto: none
+datasource:
+  demodb:
+    db-type: postgresql
+    host: 192.168.128.150
+    db-name: testdb
+    username: postgres
+    encrypted-password: 1tvmTu8Ya8A=
+    ddl-auto: none
 
 #-----------------------------------------------------------------------------------------------------------------------
 # datasource h2
 #-----------------------------------------------------------------------------------------------------------------------
-datasource:
-  demodb:
-    db-type: h2
-    host: mem
-    db-name: test
-    username: sa
-    password:
-    ddl-auto: none
-    options: INIT=CREATE SCHEMA IF NOT EXISTS dbo\;SET SCHEMA dbo
+#datasource:
+#  demodb:
+#    db-type: h2
+#    host: mem
+#    db-name: test
+#    username: sa
+#    password:
+#    ddl-auto: none
+#    options: INIT=CREATE SCHEMA IF NOT EXISTS dbo\;SET SCHEMA dbo
 
 
 #-----------------------------------------------------------------------------------------------------------------------
