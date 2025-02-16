@@ -99,6 +99,7 @@ dependencyManagement {
 - ForwardingAuthRequestInterceptor: forwards incoming token
 - JwtPropertiesPublic for special validation for the public key only
 - spring-cloud-eureka removed
+- LdapAuthenticationProvider only accepts username with domain
 
 ### 3.3.3-1-RELEASE not yet released
 

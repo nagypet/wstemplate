@@ -16,9 +16,12 @@
 
 package hu.perit.template.authservice.auth;
 
-import java.util.stream.Collectors;
-
+import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
+import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.template.authservice.db.demodb.table.UserEntity;
+import hu.perit.template.authservice.services.api.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,12 +30,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.template.authservice.db.demodb.table.UserEntity;
-import hu.perit.template.authservice.services.api.UserService;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * #know-how:custom-authentication-provider
@@ -60,8 +57,11 @@ public class DbAuthenticationProvider implements AuthenticationProvider
                 throw new DbAuthenticationException("Invalid user credentials!");
             }
 
-            return AuthenticatedUser.builder().username(userEntity.getUserName()).userId(userEntity.getUserId()).authorities(
-                userEntity.getRoles().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())).build();
+            return AuthenticatedUser.builder()
+                    .username(userEntity.getUserName())
+                    .userId(userEntity.getUserId())
+                    .authorities(userEntity.getRoles().stream().map(SimpleGrantedAuthority::new).toList())
+                    .build();
         }
         catch (RuntimeException | ResourceNotFoundException ex)
         {
@@ -81,7 +81,7 @@ public class DbAuthenticationProvider implements AuthenticationProvider
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
 
         AuthenticatedUser authenticatedUser = this.loadUserByUsernameAndPassword((String) token.getPrincipal(),
-            (String) token.getCredentials());
+                (String) token.getCredentials());
 
         if (authenticatedUser.getUserId() != 0)
         {

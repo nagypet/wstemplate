@@ -62,14 +62,14 @@ public class JwtTokenProvider
             DomainUser domainUser = DomainUser.newInstance(subject);
 
             String jwt = Jwts.builder()
-                .subject(domainUser.getUsername())
+                .subject(domainUser.getCanonicalName())
                 .issuedAt(iat)
                 .expiration(exp)
                 .claims(additionalClaims)
                 .signWith(privateKey, SignatureAlgorithm.RS512)
                 .compact();
 
-            return new AuthorizationToken(domainUser.getUsername(), jwt, issuedAt, expiryDate);
+            return new AuthorizationToken(domainUser.getCanonicalName(), jwt, issuedAt, expiryDate);
         }
         catch (Exception e)
         {

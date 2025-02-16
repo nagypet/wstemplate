@@ -166,7 +166,7 @@ public class LdapAuthenticationProvider extends AbstractLdapAuthenticationProvid
                         "Only UsernamePasswordAuthenticationToken is supported"));
         UsernamePasswordAuthenticationToken userToken = (UsernamePasswordAuthenticationToken) authentication;
         DomainUser domainUser = DomainUser.newInstance(userToken.getName());
-        if (domainUser.getDomain() != null && !this.domain.contains(domainUser.getDomain()))
+        if (domainUser.getDomain() == null || !this.domain.contains(domainUser.getDomain()))
         {
             return null;
         }
