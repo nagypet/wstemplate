@@ -103,6 +103,7 @@ public class HealthIndicatorDatabase extends AbstractHealthIndicator
 
     boolean checkDbUpAndRunning()
     {
+        // Use SELECT 1 FROM DUAL with ORACLE
         Object result = this.nativeQueryRepo.getSingleResult("SELECT 1", false);
         return (result instanceof Integer && result.equals(1)) || (result instanceof BigDecimal && result.equals(BigDecimal.ONE));
     }
