@@ -49,7 +49,7 @@ public class MicrometerMetricsService
     private final List<HealthIndicator> healthIndicators;
 
     private final Counter generalWSCallCounter;
-    private DualMetric metricService;
+    private final DualMetric metricService;
 
     public MicrometerMetricsService(MeterRegistry registry, HealthContributorRegistry healthContributorRegistry)
     {
@@ -58,7 +58,7 @@ public class MicrometerMetricsService
 
         // Health indicators
         this.healthIndicators = healthContributorRegistry.stream()
-                .map(c -> this.getIndicatorFromContributor(c))
+                .map(this::getIndicatorFromContributor)
                 .toList();
         Gauge.builder(METRIC_HEALTH, healthIndicators, MicrometerMetricsService::healthToCode)
                 .description("The current value of the composite health endpoint").register(registry);
