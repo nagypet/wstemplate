@@ -16,17 +16,17 @@
 
 package hu.perit.template.authservice.metrics;
 
-import java.util.concurrent.TimeoutException;
-
+import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.timeoutlatch.TimeoutLatch;
+import hu.perit.spvitamin.spring.config.SysConfig;
+import hu.perit.spvitamin.spring.metrics.AsyncExecutor;
 import hu.perit.template.authservice.db.demodb.repo.UserRepo;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import hu.perit.spvitamin.spring.config.SysConfig;
-import hu.perit.spvitamin.spring.metrics.AsyncExecutor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Service
@@ -45,10 +45,20 @@ public class MetricsProviderService
 
     public double getUserCountMetric()
     {
+        if (this.timeoutLatch.isClosed())
+        {
+            log.info("Getting total user count failed! The Database server was down, waiting some time before checking it again.");
+            return 0.0;
+        }
+
         try
         {
-            long userCount = AsyncExecutor.invoke(this::getTotalUserCount, 0L);
-            return (double) userCount;
+            return AsyncExecutor.invoke(this::getTotalUserCount, 0L);
+        }
+        catch (RuntimeException ex)
+        {
+            this.timeoutLatch.setClosed();
+            log.error(StackTracer.toString(ex));
         }
         catch (TimeoutException ex)
         {
@@ -63,11 +73,6 @@ public class MetricsProviderService
 
     private long getTotalUserCount()
     {
-        if (this.timeoutLatch.isClosed())
-        {
-            return 0;
-        }
-
         return userRepo.count();
     }
 }

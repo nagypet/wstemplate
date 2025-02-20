@@ -32,7 +32,6 @@ import org.springframework.boot.actuate.health.Status;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author nagy_peter
@@ -42,6 +41,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MicrometerMetricsService
 {
+    private static final String METRIC_HEALTH = Constants.SUBSYSTEM_NAME.toLowerCase() + ".health";
+    private static final String TOTAL_USER_COUNT_METRIC = Constants.SUBSYSTEM_NAME.toLowerCase() + ".total_user_count";
+
     private final MetricsProviderService metricsProviderService;
     private final List<HealthIndicator> healthIndicators;
 
@@ -49,14 +51,11 @@ public class MicrometerMetricsService
     {
         this.metricsProviderService = metricsProviderService;
 
-        final String METRIC_HEALTH = Constants.SUBSYSTEM_NAME.toLowerCase() + ".health";
-        final String TOTAL_USER_COUNT_METRIC = Constants.SUBSYSTEM_NAME.toLowerCase() + ".total_user_count";
-
         // Health indicators
-        this.healthIndicators = healthContributorRegistry.stream() //
-                .map(c -> this.getIndicatorFromContributor(c)) //
-                .collect(Collectors.toList());
-        Gauge.builder(METRIC_HEALTH, healthIndicators, MicrometerMetricsService::healthToCode) //
+        this.healthIndicators = healthContributorRegistry.stream()
+                .map(this::getIndicatorFromContributor)
+                .toList();
+        Gauge.builder(METRIC_HEALTH, healthIndicators, MicrometerMetricsService::healthToCode)
                 .description("The current value of the composite health endpoint").register(registry);
 
         // Total count of users
@@ -69,14 +68,13 @@ public class MicrometerMetricsService
         log.debug(String.format("Using health contributor: '%s'", namedContributor.getName()));
 
         HealthContributor contributor = namedContributor.getContributor();
-        if (contributor instanceof HealthIndicator)
+        if (contributor instanceof HealthIndicator healthIndicator)
         {
-            return (HealthIndicator) contributor;
+            return healthIndicator;
         }
 
-        if (contributor instanceof CompositeHealthContributor)
+        if (contributor instanceof CompositeHealthContributor compositeHealthContributor)
         {
-            CompositeHealthContributor compositeHealthContributor = (CompositeHealthContributor) contributor;
             for (NamedContributor<HealthContributor> elementOfComposite : compositeHealthContributor)
             {
                 return getIndicatorFromContributor(elementOfComposite); // NOSONAR
