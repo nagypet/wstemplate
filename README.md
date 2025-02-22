@@ -1,11 +1,25 @@
 # wstemplate
 
-This is a sample project for the [Microservice Development Guideline](https://github.com/nagypet/wstemplate/wiki).
+This is a **sample project** for demonstrating the usage of the `spvitamin` library. 
+
+Please visit the [**Microservice Development Guideline**](https://github.com/nagypet/wstemplate/wiki) for detailed instructions.
+
+Contents:
+<!-- TOC -->
+* [wstemplate](#wstemplate)
+  * [Architecture](#architecture)
+  * [Building and running the samples](#building-and-running-the-samples-)
+    * [Running the services in IDEA](#running-the-services-in-idea)
+    * [Building docker images](#building-docker-images)
+    * [Deployment in K8s](#deployment-in-k8s)
+  * [Monitoring](#monitoring)
+  * [Open issues](#open-issues)
+<!-- TOC -->
+
+## Architecture
+![](docs/images/wstemplate_architecture-K8s.drawio.png)
 
 ## Building and running the samples 
-
-### Architecture
-![](docs/images/wstemplate_architecture-K8s.drawio.png)
 
 There are 2 main components of the system:
 - template-auth-service: an authorization and user management service with Jwt authentication
