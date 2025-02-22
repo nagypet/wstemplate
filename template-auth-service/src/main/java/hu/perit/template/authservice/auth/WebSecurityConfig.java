@@ -34,6 +34,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * #know-how:simple-httpsecurity-builder
+ * #know-how:ldap
  *
  * @author Peter Nagy
  */

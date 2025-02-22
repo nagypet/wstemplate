@@ -57,43 +57,6 @@ services:
     #logging:
     #    driver: none
 
-
-#  #####################################################################################
-#  gateway:
-#    #####################################################################################
-#    container_name: wstemplate-dev-gateway
-#    image: wstemplate-template-gateway
-#    environment:
-#      - JAVA_OPTS=-DEUREKA_SERVER=http://discovery:8400/eureka -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
-#    ports:
-#      - '8500:8500'
-#      - '5503:5005'
-#    networks:
-#      - back-tier-net
-#    hostname: 'gateway'
-#
-#
-#  #####################################################################################
-#  discovery:
-#    #####################################################################################
-#    container_name: wstemplate-dev-discovery
-#    image: wstemplate-template-eureka
-#    environment:
-#      #agentlib for remote debugging
-#      - JAVA_OPTS=-DEUREKA_SERVER=http://discovery:8400/eureka -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
-#      #- TEMPLATE_EUREKA_OPTS=-Dspring.profiles.active=docker
-#      - EUREKA_ENVIRONMENT_PROFILE=dev
-#    ports:
-#      - '8400:8400'
-#      - '5501:5005'
-#    networks:
-#      - back-tier-net
-#    depends_on:
-#      #- ldap
-#      - postgres
-#    hostname: 'discovery'
-
-
 volumes:
   postgres:
   pgadmin:

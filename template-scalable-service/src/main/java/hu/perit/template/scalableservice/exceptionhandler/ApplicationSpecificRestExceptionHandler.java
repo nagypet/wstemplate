@@ -31,6 +31,7 @@ import org.springframework.web.context.request.WebRequest;
 
 /**
  * @author Peter Nagy
+ * #know-how:controller-advice
  */
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
