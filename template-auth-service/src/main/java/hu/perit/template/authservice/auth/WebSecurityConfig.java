@@ -21,12 +21,14 @@ import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
 import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
 import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.EnableLocalUserAuthProvider;
 import hu.perit.spvitamin.spring.security.ldap.LdapAuthenticationProviderConfigurer;
+import hu.perit.spvitamin.spring.security.oauth2.rest.api.OAuthProxyApi;
 import hu.perit.template.authservice.rest.api.TemplateAuthServiceControllerApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -53,6 +55,35 @@ public class WebSecurityConfig
 
     @Bean
     @Order(1)
+    public SecurityFilterChain configureMicrosoftLogin(HttpSecurity http) throws Exception
+    {
+        // http://localhost:8410/oauth2/authorization/microsoft
+        // http://localhost:8410/login/oauth2/code/microsoft
+        // http://localhost:8410/api/spvitamin/oauth2/authorization?provider=microsoft
+
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope("/login/**",
+                        OAuthProxyApi.BASE_URL + "/**",
+                        "/oauth2/authorization/*")
+                .authorizeRequests(r -> r.anyRequest().permitAll())
+                .and()
+                .oauth2Login(Customizer.withDefaults());
+
+        return http.build();
+
+//        http
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/", "/login", OAuthProxyApi.BASE_URL + "/**").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .oauth2Login(Customizer.withDefaults());
+//
+//        return http.build();
+    }
+
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain configureAuthenticateEndpoint(HttpSecurity http) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)
@@ -72,7 +103,7 @@ public class WebSecurityConfig
 
 
     @Bean
-    @Order(2)
+    @Order(3)
     public SecurityFilterChain configureTokenSecuredEndpoints(HttpSecurity http) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)

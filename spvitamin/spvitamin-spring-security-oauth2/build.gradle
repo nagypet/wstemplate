@@ -40,6 +40,8 @@ dependencies {
     // -----------------------------------------------------------------------------------------------------------------
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-spring-general')
+    implementation project(':spvitamin-spring-logging')
+    implementation project(':spvitamin-spring-security')
 
     // Lombok
     compileOnly libs.lombok
@@ -50,6 +52,7 @@ dependencies {
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
     // apache.commons
@@ -57,12 +60,8 @@ dependencies {
     implementation libs.commons.collections4
 
     // JJWT
-    implementation libs.bundles.jsonwebtoken
-    implementation libs.jaxb.api
-
-    // Swagger
-    implementation libs.openapi.ui
-    implementation libs.openapi.api
+//    implementation libs.bundles.jsonwebtoken
+//    implementation libs.jaxb.api
 
     // -----------------------------------------------------------------------------------------------------------------
     // Test dependencies

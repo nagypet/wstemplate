@@ -46,6 +46,9 @@
 	<logger name="liquibase.changelog" level="INFO"/>
 
 	<!-- Spvitamin loggers -->
+	<!--	<logger name="hu.perit.spvitamin" level="DEBUG" additivity="false">-->
+	<!--		<appender-ref ref="application-message"/>-->
+	<!--	</logger>-->
 	<logger name="hu.perit.spvitamin" level="INFO" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
@@ -61,7 +64,7 @@
 	<logger name="hu.perit.spvitamin.spring.restmethodlogger" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
-	<logger name="hu.perit.spvitamin.spring.security" level="INFO" additivity="false">
+	<logger name="hu.perit.spvitamin.spring.security" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
 	<logger name="hu.perit.spvitamin.spring.connectablecontext" level="DEBUG" additivity="false">
