@@ -158,9 +158,13 @@ public class SpvitaminWebSecurityConfig
     {
         registry
                 .requestMatchers(
+                        // Login
+                        mvc.pattern("/login/**"),
+                        // OAuth2
+                        mvc.pattern("/oauth2/authorization/*"),
+                        mvc.pattern("/api/spvitamin/oauth2/authorization"),
                         // error
                         mvc.pattern("/error"),
-
                         // Logout endpoint
                         mvc.pattern("/logout")
                 ).permitAll()

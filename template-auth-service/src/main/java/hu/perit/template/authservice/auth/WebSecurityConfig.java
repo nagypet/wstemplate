@@ -21,7 +21,6 @@ import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
 import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
 import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.EnableLocalUserAuthProvider;
 import hu.perit.spvitamin.spring.security.ldap.LdapAuthenticationProviderConfigurer;
-import hu.perit.spvitamin.spring.security.oauth2.rest.api.OAuthProxyApi;
 import hu.perit.template.authservice.rest.api.TemplateAuthServiceControllerApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,10 +61,9 @@ public class WebSecurityConfig
         // http://localhost:8410/api/spvitamin/oauth2/authorization?provider=microsoft
 
         SimpleHttpSecurityBuilder.newInstance(http)
-                .scope("/login/**",
-                        OAuthProxyApi.BASE_URL + "/**",
+                .scope(
+                        "/login/**",
                         "/oauth2/authorization/*")
-                .authorizeRequests(r -> r.anyRequest().permitAll())
                 .and()
                 .oauth2Login(Customizer.withDefaults());
 
