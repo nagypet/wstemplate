@@ -49,7 +49,11 @@ kubectl apply -f .
 When the containers are up and running, go to http://pgadmin.wstemplate.k8s-test.perit.hu for pgadmin. 
 - login with postgres/sa
 - create a new connection. Parameters: host: postgres, port: 5432, username: postgres, password: sa
-- create a new database with the name 'testdb'. 
+- create a new login: name: 'dbo', password: 'dbo'
+- create a new database: name: 'testdb', owner: 'dbo'
+- create a new schema: name: 'dbo', owner: 'dbo'
+
+OR
 - run the script in db\scripts.sql
 
 Check if all container is up and running.
