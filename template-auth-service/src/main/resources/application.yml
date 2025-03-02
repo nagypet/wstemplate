@@ -26,7 +26,6 @@ spring:
       enabled: true
       path: /h2
 
-
 #-----------------------------------------------------------------------------------------------------------------------
 # System settings
 #-----------------------------------------------------------------------------------------------------------------------
@@ -86,7 +85,34 @@ security:
   management-endpoints-access: "*"
   admin-gui-access: "*"
   admin-endpoints-access: "*"
-
+  oauth2:
+    providers:
+      microsoft:
+        display-name: Microsoft Entra
+        issuer-uri: https://login.microsoftonline.com/aaef3ba4-e05f-4282-a763-ad4698e5e531/v2.0
+        client-id: 48de203b-3973-4e90-875c-d78b27beb2e2
+        client-secret: WPv8Q~b2.6bobCk-ko5lpOju7_4AUnyqx6lEkdm3
+        scopes:
+          - openid
+          - profile
+          - email
+      google:
+        display-name: Google
+        issuer-uri: https://accounts.google.com
+        client-id: 370433189497-92a3d8tmj779ql49k4amsmde1gd49fg7.apps.googleusercontent.com
+        client-secret: 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
+        scopes:
+          - openid
+          - profile
+          - email
+      facebook:
+        display-name: Facebook
+        issuer-uri: https://www.facebook.com
+        client-id: 950011440533819
+        client-secret: f91a1c7f973ba27c9c9a7ba77388caaa
+        scopes:
+          - public_profile
+          - email
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Local users for test reasons
