@@ -33,6 +33,6 @@ datasource:
     host: k8s-test.perit.local
     port: 31900
     db-name: testdb
-    username: postgres
-    encrypted-password: 1tvmTu8Ya8A=
+    username: dbo
+    password: dbo
     ddl-auto: none

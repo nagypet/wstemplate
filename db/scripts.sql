@@ -14,17 +14,44 @@
  * limitations under the License.
  */
 
-CREATE SCHEMA IF NOT EXISTS dbo AUTHORIZATION postgres;
+-- Role: dbo
+-- DROP ROLE IF EXISTS dbo;
 
-SET default_tablespace = 'pg_default';
+CREATE ROLE dbo WITH
+    LOGIN
+    NOSUPERUSER
+    INHERIT
+    CREATEDB
+    CREATEROLE
+    NOREPLICATION
+    NOBYPASSRLS
+    ENCRYPTED PASSWORD 'SCRAM-SHA-256$4096:EtGDbgGxqeS5UPFCgSFu5A==$teLoyXC9oDsiqPJmmXeuuvrXcZRUwEsuHjEOLpIJaeE=:elb7H7nlk9Vueg0TbQnqhTwGaZWKNTTvlO6jp/SdVds=';
 
-CREATE TABLE IF NOT EXISTS dbo.role (
-    roleid bigint NOT NULL,
-    role character varying(255),
-	CONSTRAINT role_pkey PRIMARY KEY (roleid)
-);
+-- Database: testdb
 
-ALTER TABLE dbo.role OWNER to postgres;
+-- DROP DATABASE IF EXISTS testdb;
+
+CREATE DATABASE testdb
+    WITH
+    OWNER = dbo
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'en_US.utf8'
+    LC_CTYPE = 'en_US.utf8'
+    LOCALE_PROVIDER = 'libc'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1
+    IS_TEMPLATE = False;
+
+
+-- SCHEMA: dbo
+
+-- DROP SCHEMA IF EXISTS dbo ;
+
+CREATE SCHEMA IF NOT EXISTS dbo
+    AUTHORIZATION dbo;
+
+
+-- Start the application now and insert the following roles
 
 INSERT INTO dbo.role(roleid, role) VALUES (1, 'ROLE_ADMIN'), (2, 'ROLE_PUBLIC'), (3, 'ROLE_EMPTY');
 

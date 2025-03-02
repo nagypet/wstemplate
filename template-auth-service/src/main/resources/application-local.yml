@@ -28,8 +28,8 @@ datasource:
     db-type: postgresql
     host: 192.168.128.150
     db-name: testdb
-    username: postgres
-    encrypted-password: 1tvmTu8Ya8A=
+    username: dbo
+    password: dbo
     ddl-auto: none
 
 #-----------------------------------------------------------------------------------------------------------------------
