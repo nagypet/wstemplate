@@ -55,7 +55,7 @@ public class WebSecurityConfig
 
     @Bean
     @Order(1)
-    public SecurityFilterChain configureMicrosoftLogin(HttpSecurity http) throws Exception
+    public SecurityFilterChain configureOAuth2Login(HttpSecurity http) throws Exception
     {
         // http://localhost:8410/oauth2/authorization/microsoft
         // http://localhost:8410/login/oauth2/code/microsoft
@@ -70,15 +70,6 @@ public class WebSecurityConfig
                 .oauth2Login(Customizer.withDefaults());
 
         return http.build();
-
-//        http
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/", "/login", OAuthProxyApi.BASE_URL + "/**").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .oauth2Login(Customizer.withDefaults());
-//
-//        return http.build();
     }
 
 

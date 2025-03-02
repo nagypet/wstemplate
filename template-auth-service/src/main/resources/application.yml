@@ -89,7 +89,7 @@ security:
     providers:
       microsoft:
         display-name: Microsoft Entra
-        issuer-uri: https://login.microsoftonline.com/aaef3ba4-e05f-4282-a763-ad4698e5e531/v2.0
+        #issuer-uri: https://login.microsoftonline.com/aaef3ba4-e05f-4282-a763-ad4698e5e531/v2.0
         client-id: 48de203b-3973-4e90-875c-d78b27beb2e2
         client-secret: WPv8Q~b2.6bobCk-ko5lpOju7_4AUnyqx6lEkdm3
         scopes:
@@ -107,12 +107,12 @@ security:
           - email
       facebook:
         display-name: Facebook
-        issuer-uri: https://www.facebook.com
         client-id: 950011440533819
         client-secret: f91a1c7f973ba27c9c9a7ba77388caaa
         scopes:
           - public_profile
           - email
+
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Local users for test reasons

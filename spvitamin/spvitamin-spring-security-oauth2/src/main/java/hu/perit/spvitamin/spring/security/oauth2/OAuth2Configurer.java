@@ -6,6 +6,7 @@ import hu.perit.spvitamin.spring.security.config.AuthenticationRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -17,7 +18,12 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepo
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 
-import java.util.*;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Configuration
 @RequiredArgsConstructor
@@ -62,21 +68,7 @@ public class OAuth2Configurer
             String registrationId = entry.getKey();
 
             ClientRegistration clientRegistration = null;
-            if ("facebook".equals(registrationId)) {
-                clientRegistration = ClientRegistration.withRegistrationId(entry.getKey())
-                        .clientId(provider.getClientId())
-                        .clientSecret(provider.getClientSecret())
-                        .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                        .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
-                        .scope(provider.getScopes())
-                        .authorizationUri("https://www.facebook.com/v12.0/dialog/oauth")
-                        .tokenUri("https://graph.facebook.com/v12.0/oauth/access_token")
-                        .userInfoUri("https://graph.facebook.com/me?fields=id,name,email,picture")
-                        .userNameAttributeName("id")
-                        .clientName(registrationId)
-                        .build();
-            }
-            else
+            if (StringUtils.isNotBlank(provider.getIssuerUri()))
             {
                 clientRegistration = ClientRegistrations.fromIssuerLocation(provider.getIssuerUri())
                         .registrationId(registrationId)
@@ -88,9 +80,42 @@ public class OAuth2Configurer
                         .scope(provider.getScopes())
                         .build();
             }
+            else
+            {
+                // Configure with well-known endpoints
+                SecurityProperties.WellKnownEndpoints wellKnownEndpoints = Optional.ofNullable(this.securityProperties.getOauth2())
+                        .map(i -> i.getWellKnownEndpoints())
+                        .map(i -> i.get(registrationId))
+                        .orElse(null);
+                if (wellKnownEndpoints == null)
+                {
+                    throw new IllegalStateException(MessageFormat.format("Well-known endpoints not found for ''{0}''!", registrationId));
+                }
+                clientRegistration = getClientConfigurationWithWellKnownEndpoints(registrationId, provider, wellKnownEndpoints);
+            }
             registrations.add(clientRegistration);
         }
         return new InMemoryClientRegistrationRepository(registrations);
+    }
+
+
+    private static ClientRegistration getClientConfigurationWithWellKnownEndpoints(String registrationId, SecurityProperties.OAuth2Provider provider, SecurityProperties.WellKnownEndpoints wellKnownEndpoints)
+    {
+        ClientRegistration clientRegistration;
+        clientRegistration = ClientRegistration.withRegistrationId(registrationId)
+                .clientId(provider.getClientId())
+                .clientSecret(provider.getClientSecret())
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
+                .scope(provider.getScopes())
+                .authorizationUri(wellKnownEndpoints.getAuthorizationUri())
+                .tokenUri(wellKnownEndpoints.getTokenUri())
+                .jwkSetUri(wellKnownEndpoints.getJwkSetUri())
+                .userInfoUri(wellKnownEndpoints.getUserInfoUri())
+                .userNameAttributeName(wellKnownEndpoints.getUserNameAttributeName())
+                .clientName(registrationId)
+                .build();
+        return clientRegistration;
     }
 
 

@@ -58,6 +58,7 @@ public class SecurityProperties
     public static class OAuth2Configuration
     {
         private Map<String, OAuth2Provider> providers = new HashMap<>();
+        private Map<String, WellKnownEndpoints> wellKnownEndpoints = new HashMap<>();
     }
 
     @Data
@@ -65,13 +66,21 @@ public class SecurityProperties
     {
         @NotNull
         private String displayName;
-        @NotNull
         private String issuerUri;
         @NotNull
         private String clientId;
         @NotNull
         private String clientSecret;
         private List<String> scopes = List.of("openid", "profile", "email");
-        private String tenant;
+    }
+
+    @Data
+    public static class WellKnownEndpoints
+    {
+        private String authorizationUri;
+        private String tokenUri;
+        private String jwkSetUri;
+        private String userInfoUri;
+        private String userNameAttributeName;
     }
 }
