@@ -21,6 +21,7 @@ import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
 import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
 import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.EnableLocalUserAuthProvider;
 import hu.perit.spvitamin.spring.security.ldap.LdapAuthenticationProviderConfigurer;
+import hu.perit.spvitamin.spring.security.oauth2.CustomOAuth2SuccessHandler;
 import hu.perit.template.authservice.rest.api.TemplateAuthServiceControllerApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,7 @@ public class WebSecurityConfig
 
     @Bean
     @Order(1)
-    public SecurityFilterChain configureOAuth2Login(HttpSecurity http) throws Exception
+    public SecurityFilterChain configureOAuth2Login(HttpSecurity http, CustomOAuth2SuccessHandler successHandler) throws Exception
     {
         // http://localhost:8410/oauth2/authorization/microsoft
         // http://localhost:8410/login/oauth2/code/microsoft
@@ -65,7 +66,7 @@ public class WebSecurityConfig
                         "/login/**",
                         "/oauth2/authorization/*")
                 .and()
-                .oauth2Login(Customizer.withDefaults());
+                .oauth2Login(i -> i.successHandler(successHandler));
 
         return http.build();
     }
