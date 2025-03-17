@@ -4,20 +4,19 @@
 aspectj = '1.9.22.1'
 jackson = '2.17.2'
 jsonwebtoken = '0.12.6'
-junit = '5.10.3'
+junit = '5.11.4'
 logback = '1.5.8'
 mapstruct = '1.6.0'
 springdoc = '2.6.0'
-saperion = '8.4.0-2'
 czhabarta = '3.2.1263'
 
 
 [plugins]
 ben-manes-versions = { id = 'com.github.ben-manes.versions', version = '0.51.0' }
 habarta-typescript-generator = { id = 'cz.habarta.typescript-generator', version.ref = 'czhabarta' }
-io-spring-dependency-management = { id = 'io.spring.dependency-management', version = '1.1.6' }
+io-spring-dependency-management = { id = 'io.spring.dependency-management', version = '1.1.7' }
 johnrengelman-shadow = { id = 'com.github.johnrengelman.shadow', version = '8.1.1' }
-org-springframework-boot = { id = 'org.springframework.boot', version = '3.3.3' }
+org-springframework-boot = { id = 'org.springframework.boot', version = '3.4.3' }
 sonarqube = { id = 'org.sonarqube', version = '5.1.0.4882' }
 thin-launcher = { id = 'org.springframework.boot.experimental.thin-launcher', version = '1.0.31.RELEASE' }
 
@@ -89,27 +88,11 @@ opencsv = 'com.opencsv:opencsv:5.9'
 pdfbox = 'org.apache.pdfbox:pdfbox:3.0.3'
 pdfbox-fontbox = 'org.apache.pdfbox:fontbox:3.0.3'
 reflections = 'org.reflections:reflections:0.10.2'
-saperion-applsrv-interface = { module = 'com.saperion.jna:applsrv-interface', version.ref = 'saperion' }
-saperion-authentication-core = { module = 'com.saperion.jcs.modules:authentication-core', version.ref = 'saperion' }
-saperion-authentication-keys = { module = 'com.saperion.jcs.modules:authentication-keys', version.ref = 'saperion' }
-saperion-cache = 'com.saperion.cache:sacache:2.5.2'
-saperion-common-lang = 'com.saperion.common.lang:saperion-common-lang:2.0.0'
-saperion-ecm-administration-api = { module = 'com.lexmark.saperion:saperion-ecm-administration-api', version.ref = 'saperion' }
-saperion-ecm-api = { module = 'com.lexmark.saperion:saperion-ecm-api', version.ref = 'saperion' }
-saperion-ecm-api-common = { module = 'com.lexmark.saperion:saperion-ecm-api-common', version.ref = 'saperion' }
-saperion-ecm-archive-api = { module = 'com.lexmark.saperion:saperion-ecm-archive-api', version.ref = 'saperion' }
-saperion-ecm-document-api = { module = 'com.lexmark.saperion:saperion-ecm-document-api', version.ref = 'saperion' }
-saperion-ecm-lookup-api = { module = 'com.lexmark.saperion:saperion-ecm-lookup-api', version.ref = 'saperion' }
-saperion-remore-common = { module = 'com.lexmark.saperion:saperion-remote-common', version.ref = 'saperion' }
-saperion-render-engines-core = 'com.saperion.rendering:render-engines-core:2.5.4'
-scr-classicconnector = { module = 'com.saperion.connector:scr-classicconnector', version.ref = 'saperion' }
-scr-common = { module = 'com.saperion.connector:scr-common', version.ref = 'saperion' }
-scr-connector = { module = 'com.saperion.connector:scr-connector', version.ref = 'saperion' }
 slf4j-api = 'org.slf4j:slf4j-api:2.0.15'
 slf4j-log4j12 = 'org.slf4j:slf4j-log4j12:2.0.13'
 smb-nio = 'ch.pontius.nio:smb-nio:0.13.0'
-spring-cloud = 'org.springframework.cloud:spring-cloud-dependencies:2023.0.3'
-spvitamin = 'hu.perit.spvitamin:spvitamin-dependencies:3.3.3-2-RELEASE'
+spring-cloud = 'org.springframework.cloud:spring-cloud-dependencies:2024.0.0'
+#spvitamin = 'hu.perit.spvitamin:spvitamin-dependencies:3.4.3-1-RELEASE'
 tika = 'org.apache.tika:tika-core:2.9.2'
 tika-parsers-standard-package = 'org.apache.tika:tika-parsers-standard-package:2.9.2'
 vandeseer-easytable = 'com.github.vandeseer:easytable:1.0.2'
