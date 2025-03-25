@@ -25,7 +25,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Peter Nagy
@@ -79,12 +78,12 @@ public class TokenClaims extends DefaultClaims
 
     public Collection<GrantedAuthority> getAuthorities()
     {
-        Set<?> authorities = this.get(ROLES, Set.class);
+        List<?> authorities = this.get(ROLES, List.class);
         return getAuthorities(authorities);
     }
 
 
-    public static Collection<GrantedAuthority> getAuthorities(Set<?> authorities)
+    public static Collection<GrantedAuthority> getAuthorities(List<?> authorities)
     {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         for (Object authority : authorities)
@@ -98,7 +97,7 @@ public class TokenClaims extends DefaultClaims
 
     public void setAuthorities(Collection<? extends GrantedAuthority> authorities)
     {
-        this.put(ROLES, AuthorityUtils.authorityListToSet(authorities));
+        this.put(ROLES, List.of(AuthorityUtils.authorityListToSet(authorities)));
     }
 
     public String getSource()
