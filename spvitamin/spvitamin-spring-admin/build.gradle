@@ -82,8 +82,7 @@ test {
 generateTypeScript {
     jsonLibrary = 'jackson2'
     classPatterns = [
-            'hu.perit.spvitamin.spring.rest.model.**',
-            'hu.perit.spvitamin.spring.auth.AuthorizationToken'
+            'hu.perit.spvitamin.spring.rest.model.**'
     ]
     outputFile = 'build/spvitamin-admin-models.ts'
     outputFileType = 'implementationFile'
