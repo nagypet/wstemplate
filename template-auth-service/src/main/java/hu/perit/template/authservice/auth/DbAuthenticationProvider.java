@@ -18,6 +18,7 @@ package hu.perit.template.authservice.auth;
 
 import hu.perit.spvitamin.spring.exception.ResourceNotFoundException;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
+import hu.perit.template.authservice.config.Constants;
 import hu.perit.template.authservice.db.demodb.table.UserEntity;
 import hu.perit.template.authservice.services.api.UserService;
 import lombok.RequiredArgsConstructor;
@@ -59,8 +60,10 @@ public class DbAuthenticationProvider implements AuthenticationProvider
 
             return AuthenticatedUser.builder()
                     .username(userEntity.getUserName())
+                    .displayName(userEntity.getDisplayName())
                     .userId(userEntity.getUserId())
                     .authorities(userEntity.getRoles().stream().map(SimpleGrantedAuthority::new).toList())
+                    .source(Constants.SUBSYSTEM_NAME)
                     .build();
         }
         catch (RuntimeException | ResourceNotFoundException ex)

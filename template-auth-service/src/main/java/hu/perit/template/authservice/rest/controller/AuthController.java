@@ -19,10 +19,8 @@ package hu.perit.template.authservice.rest.controller;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
-import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
 import hu.perit.template.authservice.config.Constants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class AuthController implements AuthApi {
+public class AuthController implements AuthApi
+{
 
     private final JwtTokenProvider tokenProvider;
     private final AuthorizationService authorizationService;
@@ -41,10 +40,8 @@ public class AuthController implements AuthApi {
 
     @Override
     @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
-    public AuthorizationToken authenticateUsingGET(String traceId) {
-        AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
-
-        return tokenProvider.generateToken(authenticatedUser.getUsername(),
-                new TokenClaims(authenticatedUser.getUserId(), authenticatedUser.getAuthorities(), authenticatedUser.getLdapUrl()));
+    public AuthorizationToken authenticateUsingGET(String traceId)
+    {
+        return tokenProvider.generateToken(this.authorizationService.getAuthenticatedUser());
     }
 }
