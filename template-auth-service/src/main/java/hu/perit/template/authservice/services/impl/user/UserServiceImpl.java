@@ -156,9 +156,9 @@ public class UserServiceImpl implements UserService
     @Override
     public long createAtLogin(AuthenticatedUser authenticatedUser)
     {
-        if (authenticatedUser.getUserId() >= 0)
+        if (StringUtils.isNotBlank(authenticatedUser.getUserId()))
         {
-            return authenticatedUser.getUserId();
+            return Long.parseLong(authenticatedUser.getUserId());
         }
         else
         {

@@ -26,6 +26,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -48,10 +49,10 @@ public class PostAuthenticationFilter extends OncePerRequestFilter
 
         AuthenticatedUser authenticatedUser = authorizationService.getAuthenticatedUser();
 
-        if (!authenticatedUser.isAnonymous() && authenticatedUser.getUserId() < 0)
+        if (!authenticatedUser.isAnonymous() && StringUtils.isBlank(authenticatedUser.getUserId()))
         {
             UserService userService = SpringContext.getBean(UserServiceImpl.class);
-            authenticatedUser.setUserId(userService.createAtLogin(authenticatedUser));
+            authenticatedUser.setUserId(String.valueOf(userService.createAtLogin(authenticatedUser)));
 
             // store in the security context
             authorizationService.setAuthenticatedUser(authenticatedUser);

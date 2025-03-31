@@ -18,7 +18,6 @@ package hu.perit.template.authservice.db.demodb;
 
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
-
 import org.springframework.data.domain.AuditorAware;
 
 import java.util.Optional;
@@ -33,6 +32,6 @@ class SpringSecurityAuditorAware implements AuditorAware<Long> {
 
     @Override
     public Optional<Long> getCurrentAuditor() {
-        return Optional.of(SpringContext.getBean(AuthorizationService.class).getAuthenticatedUser().getUserId());
+        return Optional.of(SpringContext.getBean(AuthorizationService.class).getAuthenticatedUser().getUserId()).map(Long::valueOf);
     }
 }

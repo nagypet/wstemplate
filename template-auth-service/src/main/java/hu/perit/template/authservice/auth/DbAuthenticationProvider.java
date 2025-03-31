@@ -23,6 +23,7 @@ import hu.perit.template.authservice.db.demodb.table.UserEntity;
 import hu.perit.template.authservice.services.api.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -61,7 +62,7 @@ public class DbAuthenticationProvider implements AuthenticationProvider
             return AuthenticatedUser.builder()
                     .username(userEntity.getUserName())
                     .displayName(userEntity.getDisplayName())
-                    .userId(userEntity.getUserId())
+                    .userId(userEntity.getUserId() != null ? String.valueOf(userEntity.getUserId()) : null)
                     .authorities(userEntity.getRoles().stream().map(SimpleGrantedAuthority::new).toList())
                     .source(Constants.SUBSYSTEM_NAME)
                     .build();
@@ -86,9 +87,9 @@ public class DbAuthenticationProvider implements AuthenticationProvider
         AuthenticatedUser authenticatedUser = this.loadUserByUsernameAndPassword((String) token.getPrincipal(),
                 (String) token.getCredentials());
 
-        if (authenticatedUser.getUserId() != 0)
+        if (StringUtils.isNotBlank(authenticatedUser.getUserId()))
         {
-            this.userService.updateLoginTime(authenticatedUser.getUserId());
+            this.userService.updateLoginTime(Long.parseLong(authenticatedUser.getUserId()));
         }
 
         return new UsernamePasswordAuthenticationToken(authenticatedUser, null, authenticatedUser.getAuthorities());
