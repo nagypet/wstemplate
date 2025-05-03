@@ -37,10 +37,9 @@ public class AuthController implements AuthApi
     @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
     public AuthorizationToken authenticateUsingGET(String traceId)
     {
-        if (SecurityContextUtil.getToken() instanceof AuthorizationToken)
+        if (SecurityContextUtil.getToken() instanceof AuthorizationToken authorizationToken)
         {
-            AuthorizationToken token = (AuthorizationToken) SecurityContextUtil.getToken();
-            return token;
+            return authorizationToken;
         }
         else
         {
