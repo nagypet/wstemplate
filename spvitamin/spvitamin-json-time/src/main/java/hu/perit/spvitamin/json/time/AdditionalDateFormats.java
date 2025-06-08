@@ -119,6 +119,9 @@ public final class AdditionalDateFormats
         formats.add(TimestampFormat.of(Type.DATE_TIME, "yyyy-MM-dd HH:mm"));
         formats.add(TimestampFormat.of(Type.DATE, "yyyy-MM-dd"));
         formats.add(TimestampFormat.of(Type.DATE, "yyyy.MM.dd"));
+        formats.add(TimestampFormat.of(Type.DATE, "yyyyMMdd"));
+        formats.add(TimestampFormat.of(Type.DATE, "dd.MM.yyyy"));
+        formats.add(TimestampFormat.of(Type.DATE, "MM/dd/yyyy"));
 
         // With timezone
         TIMESTAMP_FORMATS = new ArrayList<>();

@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -30,7 +31,25 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Simple Reflection Utility
+ * A comprehensive utility class for Java reflection operations.
+ * 
+ * <p>This class provides a collection of static methods to simplify common reflection
+ * tasks such as discovering properties, working with getters and setters, accessing
+ * fields, and handling annotations. It includes special handling for various Java types
+ * and supports both public and private member access.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Property discovery and access from classes</li>
+ *   <li>Getter and setter method identification and invocation</li>
+ *   <li>Field name extraction from method names</li>
+ *   <li>Static and non-static member differentiation</li>
+ *   <li>Recursive annotation lookup through class hierarchies</li>
+ *   <li>Terminal type detection for object traversal</li>
+ * </ul>
+ * 
+ * <p>The class is designed to handle edge cases and provide consistent behavior
+ * across different Java types and inheritance hierarchies.</p>
  *
  * @author Peter Nagy
  */
@@ -104,10 +123,12 @@ public class ReflectionUtils
         return properties;
     }
 
+
     private static boolean isIgnored(Method method)
     {
         return method.getAnnotation(JsonIgnore.class) != null;
     }
+
 
     private static boolean isCommonBaseMethod(String name)
     {
@@ -277,6 +298,55 @@ public class ReflectionUtils
     }
 
 
+    public static <A extends Annotation> A getAnnotationRecursive(Method method, Class<A> annotationClass)
+    {
+        // Elsőként próbáljuk meg a metóduson
+        A annotation = method.getAnnotation(annotationClass);
+        if (annotation != null)
+        {
+            return annotation;
+        }
+
+        // Szülőosztályok és interfészek vizsgálata
+        Class<?> declaringClass = method.getDeclaringClass();
+        for (Class<?> iface : declaringClass.getInterfaces())
+        {
+            try
+            {
+                Method interfaceMethod = iface.getMethod(method.getName(), method.getParameterTypes());
+                annotation = interfaceMethod.getAnnotation(annotationClass);
+                if (annotation != null)
+                {
+                    return annotation;
+                }
+            }
+            catch (NoSuchMethodException ignored)
+            {
+            }
+        }
+
+        Class<?> superclass = declaringClass.getSuperclass();
+        while (superclass != null && superclass != Object.class)
+        {
+            try
+            {
+                Method superMethod = superclass.getMethod(method.getName(), method.getParameterTypes());
+                annotation = superMethod.getAnnotation(annotationClass);
+                if (annotation != null)
+                {
+                    return annotation;
+                }
+            }
+            catch (NoSuchMethodException ignored)
+            {
+            }
+            superclass = superclass.getSuperclass();
+        }
+
+        return null;
+    }
+
+
     // Returns true, if this type of object cannot be converted
     public static boolean isTerminalType(Object object)
     {
@@ -294,6 +364,12 @@ public class ReflectionUtils
         if (clazz.isPrimitive() || clazz.isEnum())
         {
             return true;
+        }
+
+        // Arrays are not terminal types
+        if (clazz.isArray())
+        {
+            return false;
         }
 
         // Special Java types

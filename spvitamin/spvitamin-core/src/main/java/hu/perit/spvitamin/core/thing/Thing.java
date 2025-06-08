@@ -31,7 +31,28 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Using composite pattern.
+ * An abstract base class implementing the Composite pattern for representing hierarchical data structures.
+ * 
+ * <p>This class provides a flexible way to convert arbitrary Java objects into a tree-like
+ * structure that can be traversed and manipulated using the Visitor pattern. It handles
+ * various types of objects including primitive values, collections, maps, arrays, and
+ * complex objects with properties.</p>
+ * 
+ * <p>Features:</p>
+ * <ul>
+ *   <li>Automatic conversion of Java objects to Thing hierarchies</li>
+ *   <li>Support for collections, maps, arrays, and nested objects</li>
+ *   <li>Visitor pattern implementation for traversing and processing the hierarchy</li>
+ *   <li>Option to include or exclude private fields</li>
+ *   <li>Special handling for terminal types and byte arrays</li>
+ * </ul>
+ * 
+ * <p>The class hierarchy includes specialized implementations for different types of values:</p>
+ * <ul>
+ *   <li>Value - for primitive and terminal types</li>
+ *   <li>ValueList - for collections and arrays</li>
+ *   <li>ValueMap - for maps and objects with properties</li>
+ * </ul>
  */
 
 @Getter
@@ -71,6 +92,12 @@ public abstract class Thing
             return objectToValue(name, object);
         }
 
+        // Special handling for byte arrays - treat them as terminal types
+        if (object instanceof byte[])
+        {
+            return objectToValue(name, object);
+        }
+
         if (object instanceof Collection<?> list)
         {
             return convertCollection(name, list, includePrivate);
@@ -78,6 +105,10 @@ public abstract class Thing
         else if (object instanceof Map<?, ?> map)
         {
             return convertMap(name, map, includePrivate);
+        }
+        else if (object.getClass().isArray())
+        {
+            return convertArray(name, object, includePrivate);
         }
 
         List<Property> properties = ReflectionUtils.allPropertiesOf(object.getClass(), includePrivate);
@@ -93,7 +124,10 @@ public abstract class Thing
             try
             {
                 Object propertyValue = property.get(object);
-                valueMap.getProperties().put(propertyName, valueToThing(propertyName, propertyValue, includePrivate));
+                if (!property.isIgnored())
+                {
+                    valueMap.getProperties().put(propertyName, valueToThing(propertyName, propertyValue, includePrivate));
+                }
             }
             catch (IllegalAccessException | InvocationTargetException | RuntimeException e)
             {
@@ -124,5 +158,18 @@ public abstract class Thing
             valueMap.getProperties().put(propertyName, valueToThing(propertyName, entry.getValue(), includePrivate));
         }
         return valueMap;
+    }
+
+
+    private static ValueList convertArray(String name, Object array, Boolean includePrivate)
+    {
+        ValueList valueList = new ValueList(name);
+        int length = java.lang.reflect.Array.getLength(array);
+        for (int i = 0; i < length; i++)
+        {
+            Object item = java.lang.reflect.Array.get(array, i);
+            valueList.getElements().add(valueToThing(name, item, includePrivate));
+        }
+        return valueList;
     }
 }
