@@ -115,9 +115,17 @@ dependencyManagement {
 - SoftEnum
 - MicroserviceProperties extended by apiKey
 - ApiKeyRequestInterceptor
-- SimpleFeignClientBuilder: errorDecoder can be customized
+- SimpleFeignClientBuilder: errorDecoder, retryer can be customized
 - Small NPE fix in RoleMapperServiceImpl
 - HttpLoggingFilter improved to shorten long Base64 strings.
+- TraceId stored in ServerException
+- PrinterVisitor fixed to compare password field ignoring the letter case.
+- ThreadContextDecorator
+- ExceptionGuard extended by a new method for returning values
+- Utility classes: CurrencyConverter, PostalAddress
+- JsonSerializer new method added: listFromJson() for easy deserialization of an array
+- NumberConverter
+
 
 ### 3.3.3-2-RELEASE not yet released
 

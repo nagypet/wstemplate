@@ -46,6 +46,8 @@ dependencies {
     implementation libs.jackson.annotations
     implementation libs.jackson.databind
 
+    implementation libs.nv.i18n
+
 
     // -----------------------------------------------------------------------------------------------------------------
     // Test dependencies
@@ -54,6 +56,7 @@ dependencies {
     testImplementation libs.junit.jupiter.api
     testImplementation libs.junit.jupiter.engine
     testImplementation libs.assertj
+    testImplementation libs.awaitility
 
     // Slf4J
     implementation libs.slf4j.api

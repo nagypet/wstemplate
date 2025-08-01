@@ -27,12 +27,12 @@ import java.util.Objects;
 
 /**
  * A class for representing and manipulating domain user identities.
- *
+ * 
  * <p>This class provides functionality for parsing, normalizing, and comparing domain user
- * identifiers in different formats. It supports both NetBIOS format (domain\ username) and
+ * identifiers in different formats. It supports both NetBIOS format (domain&#92;username) and
  * User Principal Name format (username@domain.com), and handles domain name normalization
  * for proper comparison.</p>
- *
+ * 
  * <p>Features:</p>
  * <ul>
  *   <li>Parse user identifiers from different formats</li>
@@ -41,23 +41,23 @@ import java.util.Objects;
  *   <li>Domain name normalization (handling both NetBIOS and FQDN formats)</li>
  *   <li>Canonical name representation</li>
  * </ul>
- *
+ * 
  * <p>Supported formats:</p>
  * <ul>
- *   <li>NetBIOS name: domain\ username (e.g., perit\nagypet)</li>
+ *   <li>NetBIOS name: domain&#92;username (e.g., perit\nagypet)</li>
  *   <li>User Principal Name: username@domain (e.g., nagypet@perit.hu)</li>
  *   <li>Plain username (e.g., nagypet)</li>
  * </ul>
- *
+ * 
  * <p>Example usage:</p>
  * <pre>
  * // Create from different formats
  * DomainUser user1 = DomainUser.newInstance("domain\\username");
  * DomainUser user2 = DomainUser.newInstance("username@domain.com");
- *
+ * 
  * // Get canonical representation
  * String canonical = user1.getCanonicalName(); // "username@domain"
- *
+ * 
  * // Compare users (case-insensitive)
  * boolean equal = user1.equals(user2); // true if same domain and username
  * </pre>
