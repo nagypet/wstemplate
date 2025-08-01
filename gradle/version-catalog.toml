@@ -27,6 +27,7 @@ antlr4 = 'org.antlr:antlr4:4.13.2'
 aspectj-rt = { module = 'org.aspectj:aspectjrt', version.ref = 'aspectj' }
 aspectj-weaver = { module = 'org.aspectj:aspectjweaver', version.ref = 'aspectj' }
 assertj = 'org.assertj:assertj-core:3.26.3'
+awaitility = 'org.awaitility:awaitility:4.2.2'
 bouncycastle-bcpkix = 'org.bouncycastle:bcpkix-jdk15on:1.70'
 bouncycastle-bcprov = 'org.bouncycastle:bcprov-jdk15on:1.70'
 caffeine = 'com.github.ben-manes.caffeine:caffeine:3.1.8'
@@ -82,6 +83,7 @@ lombok = 'org.projectlombok:lombok:1.18.34'
 mapstruct = { module = 'org.mapstruct:mapstruct', version.ref = 'mapstruct' }
 mapstruct-processor = { module = 'org.mapstruct:mapstruct-processor', version.ref = 'mapstruct' }
 mssql-jdbc = 'com.microsoft.sqlserver:mssql-jdbc:12.6.2.jre11'
+nv-i18n = 'com.neovisionaries:nv-i18n:1.29'
 openapi-api = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-api', version.ref = 'springdoc' }
 openapi-ui = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-ui', version.ref = 'springdoc' }
 opencsv = 'com.opencsv:opencsv:5.9'
