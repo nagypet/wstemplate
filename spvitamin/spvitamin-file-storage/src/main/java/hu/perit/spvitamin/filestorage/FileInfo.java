@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.security.auth.filter;
+package hu.perit.spvitamin.filestorage;
 
-import org.springframework.security.core.AuthenticationException;
+import hu.perit.spvitamin.filestorage.impl.FilePath;
+import lombok.Data;
 
-public class FilterAuthenticationException extends AuthenticationException {
+import java.time.Instant;
 
-    public FilterAuthenticationException(String msg, Throwable t) {
-        super(msg, t);
-    }
-
-    public FilterAuthenticationException(String msg) {
-        super(msg);
-    }
+@Data
+public class FileInfo
+{
+    private final FilePath path;
+    private final boolean directory;
+    private final boolean regularFile;
+    private final long size;
+    private final Instant lastModifiedTime;
+    private final Instant creationTime;
 }

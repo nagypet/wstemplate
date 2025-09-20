@@ -54,7 +54,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '3.3.3-2-RELEASE')
+    set('spvitaminVersion', '3.4.3-1-RELEASE')
 }
 
 dependencies {
@@ -73,6 +73,10 @@ dependencies {
     implementation 'hu.perit.spvitamin:spvitamin-spring-security-keycloak'
     implementation 'hu.perit.spvitamin:spvitamin-spring-security-ldap'
     implementation 'hu.perit.spvitamin:spvitamin-spring-server'
+    implementation 'hu.perit.spvitamin:spvitamin-file-storage'
+    implementation 'hu.perit.spvitamin:spvitamin-file-storage-spring-sftp'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-session-redis'
+    implementation 'hu.perit.spvitamin:spvitamin-test'
 }	
 
 dependencyManagement {
@@ -125,6 +129,21 @@ dependencyManagement {
 - Utility classes: CurrencyConverter, PostalAddress
 - JsonSerializer new method added: listFromJson() for easy deserialization of an array
 - NumberConverter
+- ResponseEntityUtils.createFileDownloadResponse() fixed in case of UTF-8 encoded file names 
+- New abstraction layer for accessing different file systems: spvitamin-file-storage, spvitamin-file-storage-spring-sftp added
+- PersonName class added for parsing names
+- FieldMapper moved to the core module from the data module
+- RequestQuery class for getting information about the current http request
+- An advanced session registry 
+- Small fix in HtmlTag
+- IllegalStateException.class, "Session was invalidated" is mapped to 401 Unauthorized now
+- AuthorizationToken: jsid added
+- If the /authenticate request comes from a browser, the sessionId will be stored in the generated token, and in subsequent calls the token is only valid within the same session
+- TookWithMetrics can now count only if the request was successful
+- New modul: spvitamin-spring-session-redis
+- SimpleFeignClientBuilder removes set-cookie headers from downstream services
+- SpvitaminSessionRepository for more reliable session handling
+- Hardening security
 
 
 ### 3.3.3-2-RELEASE not yet released

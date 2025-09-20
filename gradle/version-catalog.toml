@@ -2,10 +2,10 @@
 
 [versions]
 aspectj = '1.9.22.1'
-jackson = '2.17.2'
+jackson = '2.18.2'
 jsonwebtoken = '0.12.6'
 junit = '5.11.4'
-logback = '1.5.8'
+logback = '1.5.16'
 mapstruct = '1.6.0'
 springdoc = '2.8.5'
 czhabarta = '3.2.1263'
@@ -35,12 +35,7 @@ commons-cli = 'commons-cli:commons-cli:1.9.0'
 commons-codec = 'commons-codec:commons-codec:1.17.1'
 commons-collections4 = 'org.apache.commons:commons-collections4:4.5.0-M2'
 commons-io = 'commons-io:commons-io:2.16.1'
-commons-lang3 = 'org.apache.commons:commons-lang3:3.16.0'
-commons-text = 'org.apache.commons:commons-text:1.11.0'
-dom4j = 'dom4j:dom4j:2.1.4'
-dumbster = 'com.github.kirviq:dumbster:1.7.1'
-glassfish-expressly = 'org.glassfish.expressly:expressly:5.0.0'
-google-code-findbugs = 'com.google.code.findbugs:jsr305:3.0.2'
+commons-lang3 = 'org.apache.commons:commons-lang3:3.17.0'
 guava = 'com.google.guava:guava:33.3.0-jre'
 hibernate-validator = 'org.hibernate:hibernate-validator:8.0.1.Final'
 hierynomus-smbj = 'com.hierynomus:smbj:0.13.0'
@@ -71,6 +66,7 @@ jsonwebtoken-impl = { module = 'io.jsonwebtoken:jjwt-impl', version.ref = 'jsonw
 jsonwebtoken-jackson = { module = 'io.jsonwebtoken:jjwt-jackson', version.ref = 'jsonwebtoken' }
 junit-jupiter-api = { module = 'org.junit.jupiter:junit-jupiter-api', version.ref = 'junit' }
 junit-jupiter-engine = { module = 'org.junit.jupiter:junit-jupiter-engine', version.ref = 'junit' }
+junit-jupiter-params = { module = 'org.junit.jupiter:junit-jupiter-params', version.ref = 'junit' }
 juniversalchardet = 'com.github.albfernandez:juniversalchardet:2.5.0'
 jws-api = 'javax.jws:javax.jws-api:1.1'
 keycloakbom = 'org.keycloak.bom:keycloak-adapter-bom:12.0.4'

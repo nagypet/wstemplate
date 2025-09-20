@@ -17,32 +17,42 @@
 package hu.perit.spvitamin.spring.security.auth.filter;
 
 import hu.perit.spvitamin.spring.auth.AbstractAuthorizationToken;
+import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.exception.InvalidTokenException;
+import hu.perit.spvitamin.spring.info.CookieHelper;
+import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.LdapAuthenticationToken;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
+import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.StringUtils;
+import org.springframework.security.core.session.SessionInformation;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.Optional;
+
 
 @Slf4j
 public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFilter
 {
 
     protected abstract AbstractAuthorizationToken getJwtFromRequest(HttpServletRequest request);
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
@@ -56,18 +66,23 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
             {
                 String jwt = token.getJwt();
 
-                if (StringUtils.hasText(jwt))
+                if (StringUtils.isNotBlank(jwt))
                 {
                     JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
 
                     TokenClaims claims = new TokenClaims(tokenProvider.getClaims(jwt));
+
+                    // Checking sessionId
+                    String sessionIdInToken = claims.getSessionId();
+                    String sessionIdInRequest = Optional.ofNullable(request.getSession(false)).map(i -> i.getId()).orElse(null);
+                    checkSessionValidity(sessionIdInToken, sessionIdInRequest, RequestQuery.isFromBrowser());
 
                     AuthenticatedUser authenticatedUser = AuthenticatedUser.fromClaims(claims);
                     log.debug(String.format("Authentication restored from JWT token: '%s'", authenticatedUser.toString()));
 
                     UsernamePasswordAuthenticationToken authentication;
                     Collection<? extends GrantedAuthority> privileges = claims.getAuthorities();
-                    if (StringUtils.hasText(authenticatedUser.getSource()))
+                    if (StringUtils.isNotBlank(authenticatedUser.getSource()))
                     {
                         authentication = new LdapAuthenticationToken(authenticatedUser, null, privileges, authenticatedUser.getSource(), claims.getPreferredUsername());
                     }
@@ -84,6 +99,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
         }
         catch (AuthenticationException ex)
         {
+            CookieHelper.clearSessionCookie(request, response);
             SecurityContextHolder.clearContext();
             HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
             if (resolver.resolveException(request, response, null, ex) == null)
@@ -93,9 +109,10 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
         }
         catch (Exception ex)
         {
+            CookieHelper.clearSessionCookie(request, response);
             SecurityContextHolder.clearContext();
             HandlerExceptionResolver resolver = SpringContext.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
-            if (resolver.resolveException(request, response, null, new FilterAuthenticationException("Authentication failed!", ex)) == null)
+            if (resolver.resolveException(request, response, null, new InvalidTokenException("Authentication failed!", ex)) == null)
             {
                 throw ex;
             }
@@ -103,6 +120,33 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
         finally
         {
             SecurityContextHolder.clearContext();
+        }
+    }
+
+
+    private static void checkSessionValidity(String sessionIdInToken, String sessionIdInRequest, boolean fromBrowser)
+    {
+        SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
+        if (!securityProperties.isSessionValidationEnabled())
+        {
+            return;
+        }
+
+        // Checking session validity
+        AdvancedSessionRegistry sessionRegistry = SpringContext.getBean(AdvancedSessionRegistry.class);
+        SessionInformation sessionInformation = sessionRegistry.getSessionInformation(sessionIdInToken);
+        if (sessionInformation == null || sessionInformation.isExpired())
+        {
+            log.info("Session {} expired!", sessionIdInToken);
+            throw new InvalidTokenException(MessageFormat.format("Session {0} expired!", sessionIdInToken));
+        }
+
+        // Additionally, if the request comes from a browser, then the token must match with the request too
+        if (fromBrowser && !StringUtils.equalsIgnoreCase(sessionIdInToken, sessionIdInRequest))
+        {
+            // The token has been issued for another session
+            log.info("sessionIdInToken: {}, sessionIdInRequest: {}", sessionIdInToken, sessionIdInRequest);
+            throw new InvalidTokenException("Invalid session id in JWT token!");
         }
     }
 }

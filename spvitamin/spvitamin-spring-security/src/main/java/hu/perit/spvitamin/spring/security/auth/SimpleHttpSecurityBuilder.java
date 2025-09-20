@@ -34,8 +34,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
@@ -86,7 +86,7 @@ public class SimpleHttpSecurityBuilder
 
 
     public SimpleHttpSecurityBuilder exceptionHandler(AuthenticationEntryPoint authenticationEntryPoint,
-        AccessDeniedHandler accessDeniedHandler) throws Exception
+                                                      AccessDeniedHandler accessDeniedHandler) throws Exception
     {
         http.exceptionHandling(i -> i.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler));
         return this;
@@ -99,10 +99,10 @@ public class SimpleHttpSecurityBuilder
         CustomAccessDeniedHandler accessDeniedHandler = SpringContext.getBean(CustomAccessDeniedHandler.class);
 
         return this
-            .defaultCors()
-            .defaultCsrf()
-            .allowAdditionalSecurityHeaders()
-            .exceptionHandler(authenticationEntryPoint, accessDeniedHandler);
+                .defaultCors()
+                .defaultCsrf()
+                .allowAdditionalSecurityHeaders()
+                .exceptionHandler(authenticationEntryPoint, accessDeniedHandler);
     }
 
 
@@ -142,7 +142,12 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder createSession() throws Exception
     {
-        this.http.sessionManagement(i -> i.sessionCreationPolicy(SessionCreationPolicy.ALWAYS));
+        SessionAuthenticationStrategy authenticationStrategy = SpringContext.getBean(SessionAuthenticationStrategy.class);
+        this.http
+                .sessionManagement(i -> i
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                        .sessionAuthenticationStrategy(authenticationStrategy)
+                );
 
         return this;
     }
@@ -156,7 +161,7 @@ public class SimpleHttpSecurityBuilder
 
         if (!isFilterAlreadyExists(Role2PermissionMapperFilter.class))
         {
-            this.http.addFilterAfter(new Role2PermissionMapperFilter(), SessionManagementFilter.class);
+            this.http.addFilterBefore(new Role2PermissionMapperFilter(), SessionManagementFilter.class);
         }
 
         return this;
@@ -196,7 +201,7 @@ public class SimpleHttpSecurityBuilder
 
 
     public SimpleHttpSecurityBuilder authorizeRequests(
-        Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> authorizeHttpRequestsCustomizer) throws Exception
+            Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry> authorizeHttpRequestsCustomizer) throws Exception
     {
         this.http.authorizeHttpRequests(authorizeHttpRequestsCustomizer);
 
@@ -210,9 +215,16 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder logout() throws Exception
+    public SimpleHttpSecurityBuilder logout(String logoutUrl) throws Exception
     {
-        this.http.logout(i -> i.invalidateHttpSession(true).deleteCookies("JSESSIONID").clearAuthentication(true));
+        this.http.logout(i -> i
+                .logoutUrl(logoutUrl)
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID", "SESSION")
+                .clearAuthentication(true)
+                .logoutSuccessHandler((request, response, authentication) -> log.info("logout success"))
+        );
+
         return this;
     }
 
