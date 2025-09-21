@@ -34,9 +34,9 @@
 	<logger name="org.springframework.cache" level="TRACE"/>
 	<logger name="com.zaxxer.hikari.HikariConfig" level="INFO"/>
 	<logger name="com.zaxxer.hikari" level="ERROR"/>
-	<logger name="org.hibernate.SQL" level="DEBUG"/>
-	<logger name="org.springframework.orm.jpa" level="DEBUG"/>
-	<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>
+<!--	<logger name="org.hibernate.SQL" level="DEBUG"/>-->
+<!--	<logger name="org.springframework.orm.jpa" level="DEBUG"/>-->
+<!--	<logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE"/>-->
 	<logger name="com.thoughtworks.xstream" level="OFF"/>
 	<!--
 	<logger name="org.springframework.transaction.interceptor" level="TRACE"/>
@@ -77,6 +77,12 @@
 		<appender-ref ref="application-message"/>
 	</logger>
 	<logger name="hu.perit.spvitamin.spring.feignclients" level="DEBUG" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
+	<logger name="hu.perit.spvitamin.spring.session" level="DEBUG" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
+	<logger name="hu.perit.spvitamin.filestorage" level="WARN" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
 

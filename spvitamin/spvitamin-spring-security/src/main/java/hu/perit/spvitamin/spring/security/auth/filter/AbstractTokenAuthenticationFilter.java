@@ -31,6 +31,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -74,8 +75,8 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
 
                     // Checking sessionId
                     String sessionIdInToken = claims.getSessionId();
-                    String sessionIdInRequest = Optional.ofNullable(request.getSession(false)).map(i -> i.getId()).orElse(null);
-                    checkSessionValidity(sessionIdInToken, sessionIdInRequest, RequestQuery.isFromBrowser());
+                    String sessionIdInRequest = Optional.ofNullable(request.getSession(false)).map(HttpSession::getId).orElse(null);
+                    checkTokenValidity(sessionIdInToken, sessionIdInRequest, RequestQuery.isFromBrowser(), tokenProvider.getTokenType(jwt));
 
                     AuthenticatedUser authenticatedUser = AuthenticatedUser.fromClaims(claims);
                     log.debug(String.format("Authentication restored from JWT token: '%s'", authenticatedUser.toString()));
@@ -124,7 +125,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
     }
 
 
-    private static void checkSessionValidity(String sessionIdInToken, String sessionIdInRequest, boolean fromBrowser)
+    private static void checkTokenValidity(String sessionIdInToken, String sessionIdInRequest, boolean fromBrowser, JwtTokenProvider.Type tokenType)
     {
         SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
         if (!securityProperties.isSessionValidationEnabled())
@@ -132,21 +133,24 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
             return;
         }
 
-        // Checking session validity
-        AdvancedSessionRegistry sessionRegistry = SpringContext.getBean(AdvancedSessionRegistry.class);
-        SessionInformation sessionInformation = sessionRegistry.getSessionInformation(sessionIdInToken);
-        if (sessionInformation == null || sessionInformation.isExpired())
+        // Checking session validity (not for access tokens)
+        if (tokenType == JwtTokenProvider.Type.JWT || tokenType == JwtTokenProvider.Type.REFRESH)
         {
-            log.info("Session {} expired!", sessionIdInToken);
-            throw new InvalidTokenException(MessageFormat.format("Session {0} expired!", sessionIdInToken));
-        }
+            AdvancedSessionRegistry sessionRegistry = SpringContext.getBean(AdvancedSessionRegistry.class);
+            SessionInformation sessionInformation = sessionRegistry.getSessionInformation(sessionIdInToken);
+            if (sessionInformation == null || sessionInformation.isExpired())
+            {
+                log.info("Session {} expired!", sessionIdInToken);
+                throw new InvalidTokenException(MessageFormat.format("Session {0} expired!", sessionIdInToken));
+            }
 
-        // Additionally, if the request comes from a browser, then the token must match with the request too
-        if (fromBrowser && !StringUtils.equalsIgnoreCase(sessionIdInToken, sessionIdInRequest))
-        {
-            // The token has been issued for another session
-            log.info("sessionIdInToken: {}, sessionIdInRequest: {}", sessionIdInToken, sessionIdInRequest);
-            throw new InvalidTokenException("Invalid session id in JWT token!");
+            // Additionally, if the request comes from a browser, then the token must match with the request too
+            if (fromBrowser && !StringUtils.equalsIgnoreCase(sessionIdInToken, sessionIdInRequest))
+            {
+                // The token has been issued for another session
+                log.info("sessionIdInToken: {}, sessionIdInRequest: {}", sessionIdInToken, sessionIdInRequest);
+                throw new InvalidTokenException("Invalid session id in JWT token!");
+            }
         }
     }
 }

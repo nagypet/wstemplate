@@ -61,5 +61,22 @@ datasource:
 #  ad1:
 #    url: ldap://ldap.wstemplate.k8s-test.perit.local:31901
 
+
+spvitamin.oauth2:
+  issuer: "https://localhost:8410"
+  basePath: "/api/spvitamin"
+  tokens:
+    access-ttl: 5m
+    refresh-ttl: 1h
+  clients:
+    - clientId: e789a21e-1eeb-4081-9a54-6405b5b9dda1
+      clientSecret: 921a0a93-a98a-4111-bb67-09b05c448d3d
+      scopes: ["offline_access"]
+  grant-types:
+    - refresh_token
+    - password
+    #- client_credentials
+
+
 logging:
   config: classpath:logback-local.xml

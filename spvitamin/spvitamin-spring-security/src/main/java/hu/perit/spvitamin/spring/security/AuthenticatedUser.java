@@ -51,7 +51,7 @@ public class AuthenticatedUser implements UserDetails
     @Builder.Default
     private boolean anonymous = true;
     private String source;
-    @Singular("additionalClaim")
+    //@Singular("additionalClaim")
     private Map<String, Object> additionalClaims;
 
 
@@ -64,7 +64,7 @@ public class AuthenticatedUser implements UserDetails
                 .userId(claims.getUserId())
                 .anonymous(false)
                 .source(claims.getSource())
-                .additionalClaims((Map<? extends String, ?>) claims.get("add"))
+                .additionalClaims(claims.getAdditionalClaims())
                 .build();
     }
 

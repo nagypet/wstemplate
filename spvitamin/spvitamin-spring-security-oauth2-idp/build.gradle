@@ -21,7 +21,6 @@ plugins {
     id 'jacoco'
     id 'maven-publish'
     id 'signing'
-    alias libs.plugins.habarta.typescript.generator
 }
 apply from: '../gradle/common.gradle'
 
@@ -41,6 +40,8 @@ dependencies {
     // -----------------------------------------------------------------------------------------------------------------
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-spring-general')
+    implementation project(':spvitamin-spring-logging')
+    implementation project(':spvitamin-spring-security')
 
     // Lombok
     compileOnly libs.lombok
@@ -51,23 +52,18 @@ dependencies {
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.session:spring-session-core'
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
     // apache.commons
     implementation libs.commons.lang3
     implementation libs.commons.collections4
 
-    // JJWT
-    implementation libs.bundles.jsonwebtoken
-    implementation libs.jaxb.api
-
     // Nimbus
     implementation libs.nimbus.jose.jwt
 
-    // Swagger
-    implementation libs.openapi.ui
-    implementation libs.openapi.api
+    // JJWT
+    implementation libs.bundles.jsonwebtoken
+    implementation libs.jaxb.api
 
     // -----------------------------------------------------------------------------------------------------------------
     // Test dependencies
@@ -79,23 +75,4 @@ dependencies {
 
 test {
     useJUnitPlatform()
-}
-
-
-generateTypeScript {
-    jsonLibrary = 'jackson2'
-    classPatterns = [
-            'hu.perit.spvitamin.spring.auth.AuthorizationToken',
-            'hu.perit.spvitamin.spring.security.config.AuthenticationRepository'
-    ]
-    outputFile = 'build/spvitamin-security-models.ts'
-    outputFileType = 'implementationFile'
-    outputKind = 'module'
-    namespace = 'SpvitaminSecurity'
-    //disableTaggedUnions = true
-    optionalProperties = 'useSpecifiedAnnotations'
-    optionalAnnotations = [
-            'javax.annotation.Nullable'
-    ]
-    optionalPropertiesDeclaration = 'nullableType'
 }

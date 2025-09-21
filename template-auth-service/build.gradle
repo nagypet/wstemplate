@@ -51,6 +51,7 @@ dependencies {
     implementation project(':spvitamin-spring-security')
     implementation project(':spvitamin-spring-security-ldap')
     implementation project(':spvitamin-spring-security-oauth2')
+    implementation project(':spvitamin-spring-security-oauth2-idp')
     implementation project(':spvitamin-spring-server')
     implementation project(':spvitamin-spring-data')
     implementation project(':template-auth-service-api')

@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -74,6 +73,26 @@ public class WebSecurityConfig
 
     @Bean
     @Order(2)
+    public SecurityFilterChain configureOAuth2Idp(HttpSecurity http, CustomOAuth2SuccessHandler successHandler) throws Exception
+    {
+        // http://localhost:8410/api/spvitamin/oauth2/token
+        // http://localhost:8410/api/spvitamin/oauth2/refresh
+        // http://localhost:8410/.well-known/openid-configuration
+        // http://localhost:8410/.well-known/jwks.json
+
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope(
+                        "/api/spvitamin/oauth2/**",
+                        "/.well-known/**")
+                .authorizeRequests(r -> r.anyRequest().permitAll())
+                .createSession();
+
+        return http.build();
+    }
+
+
+    @Bean
+    @Order(3)
     public SecurityFilterChain configureAuthenticateEndpoint(HttpSecurity http) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)
@@ -93,7 +112,7 @@ public class WebSecurityConfig
 
 
     @Bean
-    @Order(3)
+    @Order(4)
     public SecurityFilterChain configureTokenSecuredEndpoints(HttpSecurity http) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)
