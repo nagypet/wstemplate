@@ -1,6 +1,8 @@
 package hu.perit.spvitamin.spring.security.oauth2.idp.rest.controller;
 
 import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
+import hu.perit.spvitamin.spring.security.oauth2.idp.config.Constants;
 import hu.perit.spvitamin.spring.security.oauth2.idp.rest.api.SpvitaminOAuth2Api;
 import hu.perit.spvitamin.spring.security.oauth2.idp.service.api.JwkService;
 import hu.perit.spvitamin.spring.security.oauth2.idp.service.api.OAuth2Service;
@@ -23,6 +25,7 @@ public class SpvitaminOAuth2Controller implements SpvitaminOAuth2Api
 
 
     @Override
+    @LoggedRestMethod(eventId = Constants.OAUTH2_CONTROLLER_TOKEN)
     public ResponseEntity<Map<String, Object>> token(MultiValueMap<String, String> form)
     {
         try
@@ -37,6 +40,7 @@ public class SpvitaminOAuth2Controller implements SpvitaminOAuth2Api
 
 
     @Override
+    @LoggedRestMethod(eventId = Constants.OAUTH2_CONTROLLER_REFRESH)
     public ResponseEntity<Map<String, Object>> refresh(MultiValueMap<String, String> form)
     {
         try
@@ -51,6 +55,7 @@ public class SpvitaminOAuth2Controller implements SpvitaminOAuth2Api
 
 
     @Override
+    @LoggedRestMethod(eventId = Constants.OAUTH2_CONTROLLER_OID_CONFIG)
     public ResponseEntity<Map<String, Object>> openidConfiguration()
     {
         try
@@ -65,6 +70,7 @@ public class SpvitaminOAuth2Controller implements SpvitaminOAuth2Api
 
 
     @Override
+    @LoggedRestMethod(eventId = Constants.OAUTH2_CONTROLLER_JWKS)
     public ResponseEntity<Map<String, Object>> jwks() throws Exception
     {
         try

@@ -67,13 +67,14 @@ public class TokenServiceImpl implements TokenService
 
 
     @Override
-    public TokenResult refreshToken(AuthorizationToken token, Duration ttl)
+    public TokenResult refreshToken(AuthorizationToken token, JwtTokenProvider.Type type, Duration ttl)
     {
         AuthorizationToken authorizationToken = token.clone();
-        authorizationToken.setType(JwtTokenProvider.Type.ACCESS);
+        authorizationToken.setType(type);
         Instant exp = Instant.now().plus(ttl);
         authorizationToken.setExp(exp);
         String jwt = this.jwtTokenProvider.getJwtFromAuthorizationToken(authorizationToken);
+        this.jwtTokenProvider.touchSession(type);
         return new TokenResult(jwt, exp);
     }
 }

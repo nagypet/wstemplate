@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.session.local;
+package hu.perit.spvitamin.spring.security.autoconfiguration;
 
-import hu.perit.spvitamin.spring.config.JwtProperties;
+import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
+import hu.perit.spvitamin.spring.session.registry.SpvitaminSessionRegistry;
+import hu.perit.spvitamin.spring.session.repository.SpvitaminSessionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.session.MapSession;
 import org.springframework.session.MapSessionRepository;
 import org.springframework.session.SessionRepository;
 import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
 
-import java.time.Duration;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Configuration
+@AutoConfiguration
 @ConditionalOnProperty(prefix = "spring.session", name = "store-type", havingValue = "none", matchIfMissing = true)
 @Slf4j
 @EnableSpringHttpSession
@@ -40,16 +41,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @EnableScheduling
 public class SessionRegistryConfigLocal
 {
-    private final JwtProperties jwtProperties;
     private final ApplicationEventPublisher applicationEventPublisher;
+
 
     @Bean
     public SessionRepository<MapSession> sessionRepository()
     {
         MapSessionRepository mapSessionRepository = new SpvitaminSessionRepository(new ConcurrentHashMap<>(), applicationEventPublisher);
-        long expirationInMinutes = jwtProperties.getExpirationInMinutes() + 5;
-        log.info("SpvitaminSessionRepository created, maxInactiveInterval: {} minutes", expirationInMinutes);
-        mapSessionRepository.setDefaultMaxInactiveInterval(Duration.ofMinutes(expirationInMinutes));
+        log.info("SpvitaminSessionRepository created");
 
         return mapSessionRepository;
     }
@@ -59,6 +58,6 @@ public class SessionRegistryConfigLocal
     public AdvancedSessionRegistry sessionRegistry(SessionRepository<?> sessionRepository)
     {
         log.info("SpvitaminSessionRegistry created");
-        return new SpvitaminSessionRegistry(sessionRepository);
+        return new SpvitaminSessionRegistry<>(sessionRepository);
     }
 }

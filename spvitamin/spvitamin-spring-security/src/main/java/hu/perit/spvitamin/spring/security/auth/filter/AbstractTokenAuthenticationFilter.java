@@ -26,7 +26,7 @@ import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.LdapAuthenticationToken;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
-import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
+import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

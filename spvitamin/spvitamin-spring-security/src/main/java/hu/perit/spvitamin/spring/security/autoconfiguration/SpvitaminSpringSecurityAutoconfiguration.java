@@ -14,21 +14,26 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.session.local;
+package hu.perit.spvitamin.spring.security.autoconfiguration;
 
+import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
+import hu.perit.spvitamin.spring.session.strategy.PerUserTypeConcurrentSessionControlStrategy;
+import hu.perit.spvitamin.spring.session.strategy.SpvitaminCompositeSessionAuthenticationStrategy;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 
 import java.util.List;
 
-@Configuration
+@AutoConfiguration
 @Slf4j
 @DependsOn("SpvitaminSpringContext")
-public class SessionRegistryConfig
+@RequiredArgsConstructor
+public class SpvitaminSpringSecurityAutoconfiguration
 {
     @Bean
     public SessionAuthenticationStrategy sessionAuthenticationStrategy(AdvancedSessionRegistry sessionRegistry)

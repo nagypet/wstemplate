@@ -25,8 +25,8 @@ import hu.perit.spvitamin.spring.exception.InvalidTokenException;
 import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
-import hu.perit.spvitamin.spring.session.local.SpvitaminCompositeSessionAuthenticationStrategy;
+import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
+import hu.perit.spvitamin.spring.session.strategy.SpvitaminCompositeSessionAuthenticationStrategy;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -52,6 +52,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Peter Nagy
@@ -100,6 +101,10 @@ public class JwtTokenProvider
         {
             DomainUser domainUser = DomainUser.newInstance(authenticatedUser.getUsername());
 
+            // Update session timeout
+            setSessionTimeout(type, ttl);
+            touchSession(type);
+
             // Updating session-registry
             if (this.sessionAuthenticationStrategy instanceof SpvitaminCompositeSessionAuthenticationStrategy authenticationStrategy)
             {
@@ -120,7 +125,7 @@ public class JwtTokenProvider
                     .exp(issuedAt.plus(ttl))
                     .uid(authenticatedUser.getUserId())
                     .clientId(type == Type.REFRESH ? clientId : null)
-                    .rls(AuthorityUtils.authorityListToSet(authenticatedUser.getAuthorities()))
+                    .rls(AuthorityUtils.authorityListToSet(authenticatedUser.getAuthorities()).stream().filter(i -> i.startsWith("ROLE_")).collect(Collectors.toSet()))
                     .scope(type != Type.JWT ? scopes : null)
                     .source(authenticatedUser.getSource())
                     .sid(RequestQuery.getSessionId())
@@ -134,6 +139,26 @@ public class JwtTokenProvider
         catch (Exception e)
         {
             throw new JwtException("Token creation failed!", e);
+        }
+    }
+
+
+    public void setSessionTimeout(Type type, Duration ttl)
+    {
+        if (type == Type.JWT || type == Type.REFRESH)
+        {
+            String sessionId = RequestQuery.getSessionId();
+            this.sessionRegistry.setMaxInactiveInterval(sessionId, ttl);
+        }
+    }
+
+
+    public void touchSession(Type type)
+    {
+        if (type == Type.JWT || type == Type.REFRESH)
+        {
+            String sessionId = RequestQuery.getSessionId();
+            this.sessionRegistry.refreshLastRequest(sessionId);
         }
     }
 

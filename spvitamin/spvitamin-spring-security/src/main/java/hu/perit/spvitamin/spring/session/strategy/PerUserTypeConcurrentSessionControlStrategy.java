@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.session.local;
+package hu.perit.spvitamin.spring.session.strategy;
 
 import hu.perit.spvitamin.spring.config.SessionProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

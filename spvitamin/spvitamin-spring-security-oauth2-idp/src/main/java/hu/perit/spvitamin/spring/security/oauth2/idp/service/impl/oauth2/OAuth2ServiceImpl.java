@@ -3,6 +3,7 @@ package hu.perit.spvitamin.spring.security.oauth2.idp.service.impl.oauth2;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.exception.InvalidTokenException;
 import hu.perit.spvitamin.spring.info.CookieHelper;
+import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.rolemapper.RoleMapperService;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
@@ -15,7 +16,8 @@ import hu.perit.spvitamin.spring.security.oauth2.idp.rest.model.ClientAuth;
 import hu.perit.spvitamin.spring.security.oauth2.idp.rest.model.TokenResult;
 import hu.perit.spvitamin.spring.security.oauth2.idp.service.api.OAuth2Service;
 import hu.perit.spvitamin.spring.security.oauth2.idp.service.api.TokenService;
-import hu.perit.spvitamin.spring.session.local.AdvancedSessionRegistry;
+import hu.perit.spvitamin.spring.session.registry.AdvancedSessionRegistry;
+import hu.perit.spvitamin.spring.session.strategy.SpvitaminCompositeSessionAuthenticationStrategy;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -127,106 +129,6 @@ public class OAuth2ServiceImpl implements OAuth2Service
     }
 
 
-    private boolean isGrantTypeEquals(String grantTypeRequested, String grantType)
-    {
-        if (StringUtils.isAnyBlank(grantTypeRequested, grantType))
-        {
-            return false;
-        }
-        return grantType.equalsIgnoreCase(grantTypeRequested)
-                && this.spvitaminOAuth2Properties.getGrantTypes().contains(grantType);
-    }
-
-
-    @Override
-    public ResponseEntity<Map<String, Object>> refresh(MultiValueMap<String, String> form)
-    {
-        ClientAuth clientAuth = extractClientAuth(request, form);
-        SpvitaminOAuth2Properties.ClientProps clientProps = spvitaminClientRegistry.authenticate(clientAuth.getClientId(), clientAuth.getClientSecret()).orElse(null);
-        if (clientProps == null)
-        {
-            return error(ErrorCode.INVALID_CLIENT, "Invalid client credentials.");
-        }
-
-        String refreshToken = one(form, Constants.REFRESH_TOKEN);
-        return handleRefresh(clientProps, refreshToken);
-    }
-
-
-    @Override
-    public ResponseEntity<Map<String, Object>> openidConfiguration()
-    {
-        String issuer = spvitaminOAuth2Properties.getIssuer();
-        String base = spvitaminOAuth2Properties.getBasePath();
-        return ResponseEntity.ok(Map.of(
-                "issuer", issuer,
-                "token_endpoint", issuer + base + "/oauth2/token",
-                "jwks_uri", issuer + "/.well-known/jwks.json",
-                "grant_types_supported", spvitaminOAuth2Properties.getGrantTypes(),
-                "token_endpoint_auth_methods_supported", List.of("client_secret_basic", "client_secret_post")
-        ));
-    }
-
-
-    private ResponseEntity<Map<String, Object>> handleUsernamePassword(String clientId, Set<String> grantedScopes, MultiValueMap<String, String> form)
-    {
-        if (StringUtils.isAnyBlank(one(form, Constants.USERNAME), one(form, Constants.PASSWORD)))
-        {
-            return error(ErrorCode.INVALID_REQUEST, "Missing credentials: username and password are required for password grant type.");
-        }
-
-        try
-        {
-            // 1) Programozott autentikáció ugyanazzal a lánccal (AuthenticationManager)
-            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(one(form, Constants.USERNAME), one(form, Constants.PASSWORD));
-            Authentication authResult = this.authenticationManager.authenticate(authRequest);
-
-            // 2) SecurityContext beállítása (mint a filterlánc tenné)
-            SecurityContextHolder.getContext().setAuthentication(authResult);
-            this.sessionAuthenticationStrategy.onAuthentication(authResult, this.request, null);
-
-            // 3) (Opcionális) Post-auth műveletek meghívása
-            AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
-            if (!authenticatedUser.isAnonymous())
-            {
-                Collection<? extends GrantedAuthority> groups = authenticatedUser.getAuthorities();
-                Collection<GrantedAuthority> roles = this.roleMapperService.mapUsernameAndGroupToRoles(authenticatedUser.getUsername(), groups);
-                authenticatedUser.setAuthorities(roles);
-
-                log.debug(String.format("Granted roles: '%s'", authenticatedUser.getAuthorities().toString()));
-                authorizationService.setAuthenticatedUser(authenticatedUser);
-            }
-
-            // 4) Tokenek kiállítása
-            Duration accessTtl = spvitaminOAuth2Properties.getTokens().getAccessTtl();
-            Duration refreshTtl = spvitaminOAuth2Properties.getTokens().getRefreshTtl();
-
-            TokenResult access = tokenService.issueAccessTokenForUser(clientId, authenticatedUser, grantedScopes, accessTtl);
-            TokenResult refresh = tokenService.issueRefreshTokenForUser(clientId, authenticatedUser, grantedScopes, refreshTtl);
-
-            Map<String, Object> response = new LinkedHashMap<>();
-            response.put(Constants.ACCESS_TOKEN, access.getToken());
-            response.put(Constants.TOKEN_TYPE, Constants.BEARER);
-            response.put(Constants.EXPIRES_IN, access.expiresInSeconds());
-            if (grantedScopes.contains(Constants.OFFLINE_ACCESS))
-            {
-                response.put(Constants.REFRESH_TOKEN, refresh.getToken());
-            }
-            // RFC6709 szerint a response-ban érdemes visszaadni a ténylegesen megadott scope-ot
-            if (!grantedScopes.isEmpty())
-            {
-                response.put(Constants.SCOPE, String.join(" ", grantedScopes));
-            }
-            return ResponseEntity.ok(response);
-        }
-        catch (AuthenticationException ex)
-        {
-            // OAuth2 szerint helyes hibakód jelszavas grantre: invalid_grant
-            return error(ErrorCode.INVALID_GRANT, "Bad credentials");
-        }
-    }
-
-
     private ResponseEntity<Map<String, Object>> finalizeWithRefreshTokenCookie(ResponseEntity<Map<String, Object>> original, SpvitaminOAuth2Properties.ClientProps clientProps)
     {
         Map<String, Object> body = original.getBody();
@@ -265,12 +167,14 @@ public class OAuth2ServiceImpl implements OAuth2Service
         String contextPath = request.getContextPath();
         String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
 
+        Duration refreshTtl = spvitaminOAuth2Properties.getTokens().getRefreshTtl();
+
         return ResponseCookie.from(Constants.REFRESH_TOKEN_COOKIE_NAME, value)
                 .httpOnly(true)
                 .secure(request.isSecure())
                 .path(path)
                 .sameSite("Strict")
-                .maxAge(Duration.ofDays(30))
+                .maxAge(refreshTtl.plusMinutes(1))
                 .build();
     }
 
@@ -287,6 +191,127 @@ public class OAuth2ServiceImpl implements OAuth2Service
                 .sameSite("Strict")
                 .maxAge(0) // törlés
                 .build();
+    }
+
+
+    private boolean isGrantTypeEquals(String grantTypeRequested, String grantType)
+    {
+        if (StringUtils.isAnyBlank(grantTypeRequested, grantType))
+        {
+            return false;
+        }
+        return grantType.equalsIgnoreCase(grantTypeRequested)
+                && this.spvitaminOAuth2Properties.getGrantTypes().contains(grantType);
+    }
+
+
+    @Override
+    public ResponseEntity<Map<String, Object>> refresh(MultiValueMap<String, String> form)
+    {
+        ClientAuth clientAuth = extractClientAuth(request, form);
+        SpvitaminOAuth2Properties.ClientProps clientProps = spvitaminClientRegistry.authenticate(clientAuth.getClientId(), clientAuth.getClientSecret()).orElse(null);
+        if (clientProps == null)
+        {
+            return error(ErrorCode.INVALID_CLIENT, "Invalid client credentials.");
+        }
+
+        String refreshToken = one(form, Constants.REFRESH_TOKEN);
+        ResponseEntity<Map<String, Object>> response = handleRefresh(clientProps, refreshToken);
+        // Ha a válasz tartalmaz refresh_token-t, tegyük cookie-ba is
+        return finalizeWithRefreshTokenCookie(response, clientProps);
+    }
+
+
+    @Override
+    public ResponseEntity<Map<String, Object>> openidConfiguration()
+    {
+        String issuer = spvitaminOAuth2Properties.getIssuer();
+        String base = spvitaminOAuth2Properties.getBasePath();
+        return ResponseEntity.ok(Map.of(
+                "issuer", issuer,
+                "token_endpoint", issuer + base + "/oauth2/token",
+                "jwks_uri", issuer + "/.well-known/jwks.json",
+                "grant_types_supported", spvitaminOAuth2Properties.getGrantTypes(),
+                "token_endpoint_auth_methods_supported", List.of("client_secret_basic", "client_secret_post")
+        ));
+    }
+
+
+    private ResponseEntity<Map<String, Object>> handleUsernamePassword(String clientId, Set<String> grantedScopes, MultiValueMap<String, String> form)
+    {
+        if (StringUtils.isAnyBlank(one(form, Constants.USERNAME), one(form, Constants.PASSWORD)))
+        {
+            return error(ErrorCode.INVALID_REQUEST, "Missing credentials: username and password are required for password grant type.");
+        }
+
+        try
+        {
+            // 1) Programozott autentikáció ugyanazzal a lánccal (AuthenticationManager)
+            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(one(form, Constants.USERNAME), one(form, Constants.PASSWORD));
+            Authentication authResult = this.authenticationManager.authenticate(authRequest);
+
+            // 2) SecurityContext beállítása (mint a filterlánc tenné)
+            SecurityContextHolder.getContext().setAuthentication(authResult);
+
+            // 3) Post-auth műveletek meghívása
+            AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
+            if (!authenticatedUser.isAnonymous())
+            {
+                Collection<? extends GrantedAuthority> groups = authenticatedUser.getAuthorities();
+                Collection<GrantedAuthority> roles = this.roleMapperService.mapUsernameAndGroupToRoles(authenticatedUser.getUsername(), groups);
+                authenticatedUser.setAuthorities(roles);
+
+                log.debug(String.format("Granted roles: '%s'", authenticatedUser.getAuthorities().toString()));
+                authorizationService.setAuthenticatedUser(authenticatedUser);
+            }
+
+            // 4) Updating session
+            SessionInformation sessionInformation = this.sessionRegistry.getSessionInformation(RequestQuery.getSessionId());
+            if (sessionInformation == null)
+            {
+                this.sessionAuthenticationStrategy.onAuthentication(authResult, this.request, null);
+            }
+            else
+            {
+                if (this.sessionAuthenticationStrategy instanceof SpvitaminCompositeSessionAuthenticationStrategy authenticationStrategy)
+                {
+                    // Checking if the current user exceeded the max. session count to cover the cases when the session has been created for another user
+                    this.sessionRegistry.updatePrincipal(RequestQuery.getSessionId(), authenticatedUser,
+                            () -> authenticationStrategy.onSessionPrincipalChanged(SecurityContextHolder.getContext().getAuthentication(), RequestQuery.getHttpServletRequest(), null));
+                }
+                else
+                {
+                    this.sessionRegistry.updatePrincipal(RequestQuery.getSessionId(), authenticatedUser, null);
+                }
+            }
+
+            // 4) Tokenek kiállítása
+            Duration accessTtl = spvitaminOAuth2Properties.getTokens().getAccessTtl();
+            Duration refreshTtl = spvitaminOAuth2Properties.getTokens().getRefreshTtl();
+
+            TokenResult access = tokenService.issueAccessTokenForUser(clientId, authenticatedUser, grantedScopes, accessTtl);
+            TokenResult refresh = tokenService.issueRefreshTokenForUser(clientId, authenticatedUser, grantedScopes, refreshTtl);
+
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put(Constants.ACCESS_TOKEN, access.getToken());
+            response.put(Constants.TOKEN_TYPE, Constants.BEARER);
+            response.put(Constants.EXPIRES_IN, access.expiresInSeconds());
+            if (grantedScopes.contains(Constants.OFFLINE_ACCESS))
+            {
+                response.put(Constants.REFRESH_TOKEN, refresh.getToken());
+            }
+            // RFC6709 szerint a response-ban érdemes visszaadni a ténylegesen megadott scope-ot
+            if (!grantedScopes.isEmpty())
+            {
+                response.put(Constants.SCOPE, String.join(" ", grantedScopes));
+            }
+            return ResponseEntity.ok(response);
+        }
+        catch (AuthenticationException ex)
+        {
+            // OAuth2 szerint helyes hibakód jelszavas grantre: invalid_grant
+            return error(ErrorCode.INVALID_GRANT, "Bad credentials");
+        }
     }
 
 
@@ -319,7 +344,6 @@ public class OAuth2ServiceImpl implements OAuth2Service
     {
         try
         {
-
             // 1) Form paraméterben próbáljuk
             String refreshToken = StringUtils.trimToNull(refreshTokenFromForm);
 
@@ -343,12 +367,15 @@ public class OAuth2ServiceImpl implements OAuth2Service
             }
 
             Duration accessTtl = spvitaminOAuth2Properties.getTokens().getAccessTtl();
-            TokenResult access = tokenService.refreshToken(token, accessTtl);
+            Duration refreshTtl = spvitaminOAuth2Properties.getTokens().getRefreshTtl();
+            TokenResult access = tokenService.refreshToken(token, JwtTokenProvider.Type.ACCESS, accessTtl);
+            TokenResult refresh = tokenService.refreshToken(token, JwtTokenProvider.Type.REFRESH, refreshTtl);
 
             Map<String, Object> response = new LinkedHashMap<>();
             response.put(Constants.ACCESS_TOKEN, access.getToken());
             response.put(Constants.TOKEN_TYPE, Constants.BEARER);
             response.put(Constants.EXPIRES_IN, access.expiresInSeconds());
+            response.put(Constants.REFRESH_TOKEN, refresh.getToken());
             if (!token.getScope().isEmpty())
             {
                 response.put(Constants.SCOPE, String.join(" ", token.getScope()));

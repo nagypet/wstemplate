@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.session.local;
+package hu.perit.spvitamin.spring.session;
 
-import hu.perit.spvitamin.spring.config.JwtProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -25,24 +24,15 @@ import org.springframework.session.events.SessionDeletedEvent;
 import org.springframework.session.events.SessionExpiredEvent;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
-
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class SessionEventListener
 {
-    private final JwtProperties jwtProperties;
-    private final AdvancedSessionRegistry sessionRegistry;
-
-
     @EventListener
     public void onSessionCreated(SessionCreatedEvent event)
     {
-        long expirationInMinutes = jwtProperties.getExpirationInMinutes() + 5;
-        sessionRegistry.setMaxInactiveInterval(event.getSessionId(), Duration.ofMinutes(expirationInMinutes));
-
-        log.debug("Session created: {}, maxInactiveInterval: {} minutes", event.getSessionId(), expirationInMinutes);
+        log.debug("Session created: {}", event.getSessionId());
     }
 
 

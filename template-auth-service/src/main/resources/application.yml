@@ -163,7 +163,7 @@ jwt:
   private-key-alias: templatekey
   private-key-encryptedPassword: jdP5CKDIu5v2VUafF33pPQ==
   public-key-alias: templatekey
-  expiration-in-minutes: 60
+  expiration-in-minutes: 10
 
 
 #-----------------------------------------------------------------------------------------------------------------------

@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.session.local;
+package hu.perit.spvitamin.spring.session.repository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.session.MapSession;
 import org.springframework.session.MapSessionRepository;
 import org.springframework.session.Session;
+import org.springframework.session.SessionIdGenerator;
+import org.springframework.session.UuidSessionIdGenerator;
 import org.springframework.session.events.SessionCreatedEvent;
 import org.springframework.session.events.SessionDeletedEvent;
 import org.springframework.session.events.SessionExpiredEvent;
@@ -28,10 +31,18 @@ import org.springframework.session.events.SessionExpiredEvent;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * - Mi ez: az alkalmazás HTTP munkameneteinek (HttpSession) általános tárolója/abstrakciója.
+ * - Mit csinál: session létrehozás, betöltés, mentés, törlés; lejárat (TTL) kezelése; események küldése (létrejött, lejárt).
+ * - Hol hasznos: megosztott/tartós tárolás (pl. Redis/JDBC) és klaszteres környezet.
+ */
+
+@Slf4j
 public class SpvitaminSessionRepository extends MapSessionRepository
 {
     private final Map<String, Session> sessions;
     private final ApplicationEventPublisher eventPublisher;
+    private final SessionIdGenerator sessionIdGenerator = UuidSessionIdGenerator.getInstance();
 
 
     public SpvitaminSessionRepository(Map<String, Session> sessions, ApplicationEventPublisher eventPublisher)
@@ -48,6 +59,24 @@ public class SpvitaminSessionRepository extends MapSessionRepository
         MapSession session = super.createSession();
         eventPublisher.publishEvent(new SessionCreatedEvent(this, session));
         return session;
+    }
+
+
+    @Override
+    public MapSession findById(String id)
+    {
+        Session saved = this.sessions.get(id);
+        if (saved == null)
+        {
+            return null;
+        }
+        if (saved.isExpired())
+        {
+            return null;
+        }
+        MapSession result = new MapSession(saved);
+        result.setSessionIdGenerator(this.sessionIdGenerator);
+        return result;
     }
 
 

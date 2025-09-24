@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.session.local;
+package hu.perit.spvitamin.spring.session.registry;
 
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import org.springframework.security.core.session.SessionRegistry;
