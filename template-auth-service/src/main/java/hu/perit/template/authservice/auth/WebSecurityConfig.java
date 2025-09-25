@@ -16,6 +16,7 @@
 
 package hu.perit.template.authservice.auth;
 
+import hu.perit.spvitamin.spring.config.EnableSpvitaminOAuth2Idp;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
 import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
@@ -46,6 +47,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @EnableLocalUserAuthProvider
 @EnableMethodSecurity(securedEnabled = true)
+@EnableSpvitaminOAuth2Idp
 public class WebSecurityConfig
 {
     private final DbAuthenticationProvider dbAuthenticationProvider;
@@ -73,54 +75,6 @@ public class WebSecurityConfig
 
     @Bean
     @Order(2)
-    public SecurityFilterChain configureOAuth2Idp1(HttpSecurity http) throws Exception
-    {
-        // http://localhost:8410/api/spvitamin/oauth2/token
-
-        SimpleHttpSecurityBuilder.newInstance(http)
-                .scope("/api/spvitamin/oauth2/token")
-                .authorizeRequests(r -> r.anyRequest().permitAll())
-                .createSession();
-
-        return http.build();
-    }
-
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain configureOAuth2Idp2(HttpSecurity http) throws Exception
-    {
-        // http://localhost:8410/api/spvitamin/oauth2/refresh
-        // http://localhost:8410/.well-known/openid-configuration
-        // http://localhost:8410/.well-known/jwks.json
-
-        SimpleHttpSecurityBuilder.newInstance(http)
-                .scope(
-                        "/api/spvitamin/oauth2/refresh",
-                        "/.well-known/**")
-                .authorizeRequests(r -> r.anyRequest().permitAll());
-
-        return http.build();
-    }
-
-
-    @Bean
-    @Order(2)
-    public SecurityFilterChain configureOAuth2Idp3(HttpSecurity http) throws Exception
-    {
-        // http://localhost:8410/.well-known/userinfo
-
-        SimpleHttpSecurityBuilder.newInstance(http)
-                .scope("/api/spvitamin/oauth2/userinfo")
-                .authorizeRequests(r -> r.anyRequest().authenticated())
-                .jwtAuth();
-
-        return http.build();
-    }
-
-
-    @Bean
-    @Order(3)
     public SecurityFilterChain configureAuthenticateEndpoint(HttpSecurity http) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)
@@ -140,7 +94,7 @@ public class WebSecurityConfig
 
 
     @Bean
-    @Order(4)
+    @Order(3)
     public SecurityFilterChain configureTokenSecuredEndpoints(HttpSecurity http) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)
