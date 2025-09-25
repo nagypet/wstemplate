@@ -20,8 +20,8 @@ import hu.perit.spvitamin.spring.exception.BadTokenException;
 import hu.perit.spvitamin.spring.security.auth.jwt.TokenClaims;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Singular;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Peter Nagy
@@ -57,10 +59,13 @@ public class AuthenticatedUser implements UserDetails
 
     public static AuthenticatedUser fromClaims(TokenClaims claims)
     {
+        Collection<GrantedAuthority> authoritiesAndScopes = claims.getAuthorities();
+        Set<String> scopes = claims.getScope().stream().map(s -> "SCOPE_" + s).collect(Collectors.toSet());
+        authoritiesAndScopes.addAll(AuthorityUtils.createAuthorityList(scopes));
         return AuthenticatedUser.builder()
                 .username(claims.getSubject())
                 .displayName(claims.getPreferredUsername())
-                .authorities(claims.getAuthorities())
+                .authorities(authoritiesAndScopes)
                 .userId(claims.getUserId())
                 .anonymous(false)
                 .source(claims.getSource())

@@ -34,6 +34,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
@@ -230,10 +231,32 @@ public class OAuth2ServiceImpl implements OAuth2Service
         return ResponseEntity.ok(Map.of(
                 "issuer", issuer,
                 "token_endpoint", issuer + base + "/oauth2/token",
+                "userinfo_endpoint", issuer + base + "/oauth2/userinfo",
                 "jwks_uri", issuer + "/.well-known/jwks.json",
                 "grant_types_supported", spvitaminOAuth2Properties.getGrantTypes(),
                 "token_endpoint_auth_methods_supported", List.of("client_secret_basic", "client_secret_post")
         ));
+    }
+
+
+    @Override
+    public ResponseEntity<Map<String, Object>> getUserInfo()
+    {
+        Map<String, Object> retval = new HashMap<>();
+
+        // Check scopes
+        AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
+        Set<String> permissions = AuthorityUtils.authorityListToSet(authenticatedUser.getAuthorities());
+        if (permissions.stream().anyMatch(i -> i.equalsIgnoreCase("SCOPE_OPENID")))
+        {
+            retval.put("sub", authenticatedUser.getUserId() != null ? authenticatedUser.getUserId() : authenticatedUser.getUsername());
+        }
+        if (permissions.stream().anyMatch(i -> i.equalsIgnoreCase("SCOPE_PROFILE")))
+        {
+            retval.put("name", authenticatedUser.getUsername());
+            retval.put("preferred_username", authenticatedUser.getDisplayName());
+        }
+        return ResponseEntity.ok(retval);
     }
 
 

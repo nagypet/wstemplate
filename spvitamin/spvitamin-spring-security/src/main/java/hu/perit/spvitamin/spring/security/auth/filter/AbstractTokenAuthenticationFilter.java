@@ -82,7 +82,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
                     log.debug(String.format("Authentication restored from JWT token: '%s'", authenticatedUser.toString()));
 
                     UsernamePasswordAuthenticationToken authentication;
-                    Collection<? extends GrantedAuthority> privileges = claims.getAuthorities();
+                    Collection<? extends GrantedAuthority> privileges = authenticatedUser.getAuthorities();
                     if (StringUtils.isNotBlank(authenticatedUser.getSource()))
                     {
                         authentication = new LdapAuthenticationToken(authenticatedUser, null, privileges, authenticatedUser.getSource(), claims.getPreferredUsername());

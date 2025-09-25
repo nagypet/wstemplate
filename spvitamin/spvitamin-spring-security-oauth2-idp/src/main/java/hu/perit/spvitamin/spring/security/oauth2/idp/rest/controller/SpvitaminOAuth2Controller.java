@@ -84,6 +84,21 @@ public class SpvitaminOAuth2Controller implements SpvitaminOAuth2Api
     }
 
 
+    @Override
+    @LoggedRestMethod(eventId = Constants.OAUTH2_CONTROLLER_USER_INFO)
+    public ResponseEntity<Map<String, Object>> getUserInfo()
+    {
+        try
+        {
+            return this.oAuth2Service.getUserInfo();
+        }
+        catch (Exception e)
+        {
+            return error(e);
+        }
+    }
+
+
     private static ResponseEntity<Map<String, Object>> error(Exception e)
     {
         log.error(StackTracer.toString(e));

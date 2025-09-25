@@ -2,6 +2,7 @@ package hu.perit.spvitamin.spring.security.oauth2.idp.rest.api;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,10 +23,16 @@ public interface SpvitaminOAuth2Api
             @RequestParam MultiValueMap<String, String> form
     );
 
+
     @GetMapping(path = "/.well-known/openid-configuration", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<Map<String, Object>> openidConfiguration();
 
 
     @GetMapping(path = "/.well-known/jwks.json", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<Map<String, Object>> jwks() throws Exception;
+
+
+    @Secured({"SCOPE_OPENID", "SCOPE_PROFILE"})
+    @GetMapping(path = "/api/spvitamin/oauth2/userinfo", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<Map<String, Object>> getUserInfo();
 }

@@ -73,12 +73,9 @@ public class WebSecurityConfig
 
     @Bean
     @Order(2)
-    public SecurityFilterChain configureOAuth2IdpToken(HttpSecurity http) throws Exception
+    public SecurityFilterChain configureOAuth2Idp1(HttpSecurity http) throws Exception
     {
         // http://localhost:8410/api/spvitamin/oauth2/token
-        // http://localhost:8410/api/spvitamin/oauth2/refresh
-        // http://localhost:8410/.well-known/openid-configuration
-        // http://localhost:8410/.well-known/jwks.json
 
         SimpleHttpSecurityBuilder.newInstance(http)
                 .scope("/api/spvitamin/oauth2/token")
@@ -91,9 +88,8 @@ public class WebSecurityConfig
 
     @Bean
     @Order(2)
-    public SecurityFilterChain configureOAuth2IdpOthers(HttpSecurity http) throws Exception
+    public SecurityFilterChain configureOAuth2Idp2(HttpSecurity http) throws Exception
     {
-        // http://localhost:8410/api/spvitamin/oauth2/token
         // http://localhost:8410/api/spvitamin/oauth2/refresh
         // http://localhost:8410/.well-known/openid-configuration
         // http://localhost:8410/.well-known/jwks.json
@@ -103,6 +99,21 @@ public class WebSecurityConfig
                         "/api/spvitamin/oauth2/refresh",
                         "/.well-known/**")
                 .authorizeRequests(r -> r.anyRequest().permitAll());
+
+        return http.build();
+    }
+
+
+    @Bean
+    @Order(2)
+    public SecurityFilterChain configureOAuth2Idp3(HttpSecurity http) throws Exception
+    {
+        // http://localhost:8410/.well-known/userinfo
+
+        SimpleHttpSecurityBuilder.newInstance(http)
+                .scope("/api/spvitamin/oauth2/userinfo")
+                .authorizeRequests(r -> r.anyRequest().authenticated())
+                .jwtAuth();
 
         return http.build();
     }

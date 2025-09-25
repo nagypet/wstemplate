@@ -25,4 +25,5 @@ public final class Constants
     public static final int OAUTH2_CONTROLLER_REFRESH = OAUTH2_CONTROLLER_BASE + 2;
     public static final int OAUTH2_CONTROLLER_OID_CONFIG = OAUTH2_CONTROLLER_BASE + 3;
     public static final int OAUTH2_CONTROLLER_JWKS = OAUTH2_CONTROLLER_BASE + 4;
+    public static final int OAUTH2_CONTROLLER_USER_INFO = OAUTH2_CONTROLLER_BASE + 5;
 }

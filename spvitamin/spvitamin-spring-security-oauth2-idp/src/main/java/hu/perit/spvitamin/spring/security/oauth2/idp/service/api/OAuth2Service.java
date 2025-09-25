@@ -12,4 +12,6 @@ public interface OAuth2Service
     ResponseEntity<Map<String, Object>> refresh(MultiValueMap<String, String> form);
 
     ResponseEntity<Map<String, Object>> openidConfiguration();
+
+    ResponseEntity<Map<String, Object>> getUserInfo();
 }
