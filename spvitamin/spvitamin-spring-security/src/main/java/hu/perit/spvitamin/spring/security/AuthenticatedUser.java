@@ -76,7 +76,7 @@ public class AuthenticatedUser implements UserDetails
 
     public <T> T getAdditionalClaimThrow(String name, Class<T> clazz)
     {
-        if (!additionalClaims.containsKey(name) || additionalClaims.get(name) == null || "null".equals(additionalClaims.get(name)))
+        if (additionalClaims == null || !additionalClaims.containsKey(name) || additionalClaims.get(name) == null || "null".equals(additionalClaims.get(name)))
         {
             throw new BadTokenException(MessageFormat.format("The token ''{0}'' doesn''t contain a claim with name ''{1}''", this.username, name));
         }
@@ -86,7 +86,7 @@ public class AuthenticatedUser implements UserDetails
 
     public <T> Optional<T> getAdditionalClaim(String name, Class<T> clazz)
     {
-        if ("null".equals(additionalClaims.get(name)))
+        if (additionalClaims == null || "null".equals(additionalClaims.get(name)))
         {
             return Optional.empty();
         }

@@ -18,12 +18,13 @@ package hu.perit.spvitamin.spring.auth;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import hu.perit.spvitamin.json.time.CustomInstantDeserializer;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Singular;
 
 import java.time.Instant;
 import java.util.Map;
@@ -49,7 +50,9 @@ public class AuthorizationToken implements AbstractAuthorizationToken
     @JsonProperty("preferred_username")
     private String preferredUsername;
     private String jwt;
+    @JsonDeserialize(using = CustomInstantDeserializer.class)
     private Instant iat;
+    @JsonDeserialize(using = CustomInstantDeserializer.class)
     private Instant exp;
     private String uid;
     private String clientId;
@@ -57,7 +60,6 @@ public class AuthorizationToken implements AbstractAuthorizationToken
     private Set<String> scope;
     private String source;
     private String sid;
-    //@Singular("additionalClaim")
     private Map<String, Object> additionalClaims;
 
 
