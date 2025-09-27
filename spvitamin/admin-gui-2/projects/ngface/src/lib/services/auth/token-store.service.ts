@@ -17,7 +17,7 @@
 // TypeScript
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {SpvitaminSecurity} from '../../../../../../ngface/src/lib/services/auth/spvitamin-security-models';
+import {SpvitaminSecurity} from '../../model/spvitamin-security-models';
 
 @Injectable({providedIn: 'root'})
 export class TokenStoreService

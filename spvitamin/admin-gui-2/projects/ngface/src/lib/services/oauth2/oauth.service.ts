@@ -1,21 +1,26 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, mapTo, mergeMap, Observable, of, Subject, throwError, timer} from 'rxjs';
+import {BehaviorSubject, mergeMap, Observable, of, Subject, throwError, timer} from 'rxjs';
 import {catchError, finalize, first, map, switchMap, tap} from 'rxjs/operators';
 import {OAuthTokenStoreService} from './oauth-token-store.service';
 import {OAuthTokenResponse, OAuthUserInfo, StoredToken} from './oauth-models';
 import {CookieService} from 'ngx-cookie-service';
-import {OAuthConfigService} from './oauth-config.service';
+import {ConfigurableService} from '../configurable.service';
+
+
+export interface OAuthConfig
+{
+  baseUrl: string;
+  tokenEndpoint: string;
+  clientId?: string;
+  clientSecret?: string;
+  scope?: string;
+}
+
 
 @Injectable({providedIn: 'root'})
-export class OAuthService
+export class OAuthService extends ConfigurableService<OAuthConfig>
 {
-  private get cfg()
-  {
-    return this.oAuthConfigService.config;
-  }
-
-
   private token$ = new BehaviorSubject<StoredToken | null>(null);
   private userInfo$ = new BehaviorSubject<OAuthUserInfo | null>(null);
   private refreshing = false;
@@ -28,10 +33,10 @@ export class OAuthService
   constructor(
     private httpClient: HttpClient,
     private tokenStoreService: OAuthTokenStoreService,
-    private cookieService: CookieService,
-    private oAuthConfigService: OAuthConfigService,
+    private cookieService: CookieService
   )
   {
+    super();
     const saved = this.tokenStoreService.getToken();
     if (saved)
     {
@@ -60,12 +65,12 @@ export class OAuthService
       grant_type: 'password',
       username,
       password,
-      client_id: this.cfg.clientId,
-      client_secret: this.cfg.clientSecret,
-      scope: this.cfg.scope,
+      client_id: this.config.clientId,
+      client_secret: this.config.clientSecret,
+      scope: this.config.scope,
     });
 
-    return this.httpClient.post<OAuthTokenResponse>(`${this.cfg.baseUrl}${this.cfg.tokenEndpoint}`, body.toString(), {
+    return this.httpClient.post<OAuthTokenResponse>(`${this.config.baseUrl}${this.config.tokenEndpoint}`, body.toString(), {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     }).pipe(
       tap(res =>
@@ -90,11 +95,11 @@ export class OAuthService
     this.refreshing = true;
     const body = this.buildForm({
       grant_type: 'refresh_token',
-      client_id: this.cfg.clientId,
-      client_secret: this.cfg.clientSecret
+      client_id: this.config.clientId,
+      client_secret: this.config.clientSecret
     });
 
-    return this.httpClient.post<OAuthTokenResponse>(`${this.cfg.baseUrl}${this.cfg.tokenEndpoint}`, body.toString(), {
+    return this.httpClient.post<OAuthTokenResponse>(`${this.config.baseUrl}${this.config.tokenEndpoint}`, body.toString(), {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     }).pipe(
       tap(res =>
@@ -110,7 +115,6 @@ export class OAuthService
       map(() => void 0),
       catchError(err =>
         {
-          // VISSZAADJUK a logout Observable-ját, hogy tényleg lefusson a hívás
           return this.logout().pipe(
             // ha a logout is hibázik, azt lenyeljük
             catchError(() => of(void 0)),
@@ -130,11 +134,12 @@ export class OAuthService
   {
     console.log('logout');
 
-    return this.httpClient.post<void>(`${this.cfg.baseUrl}/api/spvitamin/logout`, {}).pipe(
+    return this.httpClient.post<void>(`${this.config.baseUrl}/api/spvitamin/logout`, {}).pipe(
       tap(() =>
       {
         console.log('logout successful');
       }),
+      catchError(() => of(void 0)),
       finalize(() =>
       {
         this.cleanUpSessionStorage();
@@ -151,7 +156,7 @@ export class OAuthService
     console.log('getProfile()');
     return new Observable<OAuthUserInfo>(observer =>
     {
-      this.httpClient.get<OAuthUserInfo>(`${this.cfg.baseUrl}/api/spvitamin/oauth2/userinfo`).subscribe({
+      this.httpClient.get<OAuthUserInfo>(`${this.config.baseUrl}/api/spvitamin/oauth2/userinfo`).subscribe({
         next: userInfo =>
         {
           // OK

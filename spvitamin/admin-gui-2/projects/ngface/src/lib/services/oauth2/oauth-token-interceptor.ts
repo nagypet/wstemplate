@@ -20,19 +20,17 @@ import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest}
 import {Observable, switchMap, throwError} from 'rxjs';
 import {OAuthService} from './oauth.service';
 import {catchError} from 'rxjs/operators';
-import {OAuthConfigService} from './oauth-config.service';
 
 @Injectable()
 export class OAuthInterceptor implements HttpInterceptor
 {
   private get cfg()
   {
-    return this.oAuthConfigService.config;
+    return this.oAuthService.config;
   }
 
   constructor(
-    private oAuthService: OAuthService,
-    private oAuthConfigService: OAuthConfigService
+    private oAuthService: OAuthService
   )
   {
   }

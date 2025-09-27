@@ -33,27 +33,21 @@ import {catchError} from 'rxjs/operators';
 import {OAuthInterceptor} from '../../../ngface/src/lib/services/oauth2/oauth-token-interceptor';
 import {OAuthService} from '../../../ngface/src/lib/services/oauth2/oauth.service';
 import {AuthGuard} from './core/services/auth.guard';
-import {OAuthConfigService} from '../../../ngface/src/lib/services/oauth2/oauth-config.service';
 import {environment} from '../environments/environment';
 
 
-function initOAuthConfig(cfg: OAuthConfigService)
+function initOAuth(oAuthService: OAuthService)
 {
-  return () => {
-    cfg.configure({
-      baseUrl: environment.baseURL,
-      tokenEndpoint: '/api/spvitamin/oauth2/token',
-      clientId: 'e789a21e-1eeb-4081-9a54-6405b5b9dda1',
-      clientSecret: '921a0a93-a98a-4111-bb67-09b05c448d3d',
-      scope: 'openid profile offline_access',
-    });
-  };
-}
+  oAuthService.configure({
+    baseUrl: environment.baseURL,
+    tokenEndpoint: '/api/spvitamin/oauth2/token',
+    clientId: 'e789a21e-1eeb-4081-9a54-6405b5b9dda1',
+    clientSecret: '921a0a93-a98a-4111-bb67-09b05c448d3d',
+    scope: 'openid profile offline_access',
+  });
 
-function initOAuth(auth: OAuthService)
-{
   return () => firstValueFrom(
-    auth.refreshToken().pipe(catchError(() => of(null)))
+    oAuthService.refreshToken().pipe(catchError(() => of(null)))
   );
 }
 
@@ -87,7 +81,6 @@ export const appConfig: ApplicationConfig = {
     },
 
     provideHttpClient(withInterceptorsFromDi()),
-    { provide: APP_INITIALIZER, useFactory: initOAuthConfig, deps: [OAuthConfigService], multi: true },
     { provide: APP_INITIALIZER, useFactory: initOAuth, deps: [OAuthService], multi: true }
   ]
 };

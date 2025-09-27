@@ -27,7 +27,7 @@ import {NgfaceWidgetFactory} from '../../../../../ngface/src/lib/widgets/ngface-
 import {AuthenticationRepositoryService} from '../../core/services/authentication-repository.service';
 import {MatButton} from '@angular/material/button';
 import {environment} from '../../../environments/environment';
-import {SpvitaminSecurity} from '../../core/model/spvitamin-security-models';
+import {SpvitaminSecurity} from '../../../../../ngface/src/lib/services/auth/spvitamin-security-models';
 import {OAuthService} from '../../../../../ngface/src/lib/services/oauth2/oauth.service';
 
 @Component({

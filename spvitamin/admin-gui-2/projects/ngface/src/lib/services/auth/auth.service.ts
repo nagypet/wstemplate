@@ -16,29 +16,28 @@
 
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, mapTo, Observable, of, switchMap, throwError} from 'rxjs';
+import {BehaviorSubject, config, mapTo, Observable, of, switchMap, throwError} from 'rxjs';
 import {CookieService} from 'ngx-cookie-service';
 import {catchError, finalize, map, tap} from 'rxjs/operators';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {environment} from '../../../../environments/environment';
-import {SpvitaminSecurity} from '../../../../../../ngface/src/lib/services/auth/spvitamin-security-models';
 import {TokenStoreService} from './token-store.service';
+import {ConfigurableService} from '../configurable.service';
+import {SpvitaminSecurity} from './spvitamin-security-models';
+
+export interface AuthConfig
+{
+  baseUrl: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService
+export class AuthService extends ConfigurableService<AuthConfig>
 {
   private loginSubject$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loggedIn$ = this.loginSubject$.asObservable();
 
   public isRefreshing = false;
-
-
-  get isLoggedIn(): boolean
-  {
-    return this.loginSubject$.value;
-  }
 
 
   constructor(private httpClient: HttpClient,
@@ -47,6 +46,7 @@ export class AuthService
               private tokenHolderService: TokenStoreService
   )
   {
+    super();
   }
 
 
@@ -58,7 +58,7 @@ export class AuthService
     console.log('getProfile()');
     return new Observable<SpvitaminSecurity.AuthorizationToken>(observer =>
     {
-      this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(`${environment.baseURL}/api/spvitamin/authenticate`).subscribe({
+      this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(`${this.config.baseUrl}/api/spvitamin/authenticate`).subscribe({
         next: token =>
         {
           // OK
@@ -94,7 +94,7 @@ export class AuthService
 
     return this.logout().pipe(
       switchMap(() => this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(
-        `${environment.baseURL}/api/spvitamin/authenticate`,
+        `${this.config.baseUrl}/api/spvitamin/authenticate`,
         {
           headers,
           withCredentials: true
@@ -166,7 +166,7 @@ export class AuthService
   {
     const headers = new HttpHeaders().append('Authorization', 'Bearer ' + token.jwt);
     return this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(
-      `${environment.baseURL}/api/spvitamin/authenticate`,
+      `${this.config.baseUrl}/api/spvitamin/authenticate`,
       {headers}
     );
   }
