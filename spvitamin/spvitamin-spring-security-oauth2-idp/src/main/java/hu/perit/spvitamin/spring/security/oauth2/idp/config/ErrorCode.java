@@ -25,8 +25,8 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode
 {
     INVALID_CLIENT("invalid_client", HttpStatus.UNAUTHORIZED),
-    INVALID_REQUEST("invalid_request", HttpStatus.BAD_REQUEST),
-    INVALID_GRANT("invalid_grant", HttpStatus.BAD_REQUEST),
+    INVALID_REQUEST("invalid_request", HttpStatus.UNAUTHORIZED),
+    INVALID_GRANT("invalid_grant", HttpStatus.UNAUTHORIZED),
     UNSUPPORTED_GRANT_TYPE("unsupported_grant_type", HttpStatus.BAD_REQUEST),
     ;
 

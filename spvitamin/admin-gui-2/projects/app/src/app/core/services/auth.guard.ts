@@ -16,11 +16,11 @@
 
 /* tslint:disable:one-line */
 import {Injectable} from '@angular/core';
-import {ActivatedRouteSnapshot, CanActivate, CanActivateChild, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
+import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree} from '@angular/router';
 import {Observable, of} from 'rxjs';
-import {AuthService} from './auth.service';
-import {AdminService} from '../admin.service';
+import {AdminService} from './admin.service';
 import {catchError, map} from 'rxjs/operators';
+import {OAuthService} from '../../../../../ngface/src/lib/services/oauth2/oauth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +29,7 @@ export class AuthGuard implements CanActivate
 {
 
   constructor(
-    private authService: AuthService,
+    private authService: OAuthService,
     private adminService: AdminService,
     private router: Router)
   {
@@ -54,7 +54,7 @@ export class AuthGuard implements CanActivate
     | Observable<boolean | UrlTree>
   {
 
-    if (this.authService.isLoggedIn)
+    if (this.authService.accessToken)
     {
       return true;
     }
