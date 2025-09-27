@@ -89,6 +89,10 @@ public class LoggedRestMethodAspect
 
         String username = getUsername(annotation, arguments);
         String subsystem = StringUtils.isNotBlank(annotation.subsystem()) ? annotation.subsystem() : environment.getProperty("spring.application.name");
+        if (StringUtils.isNotBlank(annotation.module()))
+        {
+            subsystem = subsystem + "." + annotation.module();
+        }
 
         try (Took took = new Took(method, !annotation.muted()))
         {

@@ -32,6 +32,7 @@ public @interface LoggedRestMethod
     int eventId();
 
     String subsystem() default "";
+    String module() default "";
     boolean muted() default false;
 
     /**
