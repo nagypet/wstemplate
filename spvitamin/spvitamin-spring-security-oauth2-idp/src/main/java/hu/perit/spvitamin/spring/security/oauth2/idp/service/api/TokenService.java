@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.security.oauth2.idp.service.api;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
+import hu.perit.spvitamin.spring.security.oauth2.idp.config.SpvitaminOAuth2Properties;
 import hu.perit.spvitamin.spring.security.oauth2.idp.rest.model.TokenResult;
 
 import java.time.Duration;
@@ -37,4 +38,6 @@ public interface TokenService
     TokenResult issueRefreshTokenForUser(String clientId, AuthenticatedUser authenticatedUser, Set<String> grantedScopes, Duration ttl);
 
     TokenResult refreshToken(AuthorizationToken token, JwtTokenProvider.Type type, Duration ttl);
+
+    AuthorizationToken getSessionToken(AuthenticatedUser authenticatedUser, SpvitaminOAuth2Properties.ClientProps clientProps);
 }

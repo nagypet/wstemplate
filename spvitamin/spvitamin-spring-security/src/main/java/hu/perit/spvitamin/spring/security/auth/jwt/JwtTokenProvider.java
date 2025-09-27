@@ -125,8 +125,8 @@ public class JwtTokenProvider
                     .exp(issuedAt.plus(ttl))
                     .uid(authenticatedUser.getUserId())
                     .clientId(type == Type.REFRESH ? clientId : null)
-                    .rls(AuthorityUtils.authorityListToSet(authenticatedUser.getAuthorities()).stream().filter(i -> i.startsWith("ROLE_")).collect(Collectors.toSet()))
-                    .scope(type != Type.JWT ? scopes : null)
+                    .rls(filterRoles(authenticatedUser))
+                    .scope(type != Type.JWT ? filterScopes(authenticatedUser, scopes) : null)
                     .source(authenticatedUser.getSource())
                     .sid(RequestQuery.getSessionId())
                     .additionalClaims(authenticatedUser.getAdditionalClaims())
@@ -140,6 +140,27 @@ public class JwtTokenProvider
         {
             throw new JwtException("Token creation failed!", e);
         }
+    }
+
+
+    private static Set<String> filterRoles(AuthenticatedUser authenticatedUser)
+    {
+        return AuthorityUtils.authorityListToSet(authenticatedUser.getAuthorities()).stream().filter(i -> i.startsWith("ROLE_")).collect(Collectors.toSet());
+    }
+
+
+    private static Set<String> filterScopes(AuthenticatedUser authenticatedUser, Set<String> additionalRoles)
+    {
+        Set<String> filtered = AuthorityUtils.authorityListToSet(authenticatedUser.getAuthorities()).stream()
+                .filter(i -> i.startsWith("SCOPE_"))
+                .map(String::toLowerCase)
+                .map(i -> i.substring(6))
+                .collect(Collectors.toSet());
+        if (additionalRoles != null)
+        {
+            filtered.addAll(additionalRoles);
+        }
+        return filtered;
     }
 
 

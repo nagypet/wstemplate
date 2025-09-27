@@ -19,6 +19,7 @@ package hu.perit.spvitamin.spring.security.oauth2.idp.service.impl.token;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
+import hu.perit.spvitamin.spring.security.oauth2.idp.config.SpvitaminOAuth2Properties;
 import hu.perit.spvitamin.spring.security.oauth2.idp.rest.model.TokenResult;
 import hu.perit.spvitamin.spring.security.oauth2.idp.service.api.TokenService;
 import lombok.RequiredArgsConstructor;
@@ -92,5 +93,12 @@ public class TokenServiceImpl implements TokenService
         String jwt = this.jwtTokenProvider.getJwtFromAuthorizationToken(authorizationToken);
         this.jwtTokenProvider.touchSession(type);
         return new TokenResult(jwt, exp);
+    }
+
+
+    @Override
+    public AuthorizationToken getSessionToken(AuthenticatedUser authenticatedUser, SpvitaminOAuth2Properties.ClientProps clientProps)
+    {
+        return  this.jwtTokenProvider.generateToken(JwtTokenProvider.Type.REFRESH, authenticatedUser, clientProps.getClientId(), null, Instant.now(), Duration.ofMinutes(5));
     }
 }

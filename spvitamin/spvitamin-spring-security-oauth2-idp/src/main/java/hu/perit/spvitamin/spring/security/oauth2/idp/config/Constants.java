@@ -34,8 +34,6 @@ public final class Constants
 
     public static final String OFFLINE_ACCESS = "offline_access";
 
-    public static final String REFRESH_TOKEN_COOKIE_NAME = "d0fbf0dd-1bc5-45c6-9061-834ed3a6e3b1";
-
     public static final int OAUTH2_CONTROLLER_BASE = 1000;
     public static final int OAUTH2_CONTROLLER_TOKEN = OAUTH2_CONTROLLER_BASE + 1;
     public static final int OAUTH2_CONTROLLER_REFRESH = OAUTH2_CONTROLLER_BASE + 2;

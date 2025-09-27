@@ -156,7 +156,7 @@ public class OAuth2ServiceImpl implements OAuth2Service
 
         if (isError)
         {
-            headers.add(HttpHeaders.SET_COOKIE, buildDeleteRefreshTokenCookie().toString());
+            headers.add(HttpHeaders.SET_COOKIE, buildDeleteRefreshTokenCookie(clientProps).toString());
             return new ResponseEntity<>(body, headers, original.getStatusCode());
         }
 
@@ -165,7 +165,7 @@ public class OAuth2ServiceImpl implements OAuth2Service
             Object rt = body.get(Constants.REFRESH_TOKEN);
             if (rt instanceof String refreshToken && !refreshToken.isBlank())
             {
-                headers.add(HttpHeaders.SET_COOKIE, buildRefreshTokenCookie(refreshToken).toString());
+                headers.add(HttpHeaders.SET_COOKIE, buildRefreshTokenCookie(refreshToken, clientProps).toString());
                 if (!clientProps.isAllowRefreshTokenInResponse())
                 {
                     body.remove(Constants.REFRESH_TOKEN);
@@ -179,14 +179,14 @@ public class OAuth2ServiceImpl implements OAuth2Service
     }
 
 
-    private ResponseCookie buildRefreshTokenCookie(String value)
+    private ResponseCookie buildRefreshTokenCookie(String value, SpvitaminOAuth2Properties.ClientProps clientProps)
     {
         String contextPath = request.getContextPath();
         String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
 
         Duration refreshTtl = spvitaminOAuth2Properties.getTokens().getRefreshTtl();
 
-        return ResponseCookie.from(Constants.REFRESH_TOKEN_COOKIE_NAME, value)
+        return ResponseCookie.from(clientProps.getClientId(), value)
                 .httpOnly(true)
                 .secure(request.isSecure())
                 .path(path)
@@ -196,12 +196,12 @@ public class OAuth2ServiceImpl implements OAuth2Service
     }
 
 
-    private ResponseCookie buildDeleteRefreshTokenCookie()
+    private ResponseCookie buildDeleteRefreshTokenCookie(SpvitaminOAuth2Properties.ClientProps clientProps)
     {
         String contextPath = request.getContextPath();
         String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
 
-        return ResponseCookie.from(Constants.REFRESH_TOKEN_COOKIE_NAME, "")
+        return ResponseCookie.from(clientProps.getClientId(), "")
                 .httpOnly(true)
                 .secure(request.isSecure())
                 .path(path)
@@ -383,26 +383,36 @@ public class OAuth2ServiceImpl implements OAuth2Service
     {
         try
         {
-            // 1) Form paraméterben próbáljuk
-            String refreshToken = StringUtils.trimToNull(refreshTokenFromForm);
-
-            // 2) Ha nincs form-ban, próbáljuk cookie-ból
-            if (refreshToken == null)
+            AuthenticatedUser authenticatedUser = this.authorizationService.getAuthenticatedUser();
+            AuthorizationToken token = null;
+            if (authenticatedUser.isAnonymous())
             {
-                refreshToken = CookieHelper.getCookie(Constants.REFRESH_TOKEN_COOKIE_NAME, request);
+                // 1) Form paraméterben próbáljuk
+                String refreshToken = StringUtils.trimToNull(refreshTokenFromForm);
+
+                // 2) Ha nincs form-ban, próbáljuk cookie-ból
+                if (refreshToken == null)
+                {
+                    refreshToken = CookieHelper.getCookie(clientProps.getClientId(), request);
+                }
+
+                // 3) Ha továbbra sincs, hiba
+                if (refreshToken == null)
+                {
+                    return error(ErrorCode.INVALID_REQUEST, "Missing refresh_token in form or cookie.");
+                }
+
+                token = tokenService.verifyRefreshToken(refreshToken);
+
+                ResponseEntity<Map<String, Object>> validationResult = validateRefreshToken(token, clientProps);
+                if (validationResult != null)
+                {
+                    return validationResult;
+                }
             }
-
-            // 3) Ha továbbra sincs, hiba
-            if (refreshToken == null)
+            else
             {
-                return error(ErrorCode.INVALID_REQUEST, "Missing refresh_token in form or cookie.");
-            }
-
-            AuthorizationToken token = tokenService.verifyRefreshToken(refreshToken);
-            ResponseEntity<Map<String, Object>> validationResult = validateRefreshToken(token, clientProps);
-            if (validationResult != null)
-            {
-                return validationResult;
+                token = this.tokenService.getSessionToken(authenticatedUser, clientProps);
             }
 
             Duration accessTtl = spvitaminOAuth2Properties.getTokens().getAccessTtl();
@@ -415,7 +425,7 @@ public class OAuth2ServiceImpl implements OAuth2Service
             response.put(Constants.TOKEN_TYPE, Constants.BEARER);
             response.put(Constants.EXPIRES_IN, access.expiresInSeconds());
             response.put(Constants.REFRESH_TOKEN, refresh.getToken());
-            if (!token.getScope().isEmpty())
+            if (token.getScope() != null && !token.getScope().isEmpty())
             {
                 response.put(Constants.SCOPE, String.join(" ", token.getScope()));
             }
