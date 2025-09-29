@@ -112,6 +112,15 @@ security:
         scopes:
           - public_profile
           - email
+      spvitamin:
+        display-name: Spvitamin idP
+        issuer-uri: http://localhost:8410
+        client-id: e789a21e-1eeb-4081-9a54-6405b5b9dda1
+        client-secret: 921a0a93-a98a-4111-bb67-09b05c448d3d
+        scopes:
+          - openid
+          - profile
+          - email
 
 
 #-----------------------------------------------------------------------------------------------------------------------
