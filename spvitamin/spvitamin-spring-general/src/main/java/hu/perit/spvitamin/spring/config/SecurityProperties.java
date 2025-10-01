@@ -65,8 +65,7 @@ public class SecurityProperties
     {
         log.debug(this.toString());
         if (productionMode
-                && ("*".equals(this.adminGuiAccess)
-                || "*".equals(this.adminEndpointsAccess)
+                && ("*".equals(this.adminEndpointsAccess)
                 || "*".equals(this.swaggerAccess)
                 || "*".equals(this.managementEndpointsAccess))
         )
@@ -75,12 +74,14 @@ public class SecurityProperties
         }
     }
 
+
     @Data
     public static class OAuth2Configuration
     {
         private Map<String, OAuth2Provider> providers = new HashMap<>();
         private Map<String, WellKnownEndpoints> wellKnownEndpoints = new HashMap<>();
     }
+
 
     @Data
     public static class OAuth2Provider
@@ -95,6 +96,7 @@ public class SecurityProperties
         private String clientSecret;
         private List<String> scopes = List.of("openid", "profile", "email");
     }
+
 
     @Data
     public static class WellKnownEndpoints
