@@ -16,34 +16,58 @@
 
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, config, mapTo, Observable, of, switchMap, throwError} from 'rxjs';
+import {BehaviorSubject, firstValueFrom, mergeMap, Observable, of, Subject, switchMap, throwError} from 'rxjs';
 import {CookieService} from 'ngx-cookie-service';
-import {catchError, finalize, map, tap} from 'rxjs/operators';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {TokenStoreService} from './token-store.service';
-import {ConfigurableService} from '../configurable.service';
+import {catchError, finalize, first, map, tap} from 'rxjs/operators';
+import {ConfigurableService} from './configurable.service';
 import {SpvitaminSecurity} from './spvitamin-security-models';
+import {AbstractAuthService} from './abstract-auth.service';
 
 export interface AuthConfig
 {
   baseUrl: string;
 }
 
+
+export function configureAuthService(authService: AuthService, config: AuthConfig)
+{
+  authService.configure(config);
+  return firstValueFrom(
+    authService.getProfile().pipe(catchError(() => of(null)))
+  );
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService extends ConfigurableService<AuthConfig>
+export class AuthService extends ConfigurableService<AuthConfig> implements AbstractAuthService
 {
-  private loginSubject$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public loggedIn$ = this.loginSubject$.asObservable();
+  private token$ = new BehaviorSubject<SpvitaminSecurity.AuthorizationToken | null>(null);
+  private refreshing = false;
+  private refreshQueue$ = new Subject<void>();
 
-  public isRefreshing = false;
+  private _displayName$ = this.token$.pipe(map(t => t?.preferred_username ?? t?.sub ?? 'Anonymous'));
+  public get displayName$(): Observable<string | undefined>
+  {
+    return this._displayName$;
+  }
+
+  get accessToken(): string | null
+  {
+    const t = this.token$.value;
+    return t && Date.now() < new Date(t.exp).getTime() ? t.jwt : null;
+  }
+
+
+  get isLoggedIn(): boolean
+  {
+    return this.accessToken !== null;
+  }
 
 
   constructor(private httpClient: HttpClient,
-              private cookieService: CookieService,
-              private snackBar: MatSnackBar,
-              private tokenHolderService: TokenStoreService
+              private cookieService: CookieService
   )
   {
     super();
@@ -63,13 +87,13 @@ export class AuthService extends ConfigurableService<AuthConfig>
         {
           // OK
           console.log(`getProfile successful for ${token.sub}`);
-          this.loginSuccess(token, false);
+          this.loginSuccess(token);
           observer.next(token);
         }, error: err =>
         {
           // error
           console.log('getProfile failed', err);
-          this.loginSubject$.next(false);
+          this.token$.next(null);
           observer.error(err);
         }
       });
@@ -83,10 +107,8 @@ export class AuthService extends ConfigurableService<AuthConfig>
    * @param password
    * @param withInfo
    */
-  login(username: string, password: string, withInfo: boolean = true): Observable<SpvitaminSecurity.AuthorizationToken>
+  login(username: string, password: string): Observable<void>
   {
-    this.isRefreshing = true;
-
     let headers = new HttpHeaders().append(
       'Authorization',
       'Basic ' + btoa(unescape(encodeURIComponent(`${username}:${password}`)))
@@ -99,13 +121,13 @@ export class AuthService extends ConfigurableService<AuthConfig>
           headers,
           withCredentials: true
         })),
-      tap(token => this.loginSuccess(token, withInfo)),
+      tap(token => this.loginSuccess(token)),
+      map(() => void 0),
       catchError(error =>
       {
         // ha a login hibás, attól még a logout már megtörtént
         return throwError(() => error);
       }),
-      finalize(() => this.isRefreshing = false)
     );
   }
 
@@ -117,29 +139,15 @@ export class AuthService extends ConfigurableService<AuthConfig>
   {
     console.log('logout');
 
-    const hasToken = !!this.getToken();
-
-    if (!hasToken)
-    {
-      this.cleanUpSessionStorage();
-      return of(void 0); // nincs token, azonnal visszatérünk
-    }
-
-    return this.httpClient.post(`${this.config.baseUrl}/api/spvitamin/logout`, {}).pipe(
+    return this.httpClient.post<void>(`${this.config.baseUrl}/api/spvitamin/logout`, {}).pipe(
       tap(() =>
       {
-        if (withWarning)
-        {
-          this.snackBar.open('Session expired, please login again!', 'OK', {
-            panelClass: 'snackbar-warning'
-          });
-        }
+        console.log('logout successful');
       }),
-      mapTo(void 0), // típus: Observable<void>
+      catchError(() => of(void 0)),
       finalize(() =>
       {
         this.cleanUpSessionStorage();
-        this.loginSubject$.next(false);
       })
     );
   }
@@ -147,7 +155,8 @@ export class AuthService extends ConfigurableService<AuthConfig>
 
   private cleanUpSessionStorage(): void
   {
-    this.tokenHolderService.clear();
+    console.log('cleanUpSessionStorage()');
+    this.token$.next(null);
     this.cookieService.deleteAll();
   }
 
@@ -162,12 +171,38 @@ export class AuthService extends ConfigurableService<AuthConfig>
   }
 
 
-  private renewToken$(token: SpvitaminSecurity.AuthorizationToken): Observable<SpvitaminSecurity.AuthorizationToken>
+  private refreshToken(token: SpvitaminSecurity.AuthorizationToken): Observable<void>
   {
+    if (this.refreshing)
+    {
+      return this.refreshQueue$.pipe(first(), map(() => void 0));
+    }
+
     const headers = new HttpHeaders().append('Authorization', 'Bearer ' + token.jwt);
     return this.httpClient.get<SpvitaminSecurity.AuthorizationToken>(
       `${this.config.baseUrl}/api/spvitamin/authenticate`,
       {headers}
+    ).pipe(
+      tap(response =>
+      {
+        this.loginSuccess(response);
+      }),
+      finalize(() =>
+      {
+        this.refreshing = false;
+        this.refreshQueue$.next();
+      }),
+      map(() => void 0),
+      catchError(err =>
+        {
+          return this.logout().pipe(
+            // ha a logout is hibázik, azt lenyeljük
+            catchError(() => of(void 0)),
+            // majd az eredeti hibát továbbdobjuk a hívónak
+            mergeMap(() => throwError(() => err))
+          );
+        }
+      )
     );
   }
 
@@ -176,61 +211,26 @@ export class AuthService extends ConfigurableService<AuthConfig>
   {
     console.log('renewToken()');
 
-    const token = this.getToken();
+    const token = this.token$.value;
     if (!token)
     {
       return;
     }
 
-    this.renewToken$(token).subscribe({
-      next: (token) => this.loginSuccess(token, false),
-      error: () => this.logout().subscribe()
-    });
+    this.refreshToken(token).subscribe();
   }
 
 
-  private loginSuccess(token: SpvitaminSecurity.AuthorizationToken, withInfo: boolean = true): void
+  private loginSuccess(token: SpvitaminSecurity.AuthorizationToken): void
   {
     console.log(`loginSuccess for ${token.sub}`);
 
-    this.tokenHolderService.setToken(token);
     if (token)
     {
       const tokenValidSeconds = this.getTokenValidSeconds(token);
-      const tokenValidMinutes = Math.round(tokenValidSeconds / 60);
       console.log('time until expire', tokenValidSeconds);
-      if (withInfo)
-      {
-        this.snackBar.open(`Welcome ${this.getDisplayName()}! Session validity: ${tokenValidMinutes} minutes`, 'OK', {
-          duration: 5000
-        });
-      }
     }
-    this.loginSubject$.next(true);
-  }
-
-
-  public checkToken(t?: SpvitaminSecurity.AuthorizationToken): Observable<SpvitaminSecurity.AuthorizationToken | undefined>
-  {
-    const token = t ?? this.getToken();
-
-    if (!token)
-    {
-      return this.logout(true).pipe(map(() => undefined));
-    }
-
-    const tokenValidSeconds = this.getTokenValidSeconds(token);
-    console.log('checkToken() sub: \'' + token.sub + '\' valid: ' + tokenValidSeconds + ' seconds');
-
-    if (tokenValidSeconds > 0)
-    {
-      this.loginSubject$.next(true);
-      return of(token);
-    }
-    else
-    {
-      return this.logout(true).pipe(map(() => undefined));
-    }
+    this.token$.next(token);
   }
 
 
@@ -241,24 +241,5 @@ export class AuthService extends ConfigurableService<AuthConfig>
       return 0;
     }
     return Math.round((new Date(token.exp).getTime() - new Date().getTime()) / 1000);
-  }
-
-
-  public getToken(): SpvitaminSecurity.AuthorizationToken | undefined
-  {
-    let token = this.tokenHolderService.getToken();
-    return token ?? undefined;
-  }
-
-
-  getUserName(): string
-  {
-    return this.getToken()?.sub ?? 'Anonymous';
-  }
-
-
-  getDisplayName(): string
-  {
-    return this.getToken()?.preferred_username ?? this.getUserName();
   }
 }

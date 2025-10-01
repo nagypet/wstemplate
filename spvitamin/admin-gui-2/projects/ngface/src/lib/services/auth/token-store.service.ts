@@ -20,22 +20,22 @@ import {BehaviorSubject, Observable} from 'rxjs';
 import {SpvitaminSecurity} from './spvitamin-security-models';
 
 @Injectable({providedIn: 'root'})
-export class TokenStoreService
+export class TokenStoreService<T>
 {
-  private tokenSubject = new BehaviorSubject<SpvitaminSecurity.AuthorizationToken | null>(null);
+  private tokenSubject = new BehaviorSubject<T | null>(null);
 
   // Feliratkozáshoz (ha kell)
-  token$: Observable<SpvitaminSecurity.AuthorizationToken | null> = this.tokenSubject.asObservable();
+  token$: Observable<T | null> = this.tokenSubject.asObservable();
 
 
   // Szinchr. lekéréshez
-  getToken(): SpvitaminSecurity.AuthorizationToken | null
+  getToken(): T | null
   {
     return this.tokenSubject.value;
   }
 
 
-  setToken(token: SpvitaminSecurity.AuthorizationToken | null): void
+  setToken(token: T | null): void
   {
     this.tokenSubject.next(token);
   }

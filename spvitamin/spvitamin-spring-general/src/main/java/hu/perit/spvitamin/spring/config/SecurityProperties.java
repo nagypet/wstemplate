@@ -95,6 +95,7 @@ public class SecurityProperties
         @NotNull
         private String clientSecret;
         private List<String> scopes = List.of("openid", "profile", "email");
+        private List<String> grantTypes = List.of("authorization_code");
     }
 
 

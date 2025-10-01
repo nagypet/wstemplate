@@ -2,10 +2,11 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, firstValueFrom, mergeMap, Observable, of, Subject, throwError, timer} from 'rxjs';
 import {catchError, finalize, first, map, switchMap, tap} from 'rxjs/operators';
-import {OAuthTokenStoreService} from './oauth-token-store.service';
 import {OAuthTokenResponse, OAuthUserInfo, OpenIdConfigurationResponse, StoredToken} from './oauth-models';
 import {CookieService} from 'ngx-cookie-service';
-import {ConfigurableService} from '../configurable.service';
+import {ConfigurableService} from '../auth/configurable.service';
+import {AbstractAuthService} from '../auth/abstract-auth.service';
+import {TokenStoreService} from '../auth/token-store.service';
 
 
 export interface SimpleOAuthConfig
@@ -43,7 +44,7 @@ export function configureOAuthService(oAuthService: OAuthService, config: Simple
 
 
 @Injectable({providedIn: 'root'})
-export class OAuthService extends ConfigurableService<OAuthConfig>
+export class OAuthService extends ConfigurableService<OAuthConfig> implements AbstractAuthService
 {
   private token$ = new BehaviorSubject<StoredToken | null>(null);
   private userInfo$ = new BehaviorSubject<OAuthUserInfo | null>(null);
@@ -51,12 +52,16 @@ export class OAuthService extends ConfigurableService<OAuthConfig>
   private refreshQueue$ = new Subject<void>();
   private refreshTimerSub: any;
 
-  displayName$ = this.userInfo$.pipe(map(u => u?.preferred_username ?? u?.name));
+  private _displayName$ = this.userInfo$.pipe(map(u => u?.preferred_username ?? u?.name));
+  public get displayName$(): Observable<string | undefined>
+  {
+    return this._displayName$;
+  }
 
 
   constructor(
     private httpClient: HttpClient,
-    private tokenStoreService: OAuthTokenStoreService,
+    private tokenStoreService: TokenStoreService<StoredToken>,
     private cookieService: CookieService
   )
   {
@@ -125,9 +130,9 @@ export class OAuthService extends ConfigurableService<OAuthConfig>
     return this.httpClient.post<OAuthTokenResponse>(`${this.config.baseUrl}${this.config.tokenEndpoint}`, body.toString(), {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     }).pipe(
-      tap(res =>
+      tap(response =>
       {
-        this.onTokenResponse(res);
+        this.onTokenResponse(response);
         this.getProfile().subscribe();
       }),
       map(() => void 0)
@@ -154,9 +159,9 @@ export class OAuthService extends ConfigurableService<OAuthConfig>
     return this.httpClient.post<OAuthTokenResponse>(`${this.config.baseUrl}${this.config.tokenEndpoint}`, body.toString(), {
       headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     }).pipe(
-      tap(res =>
+      tap(response =>
       {
-        this.onTokenResponse(res);
+        this.onTokenResponse(response);
         this.getProfile().subscribe();
       }),
       finalize(() =>
@@ -237,11 +242,11 @@ export class OAuthService extends ConfigurableService<OAuthConfig>
   }
 
 
-  private onTokenResponse(res: OAuthTokenResponse): void
+  private onTokenResponse(response: OAuthTokenResponse): void
   {
-    const expiresAt = Date.now() + (res.expires_in - 30) * 1000; // 30 mp ráhagyás
+    const expiresAt = Date.now() + (response.expires_in - 30) * 1000; // 30 mp ráhagyás
     const stored: StoredToken = {
-      accessToken: res.access_token,
+      accessToken: response.access_token,
       expiresAt
     };
     this.tokenStoreService.setToken(stored);
