@@ -28,13 +28,13 @@ import {NgfaceModule} from '../../../ngface/src/lib/ngface.module';
 import {MatDialogModule} from '@angular/material/dialog';
 import {A11yModule} from '@angular/cdk/a11y';
 import {MAT_SNACK_BAR_DEFAULT_OPTIONS} from '@angular/material/snack-bar';
-import {OAuthInterceptor} from '../../../ngface/src/lib/services/oauth2/oauth-token-interceptor';
 import {OAuthService} from '../../../ngface/src/lib/services/oauth2/oauth.service';
 import {AuthGuard} from './core/services/auth.guard';
 import {environment} from '../environments/environment';
 import {AuthService} from '../../../ngface/src/lib/services/auth/auth.service';
 import {configureSecurity} from '../../../ngface/src/lib/services/auth/configure-security';
 import {AuthenticationRepositoryService} from '../../../ngface/src/lib/services/auth/authentication-repository.service';
+import {TokenInterceptor} from '../../../ngface/src/lib/services/auth/token-interceptor';
 
 
 export function initSecurity(repositoryService: AuthenticationRepositoryService, authService: AuthService, oAuthService: OAuthService)
@@ -66,14 +66,9 @@ export const appConfig: ApplicationConfig = {
     {provide: LOCALE_ID, useValue: 'de-DE'},
     AuthGuard,
     provideAnimations(),
-    // {
-    //   provide: HTTP_INTERCEPTORS,
-    //   useClass: TokenInterceptor,
-    //   multi: true
-    // },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: OAuthInterceptor,
+      useClass: TokenInterceptor,
       multi: true
     },
     {

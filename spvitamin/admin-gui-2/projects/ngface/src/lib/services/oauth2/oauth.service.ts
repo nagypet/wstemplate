@@ -275,4 +275,10 @@ export class OAuthService extends ConfigurableService<OAuthConfig> implements Ab
     });
     return form;
   }
+
+
+  ignoreInTokenInterceptor(url: string): boolean
+  {
+    return this.isConfigured ? url.includes(this.config.tokenEndpoint) : false;
+  }
 }

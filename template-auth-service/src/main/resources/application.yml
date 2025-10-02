@@ -175,8 +175,8 @@ jwt:
   private-key-alias: templatekey
   private-key-encryptedPassword: jdP5CKDIu5v2VUafF33pPQ==
   public-key-alias: templatekey
-  expiration: 1m
-  refresh-expiration: 2m
+  expiration: 5m
+  refresh-expiration: 5d
 
 
 #-----------------------------------------------------------------------------------------------------------------------

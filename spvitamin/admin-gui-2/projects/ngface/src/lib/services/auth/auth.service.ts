@@ -16,8 +16,8 @@
 
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, firstValueFrom, mergeMap, Observable, of, Subject, switchMap, throwError, timer} from 'rxjs';
-import {catchError, finalize, first, map, tap} from 'rxjs/operators';
+import {BehaviorSubject, firstValueFrom, mergeMap, Observable, of, Subject, throwError, timer} from 'rxjs';
+import {catchError, finalize, first, map, switchMap, tap} from 'rxjs/operators';
 import {ConfigurableService} from './configurable.service';
 import {SpvitaminSecurity} from './spvitamin-security-models';
 import {AbstractAuthService} from './abstract-auth.service';
@@ -170,7 +170,7 @@ export class AuthService extends ConfigurableService<AuthConfig> implements Abst
   }
 
 
-  private refreshToken(): Observable<void>
+  refreshToken(): Observable<void>
   {
     const token = this.token$.value;
     if (!token)
@@ -257,5 +257,11 @@ export class AuthService extends ConfigurableService<AuthConfig> implements Abst
       this.refreshTimerSub.unsubscribe?.();
       this.refreshTimerSub = null;
     }
+  }
+
+
+  ignoreInTokenInterceptor(url: string): boolean
+  {
+    return url.includes('authenticate');
   }
 }

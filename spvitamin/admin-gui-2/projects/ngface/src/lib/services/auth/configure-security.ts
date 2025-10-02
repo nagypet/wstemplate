@@ -1,5 +1,5 @@
-import {firstValueFrom, of} from 'rxjs';
-import {catchError, tap} from 'rxjs/operators';
+import {firstValueFrom, from, of} from 'rxjs';
+import {catchError, switchMap, tap} from 'rxjs/operators';
 import {configureOAuthService, OAuthService, SimpleOAuthConfig} from '../oauth2/oauth.service';
 import {AuthenticationRepositoryService} from './authentication-repository.service';
 import {AuthConfig, AuthService, configureAuthService} from './auth.service';
@@ -14,20 +14,22 @@ export function configureSecurity(
 {
   return firstValueFrom(
     repositoryService.getAuthenticationRepository().pipe(
-      tap(authRepo =>
+      switchMap(authRepo =>
       {
         if (isSpvitaminOAuthSupported(authRepo))
         {
           repositoryService.authService = oAuthService;
-          configureOAuthService(oAuthService, oAuthConfig);
+          // Promise -> Observable
+          return from(configureOAuthService(oAuthService, oAuthConfig));
         }
         else
         {
           repositoryService.authService = authService;
-          configureAuthService(authService, authConfig);
+          // Promise -> Observable
+          return from(configureAuthService(authService, authConfig));
         }
       }),
-      catchError((err) =>
+      catchError(err =>
       {
         console.error('Security lib init error', err);
         return of(void 0);
