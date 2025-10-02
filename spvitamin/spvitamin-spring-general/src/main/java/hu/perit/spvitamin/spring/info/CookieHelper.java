@@ -22,6 +22,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.ResponseCookie;
+
+import java.time.Duration;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CookieHelper
@@ -71,5 +74,35 @@ public final class CookieHelper
         }
 
         return null;
+    }
+
+
+    public static ResponseCookie buildRefreshTokenCookie(HttpServletRequest request, String value, String name, Duration ttl)
+    {
+        String contextPath = request.getContextPath();
+        String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
+
+        return ResponseCookie.from(name, value)
+                .httpOnly(true)
+                .secure(request.isSecure())
+                .path(path)
+                .sameSite("Strict")
+                .maxAge(ttl.plusMinutes(1))
+                .build();
+    }
+
+
+    public static ResponseCookie buildDeleteRefreshTokenCookie(HttpServletRequest request, String name)
+    {
+        String contextPath = request.getContextPath();
+        String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
+
+        return ResponseCookie.from(name, "")
+                .httpOnly(true)
+                .secure(request.isSecure())
+                .path(path)
+                .sameSite("Strict")
+                .maxAge(0) // törlés
+                .build();
     }
 }

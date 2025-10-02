@@ -16,8 +16,7 @@
 
 import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, firstValueFrom, mergeMap, Observable, of, Subject, switchMap, throwError} from 'rxjs';
-import {CookieService} from 'ngx-cookie-service';
+import {BehaviorSubject, firstValueFrom, mergeMap, Observable, of, Subject, switchMap, throwError, timer} from 'rxjs';
 import {catchError, finalize, first, map, tap} from 'rxjs/operators';
 import {ConfigurableService} from './configurable.service';
 import {SpvitaminSecurity} from './spvitamin-security-models';
@@ -46,12 +45,14 @@ export class AuthService extends ConfigurableService<AuthConfig> implements Abst
   private token$ = new BehaviorSubject<SpvitaminSecurity.AuthorizationToken | null>(null);
   private refreshing = false;
   private refreshQueue$ = new Subject<void>();
+  private refreshTimerSub: any;
 
   private _displayName$ = this.token$.pipe(map(t => t?.preferred_username ?? t?.sub ?? 'Anonymous'));
   public get displayName$(): Observable<string | undefined>
   {
     return this._displayName$;
   }
+
 
   get accessToken(): string | null
   {
@@ -66,9 +67,7 @@ export class AuthService extends ConfigurableService<AuthConfig> implements Abst
   }
 
 
-  constructor(private httpClient: HttpClient,
-              private cookieService: CookieService
-  )
+  constructor(private httpClient: HttpClient)
   {
     super();
   }
@@ -156,8 +155,8 @@ export class AuthService extends ConfigurableService<AuthConfig> implements Abst
   private cleanUpSessionStorage(): void
   {
     console.log('cleanUpSessionStorage()');
+    this.clearRefreshTimer();
     this.token$.next(null);
-    this.cookieService.deleteAll();
   }
 
 
@@ -171,8 +170,14 @@ export class AuthService extends ConfigurableService<AuthConfig> implements Abst
   }
 
 
-  private refreshToken(token: SpvitaminSecurity.AuthorizationToken): Observable<void>
+  private refreshToken(): Observable<void>
   {
+    const token = this.token$.value;
+    if (!token)
+    {
+      return of(void 0) as Observable<void>;
+    }
+
     if (this.refreshing)
     {
       return this.refreshQueue$.pipe(first(), map(() => void 0));
@@ -207,20 +212,6 @@ export class AuthService extends ConfigurableService<AuthConfig> implements Abst
   }
 
 
-  renewToken(): void
-  {
-    console.log('renewToken()');
-
-    const token = this.token$.value;
-    if (!token)
-    {
-      return;
-    }
-
-    this.refreshToken(token).subscribe();
-  }
-
-
   private loginSuccess(token: SpvitaminSecurity.AuthorizationToken): void
   {
     console.log(`loginSuccess for ${token.sub}`);
@@ -228,18 +219,43 @@ export class AuthService extends ConfigurableService<AuthConfig> implements Abst
     if (token)
     {
       const tokenValidSeconds = this.getTokenValidSeconds(token);
-      console.log('time until expire', tokenValidSeconds);
+      console.log(`token expires in: ${tokenValidSeconds} seconds`);
     }
     this.token$.next(token);
+    this.scheduleRefresh(token);
   }
 
 
-  public getTokenValidSeconds(token?: SpvitaminSecurity.AuthorizationToken): number
+  public getTokenValidSeconds(token: SpvitaminSecurity.AuthorizationToken): number
   {
     if (!token)
     {
       return 0;
     }
+
     return Math.round((new Date(token.exp).getTime() - new Date().getTime()) / 1000);
+  }
+
+
+  private scheduleRefresh(token: SpvitaminSecurity.AuthorizationToken): void
+  {
+    this.clearRefreshTimer();
+    var validSeconds = this.getTokenValidSeconds(token);
+    const delayMs = Math.max(0, validSeconds * 1000 - 30000); // 30 mp ráhagyás
+    this.refreshTimerSub = timer(delayMs).pipe(
+      switchMap(() => this.refreshToken())
+    ).subscribe({
+      error: () => this.logout()
+    });
+  }
+
+
+  private clearRefreshTimer(): void
+  {
+    if (this.refreshTimerSub)
+    {
+      this.refreshTimerSub.unsubscribe?.();
+      this.refreshTimerSub = null;
+    }
   }
 }

@@ -3,10 +3,8 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject, firstValueFrom, mergeMap, Observable, of, Subject, throwError, timer} from 'rxjs';
 import {catchError, finalize, first, map, switchMap, tap} from 'rxjs/operators';
 import {OAuthTokenResponse, OAuthUserInfo, OpenIdConfigurationResponse, StoredToken} from './oauth-models';
-import {CookieService} from 'ngx-cookie-service';
 import {ConfigurableService} from '../auth/configurable.service';
 import {AbstractAuthService} from '../auth/abstract-auth.service';
-import {TokenStoreService} from '../auth/token-store.service';
 
 
 export interface SimpleOAuthConfig
@@ -59,19 +57,9 @@ export class OAuthService extends ConfigurableService<OAuthConfig> implements Ab
   }
 
 
-  constructor(
-    private httpClient: HttpClient,
-    private tokenStoreService: TokenStoreService<StoredToken>,
-    private cookieService: CookieService
-  )
+  constructor(private httpClient: HttpClient)
   {
     super();
-    const saved = this.tokenStoreService.getToken();
-    if (saved)
-    {
-      this.token$.next(saved);
-      this.scheduleRefresh(saved);
-    }
   }
 
 
@@ -235,8 +223,6 @@ export class OAuthService extends ConfigurableService<OAuthConfig> implements Ab
   {
     console.log('cleanUpSessionStorage()');
     this.clearRefreshTimer();
-    this.tokenStoreService.clear();
-    this.cookieService.deleteAll();
     this.token$.next(null);
     this.userInfo$.next(null);
   }
@@ -244,12 +230,12 @@ export class OAuthService extends ConfigurableService<OAuthConfig> implements Ab
 
   private onTokenResponse(response: OAuthTokenResponse): void
   {
-    const expiresAt = Date.now() + (response.expires_in - 30) * 1000; // 30 mp ráhagyás
+    console.log(`token expires in: ${response.expires_in} seconds`);
+    const expiresAt = Date.now() + response.expires_in * 1000;
     const stored: StoredToken = {
       accessToken: response.access_token,
       expiresAt
     };
-    this.tokenStoreService.setToken(stored);
     this.token$.next(stored);
     this.scheduleRefresh(stored);
   }
@@ -258,7 +244,7 @@ export class OAuthService extends ConfigurableService<OAuthConfig> implements Ab
   private scheduleRefresh(tokens: StoredToken): void
   {
     this.clearRefreshTimer();
-    const delayMs = Math.max(0, tokens.expiresAt - Date.now() - 5000); // még 5 mp ráhagyás
+    const delayMs = Math.max(0, tokens.expiresAt - Date.now() - 30000); // 30 mp ráhagyás
     this.refreshTimerSub = timer(delayMs).pipe(
       switchMap(() => this.refreshToken())
     ).subscribe({

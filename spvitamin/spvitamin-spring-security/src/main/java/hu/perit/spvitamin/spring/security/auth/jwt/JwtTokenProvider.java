@@ -22,6 +22,7 @@ import hu.perit.spvitamin.core.domainuser.DomainUser;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.JwtProperties;
 import hu.perit.spvitamin.spring.exception.InvalidTokenException;
+import hu.perit.spvitamin.spring.info.CookieHelper;
 import hu.perit.spvitamin.spring.info.RequestQuery;
 import hu.perit.spvitamin.spring.keystore.KeystoreUtils;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
@@ -32,11 +33,14 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.DefaultClaims;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
@@ -46,12 +50,7 @@ import java.security.Key;
 import java.security.PublicKey;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -63,6 +62,8 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider
 {
+    public static final String CLIENT_ID = "a36eb0ae-8d15-45c3-b9eb-e0c21d519ce3";
+
     @RequiredArgsConstructor
     @Getter
     public enum Type
@@ -84,14 +85,25 @@ public class JwtTokenProvider
     private final JwtProperties jwtProperties;
     private final SessionAuthenticationStrategy sessionAuthenticationStrategy;
     private final AdvancedSessionRegistry sessionRegistry;
+    private final HttpServletRequest request;
+    private final HttpServletResponse response;
 
 
     public AuthorizationToken generateToken(AuthenticatedUser authenticatedUser)
     {
         Instant issuedAt = Instant.now();
-        Duration ttl = Duration.ofMinutes(jwtProperties.getExpirationInMinutes());
+        Duration ttl = jwtProperties.getExpiration();
+        Duration refreshTtl = jwtProperties.getRefreshExpiration();
 
-        return this.generateToken(Type.JWT, authenticatedUser, null, Collections.emptySet(), issuedAt, ttl);
+        // Creating the jwt token
+        AuthorizationToken jwtToken = this.generateToken(Type.JWT, authenticatedUser, null, Collections.emptySet(), issuedAt, ttl);
+
+        // Creating the refresh token
+        AuthorizationToken refreshToken = this.generateToken(Type.REFRESH, authenticatedUser, CLIENT_ID, Collections.emptySet(), issuedAt, refreshTtl);
+
+        this.response.addHeader(HttpHeaders.SET_COOKIE, CookieHelper.buildRefreshTokenCookie(request, refreshToken.getJwt(), CLIENT_ID, refreshTtl).toString());
+
+        return jwtToken;
     }
 
 
@@ -101,9 +113,12 @@ public class JwtTokenProvider
         {
             DomainUser domainUser = DomainUser.newInstance(authenticatedUser.getUsername());
 
-            // Update session timeout
-            setSessionTimeout(type, ttl);
-            touchSession(type);
+            if (type == Type.REFRESH)
+            {
+                // Update session timeout
+                setSessionTimeout(type, ttl);
+                touchSession(type);
+            }
 
             // Updating session-registry
             if (this.sessionAuthenticationStrategy instanceof SpvitaminCompositeSessionAuthenticationStrategy authenticationStrategy)

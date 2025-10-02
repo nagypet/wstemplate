@@ -123,7 +123,7 @@ security:
           - email
         grant-types:
           #- authorization_code
-          - password
+          #- password
 
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -175,7 +175,8 @@ jwt:
   private-key-alias: templatekey
   private-key-encryptedPassword: jdP5CKDIu5v2VUafF33pPQ==
   public-key-alias: templatekey
-  expiration-in-minutes: 10
+  expiration: 1m
+  refresh-expiration: 2m
 
 
 #-----------------------------------------------------------------------------------------------------------------------
