@@ -16,18 +16,17 @@
 
 package hu.perit.spvitamin.spring.config;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.stereotype.Component;
 
-import lombok.Data;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Peter Nagy
@@ -49,6 +48,9 @@ public class SecurityProperties
     private String adminEndpointsAccess = "*";
     private boolean sessionValidationEnabled = true;
     private boolean productionMode = true;
+
+    @NestedConfigurationProperty
+    private AuthConfiguration auth;
 
     @NestedConfigurationProperty
     private OAuth2Configuration oauth2;
@@ -107,5 +109,18 @@ public class SecurityProperties
         private String jwkSetUri;
         private String userInfoUri;
         private String userNameAttributeName;
+    }
+
+
+    @Data
+    public static class AuthConfiguration
+    {
+        @NotNull
+        private String clientId;
+        // If this is set to false, the AuthorizationToken class will not contain a jwt field if the request comes from a browser,
+        // but instead the token will be put into a cookie
+        private boolean allowTokenInResponse = false;
+        private String accessTokenCookieName;
+        private String refreshTokenCookieName;
     }
 }

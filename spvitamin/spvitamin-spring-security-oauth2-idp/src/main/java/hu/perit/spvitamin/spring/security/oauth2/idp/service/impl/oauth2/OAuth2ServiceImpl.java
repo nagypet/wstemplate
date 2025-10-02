@@ -147,7 +147,7 @@ public class OAuth2ServiceImpl implements OAuth2Service
 
         if (isError)
         {
-            headers.add(HttpHeaders.SET_COOKIE, CookieHelper.buildDeleteRefreshTokenCookie(request, clientProps.getClientId()).toString());
+            headers.add(HttpHeaders.SET_COOKIE, CookieHelper.buildDeleteTokenCookie(request, clientProps.getClientId()).toString());
             return new ResponseEntity<>(body, headers, original.getStatusCode());
         }
 
@@ -157,7 +157,7 @@ public class OAuth2ServiceImpl implements OAuth2Service
             if (rt instanceof String refreshToken && !refreshToken.isBlank())
             {
                 Duration refreshTtl = spvitaminOAuth2Properties.getTokens().getRefreshTtl();
-                headers.add(HttpHeaders.SET_COOKIE, CookieHelper.buildRefreshTokenCookie(request, refreshToken, clientProps.getClientId(), refreshTtl).toString());
+                headers.add(HttpHeaders.SET_COOKIE, CookieHelper.buildSetTokenCookie(request, refreshToken, clientProps.getClientId(), refreshTtl).toString());
                 if (!clientProps.isAllowRefreshTokenInResponse())
                 {
                     body.remove(Constants.REFRESH_TOKEN);

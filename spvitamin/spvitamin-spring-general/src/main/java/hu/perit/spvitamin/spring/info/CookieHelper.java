@@ -77,7 +77,7 @@ public final class CookieHelper
     }
 
 
-    public static ResponseCookie buildRefreshTokenCookie(HttpServletRequest request, String value, String name, Duration ttl)
+    public static ResponseCookie buildSetTokenCookie(HttpServletRequest request, String value, String name, Duration ttl)
     {
         String contextPath = request.getContextPath();
         String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;
@@ -92,7 +92,7 @@ public final class CookieHelper
     }
 
 
-    public static ResponseCookie buildDeleteRefreshTokenCookie(HttpServletRequest request, String name)
+    public static ResponseCookie buildDeleteTokenCookie(HttpServletRequest request, String name)
     {
         String contextPath = request.getContextPath();
         String path = (contextPath == null || contextPath.isEmpty()) ? "/" : contextPath;

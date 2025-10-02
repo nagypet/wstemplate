@@ -81,10 +81,15 @@ admin:
 #security.allowed-methods
 # * or comma separated roles (e.g. ADMIN)
 security:
-  swagger-access: "*"
-  management-endpoints-access: "*"
+  swagger-access: ADMIN
+  management-endpoints-access: ADMIN
   admin-gui-access: "*"
-  admin-endpoints-access: "*"
+  admin-endpoints-access: ADMIN
+  auth:
+    client-id: e89f64cf-43ff-49e8-acf2-45c3cc44303d
+    allow-token-in-response: false
+    access-token-cookie-name: spvitamin-auth-at
+    refresh-token-cookie-name: spvitamin-auth-rt
   oauth2:
     providers:
       microsoft:

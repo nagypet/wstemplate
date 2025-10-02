@@ -21,6 +21,7 @@ import com.nimbusds.jose.JWSObject;
 import hu.perit.spvitamin.core.domainuser.DomainUser;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.config.JwtProperties;
+import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.exception.InvalidTokenException;
 import hu.perit.spvitamin.spring.info.CookieHelper;
 import hu.perit.spvitamin.spring.info.RequestQuery;
@@ -35,7 +36,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.impl.DefaultClaims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,11 +58,11 @@ import java.util.stream.Collectors;
  */
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Component
 public class JwtTokenProvider
 {
-    public static final String CLIENT_ID = "a36eb0ae-8d15-45c3-b9eb-e0c21d519ce3";
+    private final SecurityProperties securityProperties;
 
     @RequiredArgsConstructor
     @Getter
@@ -95,13 +95,21 @@ public class JwtTokenProvider
         Duration ttl = jwtProperties.getExpiration();
         Duration refreshTtl = jwtProperties.getRefreshExpiration();
 
+        SecurityProperties.AuthConfiguration auth = this.securityProperties.getAuth();
+
         // Creating the jwt token
-        AuthorizationToken jwtToken = this.generateToken(Type.JWT, authenticatedUser, null, Collections.emptySet(), issuedAt, ttl);
+        AuthorizationToken jwtToken = this.generateToken(Type.JWT, authenticatedUser, auth.getClientId(), Collections.emptySet(), issuedAt, ttl);
 
         // Creating the refresh token
-        AuthorizationToken refreshToken = this.generateToken(Type.REFRESH, authenticatedUser, CLIENT_ID, Collections.emptySet(), issuedAt, refreshTtl);
+        AuthorizationToken refreshToken = this.generateToken(Type.REFRESH, authenticatedUser, auth.getClientId(), Collections.emptySet(), issuedAt, refreshTtl);
 
-        this.response.addHeader(HttpHeaders.SET_COOKIE, CookieHelper.buildRefreshTokenCookie(request, refreshToken.getJwt(), CLIENT_ID, refreshTtl).toString());
+        // Putting tokens into the cookie
+        if (!auth.isAllowTokenInResponse() && RequestQuery.isFromBrowser())
+        {
+            this.response.addHeader(HttpHeaders.SET_COOKIE, CookieHelper.buildSetTokenCookie(request, jwtToken.getJwt(), auth.getAccessTokenCookieName(), ttl).toString());
+            jwtToken.setJwt("hidden");
+        }
+        this.response.addHeader(HttpHeaders.SET_COOKIE, CookieHelper.buildSetTokenCookie(request, refreshToken.getJwt(), auth.getRefreshTokenCookieName(), refreshTtl).toString());
 
         return jwtToken;
     }

@@ -16,11 +16,14 @@
 
 package hu.perit.spvitamin.spring.security.auth.filter.jwt;
 
+import hu.perit.spvitamin.spring.config.SecurityProperties;
+import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.info.CookieHelper;
 import hu.perit.spvitamin.spring.security.auth.filter.AbstractTokenAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.JwtString;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
-import org.springframework.util.StringUtils;
 
 /**
  * This class is intentionally no container. It should be invoked only for Jwt endpoints.
@@ -33,10 +36,18 @@ public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
     @Override
     protected JwtString getJwtFromRequest(HttpServletRequest request)
     {
-        String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer "))
+        // First, check if there is a cookie
+        SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
+        String cookie = CookieHelper.getCookie(securityProperties.getAuth().getAccessTokenCookieName(), request);
+        if (StringUtils.isNotBlank(cookie))
         {
-            return new JwtString(bearerToken.substring(7));
+            return new JwtString(cookie);
+        }
+
+        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (StringUtils.isNotBlank(authorization) && authorization.startsWith("Bearer "))
+        {
+            return new JwtString(authorization.substring(7));
         }
         return null;
     }

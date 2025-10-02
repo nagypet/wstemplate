@@ -34,7 +34,6 @@ import {environment} from '../environments/environment';
 import {AuthService} from '../../../ngface/src/lib/services/auth/auth.service';
 import {configureSecurity} from '../../../ngface/src/lib/services/auth/configure-security';
 import {AuthenticationRepositoryService} from '../../../ngface/src/lib/services/auth/authentication-repository.service';
-import {TokenInterceptor} from '../../../ngface/src/lib/services/auth/token-interceptor';
 
 
 export function initSecurity(repositoryService: AuthenticationRepositoryService, authService: AuthService, oAuthService: OAuthService)
@@ -66,11 +65,11 @@ export const appConfig: ApplicationConfig = {
     {provide: LOCALE_ID, useValue: 'de-DE'},
     AuthGuard,
     provideAnimations(),
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: TokenInterceptor,
-      multi: true
-    },
+    // {
+    //   provide: HTTP_INTERCEPTORS,
+    //   useClass: TokenInterceptor,
+    //   multi: true
+    // },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ErrorInterceptor,

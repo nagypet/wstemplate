@@ -160,11 +160,11 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
             String authorizationHeader = Optional.ofNullable(httpServletRequest).map(i -> i.getHeader("Authorization")).orElse(null);
             if (authorizationHeader == null || !authorizationHeader.startsWith("Basic"))
             {
-                String refreshJwt = CookieHelper.getCookie(JwtTokenProvider.CLIENT_ID, httpServletRequest);
+                String refreshJwt = CookieHelper.getCookie(securityProperties.getAuth().getRefreshTokenCookieName(), httpServletRequest);
                 JwtTokenProvider jwtTokenProvider = SpringContext.getBean(JwtTokenProvider.class);
                 AuthorizationToken refreshToken = jwtTokenProvider.getAuthorizationTokenFromJwt(refreshJwt);
                 // Client-ID must match
-                if (!StringUtils.equalsIgnoreCase(refreshToken.getClientId(), JwtTokenProvider.CLIENT_ID))
+                if (!StringUtils.equalsIgnoreCase(refreshToken.getClientId(), securityProperties.getAuth().getClientId()))
                 {
                     log.warn("Client-ID mismatch in JWT token!");
                     throw new InvalidTokenException("Invalid refresh token!");
