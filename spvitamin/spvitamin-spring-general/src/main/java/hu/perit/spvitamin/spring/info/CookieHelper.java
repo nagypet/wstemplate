@@ -25,6 +25,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseCookie;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CookieHelper
@@ -53,7 +55,19 @@ public final class CookieHelper
     }
 
 
-    public static String getCookie(String cookieName, HttpServletRequest request)
+    public static Optional<Cookie> getCookie(String cookieName, HttpServletRequest request)
+    {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null || cookies.length == 0)
+        {
+            return Optional.empty();
+        }
+
+        return Arrays.stream(cookies).filter(i -> StringUtils.equalsIgnoreCase(cookieName, i.getName())).findFirst();
+    }
+
+
+    public static String getCookieValue(String cookieName, HttpServletRequest request)
     {
         Cookie[] cookies = request.getCookies();
         if (cookies == null || cookies.length == 0)
@@ -61,19 +75,7 @@ public final class CookieHelper
             return null;
         }
 
-        for (Cookie cookie : cookies)
-        {
-            if (StringUtils.equalsIgnoreCase(cookieName, cookie.getName()))
-            {
-                String value = StringUtils.trimToNull(cookie.getValue());
-                if (value != null)
-                {
-                    return value;
-                }
-            }
-        }
-
-        return null;
+        return getCookie(cookieName, request).map(i -> StringUtils.trimToNull(i.getValue())).orElse(null);
     }
 
 

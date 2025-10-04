@@ -21,7 +21,9 @@ import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.info.CookieHelper;
 import hu.perit.spvitamin.spring.security.auth.filter.AbstractTokenAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.JwtString;
+import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 
@@ -31,23 +33,35 @@ import org.springframework.http.HttpHeaders;
  * @author Peter Nagy
  */
 
+@Slf4j
 public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
 {
     @Override
     protected JwtString getJwtFromRequest(HttpServletRequest request)
     {
-        // First, check if there is a cookie
-        SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
-        String cookie = CookieHelper.getCookie(securityProperties.getAuth().getAccessTokenCookieName(), request);
-        if (StringUtils.isNotBlank(cookie))
+        // If there is a Basic auth header, we do nothing
+        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (StringUtils.isNotBlank(authorization) && authorization.startsWith("Basic "))
         {
-            return new JwtString(cookie);
+            return null;
         }
 
-        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.isNotBlank(authorization) && authorization.startsWith("Bearer "))
+        // Then, check if there is a cookie
+        SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
+        String tokenInCookie = CookieHelper.getCookieValue(securityProperties.getAuth().getAccessTokenCookieName(), request);
+        if (StringUtils.isNotBlank(tokenInCookie))
         {
-            return new JwtString(authorization.substring(7));
+            // Returning only if valid to allow checking if the session is authenticated
+            JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
+            return !tokenProvider.isExpired(tokenInCookie) ? new JwtString(tokenInCookie) : null;
+        }
+
+        // Finally, try to get the token from the authorization header
+        if (StringUtils.isNotBlank(authorization) && authorization.startsWith("Bearer ") && authorization.length() > 7)
+        {
+            String tokenInHeader = authorization.substring(7);
+            boolean dummyToken = StringUtils.equals(tokenInHeader, JwtTokenProvider.HIDDEN);
+            return !dummyToken ? new JwtString(tokenInHeader) : null;
         }
         return null;
     }

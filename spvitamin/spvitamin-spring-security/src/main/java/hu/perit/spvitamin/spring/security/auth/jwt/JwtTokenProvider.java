@@ -40,7 +40,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
@@ -50,8 +49,15 @@ import java.security.Key;
 import java.security.PublicKey;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 /**
  * @author Peter Nagy
@@ -62,7 +68,10 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider
 {
+    public static final String HIDDEN = "hidden";
+
     private final SecurityProperties securityProperties;
+
 
     @RequiredArgsConstructor
     @Getter
@@ -103,13 +112,15 @@ public class JwtTokenProvider
         // Creating the refresh token
         AuthorizationToken refreshToken = this.generateToken(Type.REFRESH, authenticatedUser, auth.getClientId(), Collections.emptySet(), issuedAt, refreshTtl);
 
+        jwtToken.setExt(Map.of("rtiat", refreshToken.getIat(), "rtexp", refreshToken.getExp()));
+
         // Putting tokens into the cookie
         if (!auth.isAllowTokenInResponse() && RequestQuery.isFromBrowser())
         {
-            this.response.addHeader(HttpHeaders.SET_COOKIE, CookieHelper.buildSetTokenCookie(request, jwtToken.getJwt(), auth.getAccessTokenCookieName(), ttl).toString());
-            jwtToken.setJwt("hidden");
+            this.response.addHeader(SET_COOKIE, CookieHelper.buildSetTokenCookie(request, jwtToken.getJwt(), auth.getAccessTokenCookieName(), ttl).toString());
+            jwtToken.setJwt(HIDDEN);
         }
-        this.response.addHeader(HttpHeaders.SET_COOKIE, CookieHelper.buildSetTokenCookie(request, refreshToken.getJwt(), auth.getRefreshTokenCookieName(), refreshTtl).toString());
+        this.response.addHeader(SET_COOKIE, CookieHelper.buildSetTokenCookie(request, refreshToken.getJwt(), auth.getRefreshTokenCookieName(), refreshTtl).toString());
 
         return jwtToken;
     }
@@ -125,7 +136,7 @@ public class JwtTokenProvider
             {
                 // Update session timeout
                 setSessionTimeout(type, ttl);
-                touchSession(type);
+                touchSession(type, ttl);
             }
 
             // Updating session-registry
@@ -197,12 +208,19 @@ public class JwtTokenProvider
     }
 
 
-    public void touchSession(Type type)
+    public void touchSession(Type type, Duration ttl)
     {
         if (type == Type.JWT || type == Type.REFRESH)
         {
             String sessionId = RequestQuery.getSessionId();
             this.sessionRegistry.refreshLastRequest(sessionId);
+
+            // If a SESSION cookie is available, resend it with updated Max-Age/Expires
+            String sessionCookieValue = CookieHelper.getCookieValue("SESSION", this.request);
+            if (StringUtils.isNotBlank(sessionCookieValue))
+            {
+                this.response.addHeader(SET_COOKIE, CookieHelper.buildSetTokenCookie(this.request, sessionCookieValue, "SESSION", ttl).toString());
+            }
         }
     }
 
@@ -298,6 +316,20 @@ public class JwtTokenProvider
         catch (Exception e)
         {
             throw new InvalidTokenException("JWT token parse failed!", e);
+        }
+    }
+
+
+    public boolean isExpired(String jwt)
+    {
+        try
+        {
+            Claims claims = getClaims(jwt);
+            return claims.getExpiration() == null || claims.getExpiration().before(new Date());
+        }
+        catch (Exception e)
+        {
+            return true;
         }
     }
 }

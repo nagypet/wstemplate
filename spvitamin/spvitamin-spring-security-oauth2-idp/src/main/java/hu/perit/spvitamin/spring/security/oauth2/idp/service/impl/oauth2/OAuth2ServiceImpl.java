@@ -353,7 +353,7 @@ public class OAuth2ServiceImpl implements OAuth2Service
                 // 2) Ha nincs form-ban, próbáljuk cookie-ból
                 if (refreshToken == null)
                 {
-                    refreshToken = CookieHelper.getCookie(clientProps.getClientId(), request);
+                    refreshToken = CookieHelper.getCookieValue(clientProps.getClientId(), request);
                 }
 
                 // 3) Ha továbbra sincs, hiba

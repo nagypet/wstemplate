@@ -62,7 +62,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
     {
         try
         {
-            log.debug("AbstractTokenAuthenticationFilter called.");
+            log.debug("{} called", this.getClass().getSimpleName());
 
             AbstractAuthorizationToken token = getJwtFromRequest(request);
             if (token != null)
@@ -98,7 +98,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
                 }
             }
 
-            filterChain.doFilter(request, response);
+            filterChain.doFilter(new BearerTokenMaskingRequestWrapper(request), response);
         }
         catch (AuthenticationException ex)
         {
@@ -160,7 +160,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
             String authorizationHeader = Optional.ofNullable(httpServletRequest).map(i -> i.getHeader("Authorization")).orElse(null);
             if (authorizationHeader == null || !authorizationHeader.startsWith("Basic"))
             {
-                String refreshJwt = CookieHelper.getCookie(securityProperties.getAuth().getRefreshTokenCookieName(), httpServletRequest);
+                String refreshJwt = CookieHelper.getCookieValue(securityProperties.getAuth().getRefreshTokenCookieName(), httpServletRequest);
                 JwtTokenProvider jwtTokenProvider = SpringContext.getBean(JwtTokenProvider.class);
                 AuthorizationToken refreshToken = jwtTokenProvider.getAuthorizationTokenFromJwt(refreshJwt);
                 // Client-ID must match
