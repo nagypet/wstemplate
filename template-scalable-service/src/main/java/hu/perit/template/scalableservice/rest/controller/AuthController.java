@@ -16,13 +16,15 @@
 
 package hu.perit.template.scalableservice.rest.controller;
 
-import hu.perit.spvitamin.core.exception.UnexpectedConditionException;
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.restmethodlogger.LoggedRestMethod;
-import hu.perit.spvitamin.spring.security.SecurityContextUtil;
+import hu.perit.spvitamin.spring.security.auth.proxy.AuthorizationServerProxy;
 import hu.perit.template.scalableservice.config.Constants;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -31,19 +33,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 public class AuthController implements AuthApi
 {
+    private final AuthorizationServerProxy authorizationServerProxy;
+    private final HttpServletRequest request;
+
+
     @Override
     @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
-    public AuthorizationToken authenticateUsingGET(String traceId)
+    public ResponseEntity<AuthorizationToken> authenticateUsingGET(String traceId)
     {
-        if (SecurityContextUtil.getToken() instanceof AuthorizationToken authorizationToken)
-        {
-            return authorizationToken;
-        }
-        else
-        {
-            throw new UnexpectedConditionException("Token is not instance of AuthorizationToken!");
-        }
+        return authorizationServerProxy.authenticate(request);
     }
 }

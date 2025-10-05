@@ -79,10 +79,12 @@ admin:
 #security.allowed-methods
 # * or comma separated roles (e.g. ADMIN)
 security:
+  production-mode: false
   swagger-access: "*"
   management-endpoints-access: ADMIN
   admin-gui-access: "*"
   admin-endpoints-access: "*"
+  mode: resource_server
 
 
 #-----------------------------------------------------------------------------------------------------------------------

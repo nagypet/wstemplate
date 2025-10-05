@@ -85,6 +85,7 @@ security:
   management-endpoints-access: ADMIN
   admin-gui-access: "*"
   admin-endpoints-access: ADMIN
+  mode: authorization_server
   auth:
     client-id: e89f64cf-43ff-49e8-acf2-45c3cc44303d
     allow-token-in-response: false

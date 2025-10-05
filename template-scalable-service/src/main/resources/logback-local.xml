@@ -54,7 +54,7 @@
 	<logger name="hu.perit.spvitamin.spring.keystore" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
-	<logger name="hu.perit.spvitamin.spring.httplogging" level="OFF" additivity="false">
+	<logger name="hu.perit.spvitamin.spring.httplogging" level="DEBUG" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
 	<logger name="hu.perit.spvitamin.spring.restmethodlogger" level="DEBUG" additivity="false">
@@ -73,6 +73,12 @@
 		<appender-ref ref="application-message"/>
 	</logger>
 	<logger name="hu.perit.spvitamin.spring.feignclients" level="DEBUG" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
+	<logger name="hu.perit.spvitamin.spring.session" level="DEBUG" additivity="false">
+		<appender-ref ref="application-message"/>
+	</logger>
+	<logger name="hu.perit.spvitamin.filestorage" level="WARN" additivity="false">
 		<appender-ref ref="application-message"/>
 	</logger>
 

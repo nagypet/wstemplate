@@ -17,6 +17,7 @@
 package hu.perit.template.authservice.rest.api;
 
 import hu.perit.spvitamin.spring.auth.AuthorizationToken;
+import hu.perit.spvitamin.spring.http.ResponseEntityUtils;
 import hu.perit.spvitamin.spring.security.AuthenticatedUser;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import hu.perit.template.authservice.rest.controller.AuthController;
@@ -68,7 +69,7 @@ class AuthControllerTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Meghívjuk a REST controllert
-        AuthorizationToken authorizationToken = this.authApiController.authenticateUsingGET("123");
+        AuthorizationToken authorizationToken = ResponseEntityUtils.get(this.authApiController.authenticateUsingGET("123"));
         log.debug(authorizationToken.getJwt());
 
         Claims claims = this.jwtTokenProvider.getClaims(authorizationToken.getJwt());

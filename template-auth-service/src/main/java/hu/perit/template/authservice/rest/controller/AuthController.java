@@ -23,6 +23,7 @@ import hu.perit.spvitamin.spring.security.auth.AuthorizationService;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import hu.perit.template.authservice.config.Constants;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -40,7 +41,7 @@ public class AuthController implements AuthApi
 
     @Override
     @LoggedRestMethod(eventId = 1, subsystem = Constants.SUBSYSTEM_NAME)
-    public AuthorizationToken authenticateUsingGET(String traceId)
+    public ResponseEntity<AuthorizationToken> authenticateUsingGET(String traceId)
     {
         return tokenProvider.generateToken(this.authorizationService.getAuthenticatedUser());
     }

@@ -19,7 +19,6 @@ package hu.perit.template.scalableservice.auth;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
 import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.EnableLocalUserAuthProvider;
-import hu.perit.spvitamin.spring.security.authservice.provider.AuthServiceAuthenticationProviderWithRestTemplate;
 import hu.perit.template.scalableservice.rest.api.ServiceApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,21 +42,15 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableLocalUserAuthProvider
 public class WebSecurityConfig
 {
-
-    private final AuthServiceAuthenticationProviderWithRestTemplate authServiceAuthenticationProvider;
-
     @Bean
     @Order(1)
     public SecurityFilterChain configureAuthenticateEndpoint(HttpSecurity http) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)
                 .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
-                .authorizeRequests(r -> r.anyRequest().authenticated())
-                .basicAuth()
-                .jwtAuth()
+                .ignorePersistedSecurity()
+                .authorizeRequests(r -> r.anyRequest().permitAll())
                 .createSession();
-
-        http.authenticationProvider(this.authServiceAuthenticationProvider);
 
         return http.build();
     }
