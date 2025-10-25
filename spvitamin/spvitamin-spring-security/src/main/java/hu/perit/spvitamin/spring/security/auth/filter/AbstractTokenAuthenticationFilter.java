@@ -54,7 +54,7 @@ import java.util.Optional;
 public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFilter
 {
 
-    protected abstract AbstractAuthorizationToken getJwtFromRequest(HttpServletRequest request);
+    protected abstract AbstractAuthorizationToken getJwtFromRequest(HttpServletRequest request, HttpServletResponse response);
 
 
     @Override
@@ -64,7 +64,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
         {
             log.debug("{} called", this.getClass().getSimpleName());
 
-            AbstractAuthorizationToken token = getJwtFromRequest(request);
+            AbstractAuthorizationToken token = getJwtFromRequest(request, response);
             if (token != null)
             {
                 String jwt = token.getJwt();
@@ -74,6 +74,18 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
                     JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
 
                     TokenClaims claims = new TokenClaims(tokenProvider.getClaims(jwt));
+
+                    // Checking token type
+                    if (!isAuthenticateEndpoint())
+                    {
+                        // Refresh tokens are only accepted within the /authenticate endpoint
+                        JwtTokenProvider.Type tokenType = tokenProvider.getTokenType(jwt);
+                        if (tokenType != JwtTokenProvider.Type.ACCESS && tokenType != JwtTokenProvider.Type.JWT)
+                        {
+                            log.warn("Token type mismatch in JWT token!");
+                            throw new InvalidTokenException(MessageFormat.format("Invalid token type: {0}!", tokenType));
+                        }
+                    }
 
                     // Checking token validity only in AUTHORIZATION_SERVER mode
                     SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
@@ -181,7 +193,7 @@ public abstract class AbstractTokenAuthenticationFilter extends OncePerRequestFi
     }
 
 
-    private static boolean isAuthenticateEndpoint()
+    protected static boolean isAuthenticateEndpoint()
     {
         String servletPath = Optional.ofNullable(RequestQuery.getHttpServletRequest()).map(i -> i.getServletPath()).orElse(null);
         return StringUtils.equalsIgnoreCase(servletPath, AuthApi.BASE_URL_AUTHENTICATE);

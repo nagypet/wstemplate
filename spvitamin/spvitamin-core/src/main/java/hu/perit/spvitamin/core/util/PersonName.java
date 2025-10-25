@@ -17,9 +17,9 @@
 package hu.perit.spvitamin.core.util;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.annotation.Nullable;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.StringJoiner;
@@ -31,7 +31,7 @@ import java.util.StringJoiner;
  */
 
 @Data
-@RequiredArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PersonName
 {
     public enum NameOrder
@@ -42,7 +42,7 @@ public class PersonName
 
 
     // Tracks the original name order used when parsing
-    private final NameOrder nameOrder;
+    private NameOrder nameOrder;
     // Family name (surname/last name)
     @Nullable
     private String familyName;
@@ -73,10 +73,30 @@ public class PersonName
     }
 
 
+    public PersonName(NameOrder nameOrder)
+    {
+        this.nameOrder = nameOrder;
+    }
+
+
     public PersonName(String fullName, NameOrder nameOrder)
     {
         this.nameOrder = nameOrder;
         setName(fullName);
+    }
+
+
+    // Für Json
+    private PersonName setNameOrder(NameOrder nameOrder)
+    {
+        if (this.nameOrder != null && nameOrder != this.nameOrder)
+        {
+            String currentFamilyName = this.familyName;
+            this.familyName = this.givenName;
+            this.givenName = currentFamilyName;
+        }
+        this.nameOrder = nameOrder;
+        return this;
     }
 
 

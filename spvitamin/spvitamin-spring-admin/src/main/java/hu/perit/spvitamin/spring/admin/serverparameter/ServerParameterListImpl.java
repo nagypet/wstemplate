@@ -89,7 +89,6 @@ public class ServerParameterListImpl implements ServerParameterList
 
     private void getProperties(String group, Object object, String namePrefix)
     {
-
         Class<?> objectClass = object.getClass();
 
         List<Property> properties = ReflectionUtils.allPropertiesOf(objectClass, false);

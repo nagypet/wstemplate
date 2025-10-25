@@ -23,9 +23,12 @@ import hu.perit.spvitamin.spring.security.auth.filter.AbstractTokenAuthenticatio
 import hu.perit.spvitamin.spring.security.auth.filter.JwtString;
 import hu.perit.spvitamin.spring.security.auth.jwt.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
+
+import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 /**
  * This class is intentionally no container. It should be invoked only for Jwt endpoints.
@@ -36,8 +39,15 @@ import org.springframework.http.HttpHeaders;
 @Slf4j
 public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
 {
+    /**
+     * Extracts a JWT (JSON Web Token) from the provided HTTP request by checking various possible sources,
+     * including the Authorization header and cookies.
+     *
+     * @param request the HttpServletRequest object from which the JWT is to be extracted.
+     * @return a JwtString object containing the extracted JWT if available; otherwise, returns null.
+     */
     @Override
-    protected JwtString getJwtFromRequest(HttpServletRequest request)
+    protected JwtString getJwtFromRequest(HttpServletRequest request, HttpServletResponse response)
     {
         // If there is a Basic auth header, we do nothing
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -46,25 +56,55 @@ public class JwtAuthenticationFilter extends AbstractTokenAuthenticationFilter
             return null;
         }
 
-        // Then, check if there is a cookie
-        SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
-        if (securityProperties.getAuth() != null)
-        {
-            String tokenInCookie = CookieHelper.getCookieValue(securityProperties.getAuth().getAccessTokenCookieName(), request);
-            if (StringUtils.isNotBlank(tokenInCookie))
-            {
-                // Returning only if valid to allow checking if the session is authenticated
-                JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
-                return !tokenProvider.isExpired(tokenInCookie) ? new JwtString(tokenInCookie) : null;
-            }
-        }
-
-        // Finally, try to get the token from the authorization header
+        // Then, try to get the token from the authorization header
         if (StringUtils.isNotBlank(authorization) && authorization.startsWith("Bearer ") && authorization.length() > 7)
         {
             String tokenInHeader = authorization.substring(7);
             boolean dummyToken = StringUtils.equals(tokenInHeader, JwtTokenProvider.HIDDEN);
-            return !dummyToken ? new JwtString(tokenInHeader) : null;
+            if (!dummyToken)
+            {
+                return new JwtString(tokenInHeader);
+            }
+        }
+
+        // After that, check if there is a valid access-token cookie
+        SecurityProperties securityProperties = SpringContext.getBean(SecurityProperties.class);
+        JwtTokenProvider tokenProvider = SpringContext.getBean(JwtTokenProvider.class);
+        if (securityProperties.getAuth() != null)
+        {
+            String accessTokenInCookie = CookieHelper.getCookieValue(securityProperties.getAuth().getAccessTokenCookieName(), request);
+            if (StringUtils.isNotBlank(accessTokenInCookie))
+            {
+                // Returning only if valid
+                if (!tokenProvider.isExpired(accessTokenInCookie))
+                {
+                    return new JwtString(accessTokenInCookie);
+                }
+                else
+                {
+                    log.debug("Access token in cookie is expired!");
+                    response.addHeader(SET_COOKIE, CookieHelper.buildDeleteTokenCookie(request, securityProperties.getAuth().getAccessTokenCookieName()).toString());
+                }
+            }
+        }
+
+        // Finally, in case of the /authenticate endpoint, check if there is a valid refresh-token cookie
+        if (securityProperties.getAuth() != null && isAuthenticateEndpoint())
+        {
+            String refreshTokenInCookie = CookieHelper.getCookieValue(securityProperties.getAuth().getRefreshTokenCookieName(), request);
+            if (StringUtils.isNotBlank(refreshTokenInCookie))
+            {
+                // Returning only if valid
+                if (!tokenProvider.isExpired(refreshTokenInCookie))
+                {
+                    return new JwtString(refreshTokenInCookie);
+                }
+                else
+                {
+                    log.debug("Refresh token in cookie is expired!");
+                    response.addHeader(SET_COOKIE, CookieHelper.buildDeleteTokenCookie(request, securityProperties.getAuth().getRefreshTokenCookieName()).toString());
+                }
+            }
         }
         return null;
     }
