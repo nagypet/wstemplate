@@ -49,8 +49,7 @@ class StandardSecurityParameters
     {
         ServerParameterList params = new ServerParameterListImpl();
 
-        ServerParameterList serverParameterList = ServerParameterListBuilder.of(this.role2PermissionMappingProperties);
-        params.add(serverParameterList);
+        params.add(ServerParameterListBuilder.of(this.role2PermissionMappingProperties));
 
         for (Map.Entry<String, LocalUserProperties.User> entry : this.localUserProperties.getLocaluser().entrySet())
         {
