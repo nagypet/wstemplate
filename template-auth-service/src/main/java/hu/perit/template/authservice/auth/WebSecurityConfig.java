@@ -17,9 +17,7 @@
 package hu.perit.template.authservice.auth;
 
 import hu.perit.spvitamin.spring.config.EnableSpvitaminOAuth2Idp;
-import hu.perit.spvitamin.spring.rest.api.AuthApi;
 import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
-import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
 import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.EnableLocalUserAuthProvider;
 import hu.perit.spvitamin.spring.security.ldap.LdapAuthenticationProviderConfigurer;
 import hu.perit.spvitamin.spring.security.oauth2.CustomOAuth2SuccessHandler;
@@ -78,16 +76,10 @@ public class WebSecurityConfig
     public SecurityFilterChain configureAuthenticateEndpoint(HttpSecurity http) throws Exception
     {
         SimpleHttpSecurityBuilder.newInstance(http)
-                .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
-                .authorizeRequests(r -> r.anyRequest().authenticated())
-                .basicAuth()
-                .jwtAuth()
-                .createSession();
+                .configureAuthorizatonServer();
 
         http.authenticationProvider(this.dbAuthenticationProvider);
         this.ldapAuthenticationProviderConfigurer.configure(http);
-
-        http.addFilterAfter(new PostAuthenticationFilter(), Role2PermissionMapperFilter.class);
 
         return http.build();
     }
