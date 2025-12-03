@@ -155,6 +155,10 @@ dependencyManagement {
 - 2 security modes: AUTHORIZATION_SERVER and RESOURCE_SERVER
 - SingletonFactory
 - Handling token-cookies fixed
+- Session cookie name is configurable
+- ServerExceptionProperties.toException fixed: only unchecked exceptions will be reconstructed on the client side
+- Bitfield, ServiceUnavailableException
+- LDAP: access without domain, only with username can be enabled
 
 
 ### 3.3.3-2-RELEASE not yet released
