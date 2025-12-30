@@ -17,6 +17,7 @@
 plugins {
     alias libs.plugins.org.springframework.boot
     alias libs.plugins.io.spring.dependency.management
+    id 'java'
     id 'application'
     id 'jacoco'
     id "com.github.ManifestClasspath" version "0.1.0-RELEASE"
@@ -32,7 +33,7 @@ repositories {
 
 
 application {
-    mainClassName = 'hu.perit.template.authservice.AuthServiceApplication'
+    mainClass = 'hu.perit.template.authservice.AuthServiceApplication'
     // Some JVM options already set in common.gradle
     applicationDefaultJvmArgs += ['-Xmx512m', '-Xms32m']
 }
@@ -83,7 +84,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.retry:spring-retry'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     //implementation 'com.azure.spring:azure-spring-boot-starter-active-directory:4.0.0'
     //implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
@@ -91,6 +91,7 @@ dependencies {
     // Micrometer tracing
     implementation 'io.micrometer:micrometer-tracing'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation 'org.springframework.boot:spring-boot-micrometer-tracing-brave'
 
     // JJWT
     implementation libs.bundles.jsonwebtoken

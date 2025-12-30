@@ -78,6 +78,7 @@ dependencies {
     implementation 'hu.perit.spvitamin:spvitamin-spring-security-oauth2-idp'
     implementation 'hu.perit.spvitamin:spvitamin-spring-server'
     implementation 'hu.perit.spvitamin:spvitamin-spring-session-redis'
+    implementation 'hu.perit.spvitamin:spvitamin-spring-resilientjobrunner'
     implementation 'hu.perit.spvitamin:spvitamin-test'
 }	
 
@@ -159,6 +160,11 @@ dependencyManagement {
 - ServerExceptionProperties.toException fixed: only unchecked exceptions will be reconstructed on the client side
 - Bitfield, ServiceUnavailableException
 - LDAP: access without domain, only with username can be enabled
+- CancellableJobExecutor refactor to use CancellableJob which is the base class of the new ContextAwareCancellableJob
+- RestExceptionResponse: ApplicationException and ApplicationRuntimeExceptions are propagated to the frontend
+- GenericRestExceptionResponseBuilder creates HTTP 400 response in case of database level ValidationExceptions
+- New module: spvitamin-spring-resilientjobrunner added
+- NumberConverter improved
 
 
 ### 3.3.3-2-RELEASE not yet released

@@ -22,9 +22,9 @@ if (project.hasProperty('application')) {
 
     ext {
         if (project.hasProperty('imagePrefix')) {
-            dockerImageName = "${imagePrefix}-" + applicationName.toLowerCase()
+            dockerImageName = "${imagePrefix}-" + project.name.toLowerCase()
         } else {
-            dockerImageName = applicationName.toLowerCase()
+            dockerImageName = project.name.toLowerCase()
         }
         dockerBuildDir = new File(buildDir, 'docker').getAbsolutePath()
         dockerImageInputsChanged = false

@@ -35,7 +35,8 @@ class ProjectConfigurer {
         this.discoverProjects(this.rootDir.getParentFile())
 
         // Step 2.
-        Set<String> deps = this.getDependendentProjects(this.rootDir, 0)
+        Set<String> deps = [] as Set
+        this.getDependendentProjects(this.rootDir, 0, deps)
 
         // Step 3.
         this.includeDependentProjects(deps)
@@ -66,8 +67,7 @@ class ProjectConfigurer {
     }
 
 
-    private Set<String> getDependendentProjects(File root, int level) {
-        Set<String> deps = [] as Set
+    private void getDependendentProjects(File root, int level, Set<String> deps) {
         File buildGradleFile = new File(root, "build.gradle")
         if (buildGradleFile.exists()) {
             buildGradleFile.eachLine { line ->
@@ -80,19 +80,21 @@ class ProjectConfigurer {
                                 || line =~ /api\s*project/)) {
                     def matcher = line =~ /:[a-z-A-Z0-9]*/
                     if (matcher.size() == 1) {
-                        def projName = matcher[0].substring(1)
-                        deps += projName
-                        //println String.join("", Collections.nCopies(level, "    ")) + ":${projName}"
+                        def projName = matcher[0].substring(1).strip()
+                        if (deps.contains(projName)) {
+                            return
+                        }
+                        println String.join("", Collections.nCopies(level, "    ")) + ":${projName}"
+                        deps.add(projName)
                         if (this.projectMap[projName] == null) {
                             println 'Project does not exist: ' + projName
                         } else {
-                            deps += this.getDependendentProjects(this.projectMap[projName], level + 1)
+                            this.getDependendentProjects(this.projectMap[projName], level + 1, deps)
                         }
                     }
                 }
             }
         }
-        return deps
     }
 
 

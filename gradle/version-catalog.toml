@@ -2,9 +2,10 @@
 
 [versions]
 aspectj = '1.9.22.1'
-jackson = '2.18.2'
+jackson-annotations = '2.20'
+jackson = '2.20.1'
 jsonwebtoken = '0.12.6'
-junit = '5.11.4'
+junit = '6.0.1'
 logback = '1.5.16'
 mapstruct = '1.6.0'
 springdoc = '2.8.5'
@@ -16,7 +17,7 @@ ben-manes-versions = { id = 'com.github.ben-manes.versions', version = '0.51.0' 
 habarta-typescript-generator = { id = 'cz.habarta.typescript-generator', version.ref = 'czhabarta' }
 io-spring-dependency-management = { id = 'io.spring.dependency-management', version = '1.1.7' }
 johnrengelman-shadow = { id = 'com.github.johnrengelman.shadow', version = '8.1.1' }
-org-springframework-boot = { id = 'org.springframework.boot', version = '3.4.3' }
+org-springframework-boot = { id = 'org.springframework.boot', version = '4.0.1' }
 sonarqube = { id = 'org.sonarqube', version = '5.1.0.4882' }
 thin-launcher = { id = 'org.springframework.boot.experimental.thin-launcher', version = '1.0.31.RELEASE' }
 
@@ -26,8 +27,8 @@ habarta-typescript-generator = { module = 'cz.habarta.typescript-generator:types
 antlr4 = 'org.antlr:antlr4:4.13.2'
 aspectj-rt = { module = 'org.aspectj:aspectjrt', version.ref = 'aspectj' }
 aspectj-weaver = { module = 'org.aspectj:aspectjweaver', version.ref = 'aspectj' }
-assertj = 'org.assertj:assertj-core:3.26.3'
-awaitility = 'org.awaitility:awaitility:4.2.2'
+assertj = 'org.assertj:assertj-core:3.27.6'
+awaitility = 'org.awaitility:awaitility:4.3.0'
 bouncycastle-bcpkix = 'org.bouncycastle:bcpkix-jdk15on:1.70'
 bouncycastle-bcprov = 'org.bouncycastle:bcprov-jdk15on:1.70'
 caffeine = 'com.github.ben-manes.caffeine:caffeine:3.1.8'
@@ -40,18 +41,18 @@ guava = 'com.google.guava:guava:33.3.0-jre'
 hibernate-validator = 'org.hibernate:hibernate-validator:8.0.1.Final'
 hierynomus-smbj = 'com.hierynomus:smbj:0.13.0'
 integralblue = 'com.integralblue:log4jdbc-spring-boot-starter:2.0.0'
-jackson-annotations = { module = 'com.fasterxml.jackson.core:jackson-annotations', version.ref = 'jackson' }
+jackson-annotations = { module = 'com.fasterxml.jackson.core:jackson-annotations', version.ref = 'jackson-annotations' }
 jackson-core = { module = 'com.fasterxml.jackson.core:jackson-core', version.ref = 'jackson' }
 jackson-databind = { module = 'com.fasterxml.jackson.core:jackson-databind', version.ref = 'jackson' }
 jackson-dataformat-yaml = { module = 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml', version.ref = 'jackson' }
 jackson-datatype-jsr310 = { module = 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310', version.ref = 'jackson' }
 jakarta-activation-api = 'jakarta.activation:jakarta.activation-api:2.1.3'
 jakarta-annotation-api = 'jakarta.annotation:jakarta.annotation-api:3.0.0'
-jakarta-validation-api = 'jakarta.validation:jakarta.validation-api:3.1.0'
+jakarta-validation-api = 'jakarta.validation:jakarta.validation-api:3.1.1'
 javax-jaxb-api = 'javax.xml.bind:jaxb-api:2.1'
 javax-mail = 'com.sun.mail:javax.mail:1.6.2'
 javax-mail-api = 'javax.mail:javax.mail-api:1.6.2'
-jaxb-api = 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.2'
+jaxb-api = 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.4'
 jaxb-core = 'com.sun.xml.bind:jaxb-core:4.0.5'
 jaxb-runtime = 'org.glassfish.jaxb:jaxb-runtime:4.0.5'
 jaxb-xjc = 'org.glassfish.jaxb:jaxb-xjc:4.0.5'
@@ -67,7 +68,7 @@ jsonwebtoken-jackson = { module = 'io.jsonwebtoken:jjwt-jackson', version.ref = 
 junit-jupiter-api = { module = 'org.junit.jupiter:junit-jupiter-api', version.ref = 'junit' }
 junit-jupiter-engine = { module = 'org.junit.jupiter:junit-jupiter-engine', version.ref = 'junit' }
 junit-jupiter-params = { module = 'org.junit.jupiter:junit-jupiter-params', version.ref = 'junit' }
-juniversalchardet = 'com.github.albfernandez:juniversalchardet:2.5.0'
+junit-platform-launcher = { module = 'org.junit.platform:junit-platform-launcher', version.ref = 'junit' }
 jws-api = 'javax.jws:javax.jws-api:1.1'
 keycloakbom = 'org.keycloak.bom:keycloak-adapter-bom:12.0.4'
 liquibase-core = 'org.liquibase:liquibase-core:4.25.0'
@@ -87,10 +88,10 @@ opencsv = 'com.opencsv:opencsv:5.9'
 pdfbox = 'org.apache.pdfbox:pdfbox:3.0.3'
 pdfbox-fontbox = 'org.apache.pdfbox:fontbox:3.0.3'
 reflections = 'org.reflections:reflections:0.10.2'
-slf4j-api = 'org.slf4j:slf4j-api:2.0.15'
-slf4j-log4j12 = 'org.slf4j:slf4j-log4j12:2.0.13'
+slf4j-api = 'org.slf4j:slf4j-api:2.0.17'
+slf4j-log4j12 = 'org.slf4j:slf4j-log4j12:2.0.17'
 smb-nio = 'ch.pontius.nio:smb-nio:0.13.0'
-spring-cloud = 'org.springframework.cloud:spring-cloud-dependencies:2024.0.0'
+spring-cloud = 'org.springframework.cloud:spring-cloud-dependencies:2025.1.0'
 #spvitamin = 'hu.perit.spvitamin:spvitamin-dependencies:3.4.3-1-RELEASE'
 tika = 'org.apache.tika:tika-core:2.9.2'
 tika-parsers-standard-package = 'org.apache.tika:tika-parsers-standard-package:2.9.2'

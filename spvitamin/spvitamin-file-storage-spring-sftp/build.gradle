@@ -36,7 +36,6 @@ dependencies {
     implementation project(':spvitamin-core')
     implementation project(':spvitamin-file-storage')
 
-    implementation 'org.springframework.retry:spring-retry'
     // SFTP
     implementation 'org.springframework.integration:spring-integration-file'
     implementation 'org.springframework.integration:spring-integration-sftp'
@@ -67,6 +66,7 @@ dependencies {
     testImplementation libs.junit.jupiter.engine
     testImplementation libs.assertj
     testImplementation libs.awaitility
+    testRuntimeOnly libs.junit.platform.launcher
 
     // Slf4J
     implementation libs.slf4j.api

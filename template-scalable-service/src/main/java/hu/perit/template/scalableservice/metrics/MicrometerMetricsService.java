@@ -24,16 +24,16 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.actuate.health.CompositeHealthContributor;
-import org.springframework.boot.actuate.health.HealthContributor;
-import org.springframework.boot.actuate.health.HealthContributorRegistry;
-import org.springframework.boot.actuate.health.HealthIndicator;
-import org.springframework.boot.actuate.health.NamedContributor;
-import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.health.contributor.CompositeHealthContributor;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.HealthContributor;
+import org.springframework.boot.health.contributor.HealthContributors;
+import org.springframework.boot.health.contributor.HealthIndicator;
+import org.springframework.boot.health.contributor.Status;
+import org.springframework.boot.health.registry.HealthContributorRegistry;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author nagy_peter
@@ -51,10 +51,11 @@ public class MicrometerMetricsService
     private final Counter generalWSCallCounter;
     private final DualMetric metricService;
 
+
     public MicrometerMetricsService(MeterRegistry registry, HealthContributorRegistry healthContributorRegistry)
     {
         this.generalWSCallCounter = registry.counter(METRIC_CALL);
-        this.metricService = new DualMetric(registry, Constants.SUBSYSTEM_NAME.toLowerCase(),"service");
+        this.metricService = new DualMetric(registry, Constants.SUBSYSTEM_NAME.toLowerCase(), "service");
 
         // Health indicators
         this.healthIndicators = healthContributorRegistry.stream()
@@ -64,16 +65,18 @@ public class MicrometerMetricsService
                 .description("The current value of the composite health endpoint").register(registry);
     }
 
+
     public void incrementWsCall()
     {
         this.generalWSCallCounter.increment();
     }
 
-    private HealthIndicator getIndicatorFromContributor(NamedContributor<HealthContributor> namedContributor)
-    {
-        log.debug(String.format("Using health contributor: '%s'", namedContributor.getName()));
 
-        HealthContributor contributor = namedContributor.getContributor();
+    private HealthIndicator getIndicatorFromContributor(HealthContributors.Entry entry)
+    {
+        log.debug(String.format("Using health contributor: '%s'", entry.name()));
+
+        HealthContributor contributor = entry.contributor();
         if (contributor instanceof HealthIndicator healthIndicator)
         {
             return healthIndicator;
@@ -81,7 +84,7 @@ public class MicrometerMetricsService
 
         if (contributor instanceof CompositeHealthContributor compositeHealthContributor)
         {
-            for (NamedContributor<HealthContributor> elementOfComposite : compositeHealthContributor)
+            for (HealthContributors.Entry elementOfComposite : compositeHealthContributor)
             {
                 return getIndicatorFromContributor(elementOfComposite); // NOSONAR
             }
@@ -90,12 +93,13 @@ public class MicrometerMetricsService
         throw new UnexpectedConditionException();
     }
 
+
     private static int healthToCode(List<HealthIndicator> indicators)
     {
         for (HealthIndicator indicator : indicators)
         {
-            Status status = indicator.health().getStatus();
-            if (Status.DOWN.equals(status))
+            Health health = indicator.health();
+            if (health == null || health.getStatus() == Status.DOWN)
             {
                 return 0;
             }

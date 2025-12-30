@@ -21,22 +21,23 @@ import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterList;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListBuilder;
 import hu.perit.spvitamin.spring.admin.serverparameter.ServerParameterListImpl;
 import hu.perit.spvitamin.spring.config.AdminProperties;
+import hu.perit.spvitamin.spring.config.AsyncProperties;
 import hu.perit.spvitamin.spring.config.CryptoProperties;
+import hu.perit.spvitamin.spring.config.FeignProperties;
 import hu.perit.spvitamin.spring.config.JwtProperties;
 import hu.perit.spvitamin.spring.config.MetricsProperties;
 import hu.perit.spvitamin.spring.config.MicroserviceCollectionProperties;
 import hu.perit.spvitamin.spring.config.MicroserviceProperties;
+import hu.perit.spvitamin.spring.config.SchedulerConfig;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.ServerProperties;
-import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.config.SessionProperties;
 import hu.perit.spvitamin.spring.config.SwaggerProperties;
 import hu.perit.spvitamin.spring.config.SystemProperties;
 import hu.perit.spvitamin.spring.environment.SpringEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.autoconfigure.h2.H2ConsoleProperties;
-import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.boot.env.OriginTrackedMapPropertySource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.AbstractEnvironment;
@@ -61,16 +62,18 @@ class StandardServerParameters
 {
     public static final String LINKS = "1-Links";
 
+    private final AdminProperties adminProperties;
+    private final AsyncProperties asyncProperties;
     private final CryptoProperties cryptoProperties;
+    private final FeignProperties feignClientProperties;
     private final JwtProperties jwtProperties;
     private final MetricsProperties metricsProperties;
-    private final SystemProperties systemProperties;
+    private final MicroserviceCollectionProperties microserviceCollectionProperties;
     private final SecurityProperties securityProperties;
     private final ServerProperties serverProperties;
-    private final JacksonProperties jacksonProperties;
-    private final MicroserviceCollectionProperties microserviceCollectionProperties;
+    private final SessionProperties sessionProperties;
     private final SwaggerProperties swaggerProperties;
-    private final AdminProperties adminProperties;
+    private final SystemProperties systemProperties;
 
     @Bean(name = "StandardServerParameters")
     public ServerParameterList getParameterList()
@@ -80,25 +83,29 @@ class StandardServerParameters
         params.add(LINKS, new ServerParameter("(1) Swagger UI", this.getSwaggerUrl(), true));
         params.add(LINKS, new ServerParameter("(2) Swagger API Docs", this.getApiDocsUrl(), true));
         params.add(LINKS, new ServerParameter("(3) Actuator", this.getActuatorUrl(), true));
-        H2ConsoleProperties h2ConsoleProperties = getH2Properties();
-        if (h2ConsoleProperties != null && h2ConsoleProperties.getEnabled())
-        {
-            params.add(LINKS, new ServerParameter("H2 console", this.getH2ConsoleUrl(h2ConsoleProperties), true));
-        }
 
+//        H2ConsoleProperties h2ConsoleProperties = getH2Properties();
+//        if (h2ConsoleProperties != null && h2ConsoleProperties.getEnabled())
+//        {
+//            params.add(LINKS, new ServerParameter("H2 console", this.getH2ConsoleUrl(h2ConsoleProperties), true));
+//        }
+
+        params.add(ServerParameterListBuilder.of(this.adminProperties));
+        params.add(ServerParameterListBuilder.of(this.asyncProperties));
         params.add(ServerParameterListBuilder.of(this.cryptoProperties));
+        params.add(ServerParameterListBuilder.of(this.feignClientProperties));
         params.add(ServerParameterListBuilder.of(this.jwtProperties));
         params.add(ServerParameterListBuilder.of(this.metricsProperties));
-        params.add(ServerParameterListBuilder.of(this.systemProperties));
         params.add(ServerParameterListBuilder.of(this.securityProperties));
         params.add(ServerParameterListBuilder.of(this.serverProperties));
-        params.add(ServerParameterListBuilder.of(this.jacksonProperties));
-        params.add(ServerParameterListBuilder.of(this.adminProperties));
+        params.add(ServerParameterListBuilder.of(this.sessionProperties));
+        params.add(ServerParameterListBuilder.of(this.swaggerProperties));
+        params.add(ServerParameterListBuilder.of(this.systemProperties));
 
-        if (h2ConsoleProperties != null && h2ConsoleProperties.getEnabled())
-        {
-            params.add(ServerParameterListBuilder.of(h2ConsoleProperties));
-        }
+//        if (h2ConsoleProperties != null && h2ConsoleProperties.getEnabled())
+//        {
+//            params.add(ServerParameterListBuilder.of(h2ConsoleProperties));
+//        }
 
         for (Map.Entry<String, MicroserviceProperties> entry : this.microserviceCollectionProperties.getMicroservices().entrySet())
         {
@@ -131,17 +138,17 @@ class StandardServerParameters
         return params;
     }
 
-    private H2ConsoleProperties getH2Properties()
-    {
-        try
-        {
-            return SpringContext.getBean(H2ConsoleProperties.class);
-        }
-        catch (RuntimeException e)
-        {
-            return null;
-        }
-    }
+//    private H2ConsoleProperties getH2Properties()
+//    {
+//        try
+//        {
+//            return SpringContext.getBean(H2ConsoleProperties.class);
+//        }
+//        catch (RuntimeException e)
+//        {
+//            return null;
+//        }
+//    }
 
     private static boolean isSecret(String propName)
     {
@@ -153,10 +160,10 @@ class StandardServerParameters
         return this.serverProperties.getServiceUrl() + "/actuator";
     }
 
-    private String getH2ConsoleUrl(H2ConsoleProperties h2ConsoleProperties)
-    {
-        return this.serverProperties.getServiceUrl() + h2ConsoleProperties.getPath();
-    }
+//    private String getH2ConsoleUrl(H2ConsoleProperties h2ConsoleProperties)
+//    {
+//        return this.serverProperties.getServiceUrl() + h2ConsoleProperties.getPath();
+//    }
 
     private String getApiDocsUrl()
     {

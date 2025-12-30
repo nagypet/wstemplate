@@ -19,7 +19,7 @@ import groovy.text.SimpleTemplateEngine
 group = 'hu.perit'
 
 
-tasks.withType(Copy) {
+tasks.withType(Copy).configureEach {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     eachFile { println it.file }
 }
@@ -101,9 +101,6 @@ if (project.hasProperty('installBootDist')) {
         into("bin") {
             from "../deployment/${project.name}"
         }
-        into("bin") {
-            from "../deployment/common"
-        }
     }
 }
 
@@ -139,9 +136,11 @@ if (project.hasProperty('compileJava')) {
 //----------------------------------------------------------------------------------------------------------------------
 // JDK > 1.8
 //----------------------------------------------------------------------------------------------------------------------
-if (project.hasProperty('java') && project.hasProperty('compileJava')) {
-    sourceCompatibility = jvmVersion
-    println "sourceCompatibility: " + sourceCompatibility
+pluginManager.withPlugin('java') {
+    project.java {
+        sourceCompatibility = jvmVersion
+    }
+    println "sourceCompatibility for ${project.name}: ${jvmVersion}"
     if (jvmVersion != '1.8') {
         compileJava {
             options.compilerArgs << '--add-exports'
@@ -227,7 +226,8 @@ if (project.hasProperty('sourceSets')) {
 
 configurations {
     integtestCompile.extendsFrom testCompile
-    integtestRuntime.extendsFrom testRuntime
+    integtestRuntime.extendsFrom runtime
+    integtestRuntimeOnly.extendsFrom runtimeOnly
     integtestImplementation.extendsFrom testImplementation
 }
 
@@ -282,9 +282,9 @@ if (project.hasProperty('jar')) {
                         'Build-Time': new File("${buildDir}/buildtime.txt").text.replace('Buildtime: ', '').trim(),
                         'Implementation-Version': project.version
                 )
-                if (project.hasProperty('application')) {
+                if (project.hasProperty('application') && project.application.mainClass.isPresent()) {
                     attributes(
-                            'Implementation-Title': applicationName,
+                            'Implementation-Title': project.name,
                             'Implementation-Type': 'Application'
                     )
                 }
@@ -303,9 +303,9 @@ if (project.hasProperty('bootJar')) {
                         'Build-Time': new File("${buildDir}/buildtime.txt").text.replace('Buildtime: ', '').trim(),
                         'Implementation-Version': version
                 )
-                if (project.hasProperty('application')) {
+                if (project.hasProperty('application') && project.application.mainClass.isPresent()) {
                     attributes(
-                            'Implementation-Title': applicationName,
+                            'Implementation-Title': project.name,
                             'Implementation-Type': 'Application'
                     )
                 }
@@ -356,10 +356,10 @@ if (project.tasks.findByName('installBootDist')) {
 //----------------------------------------------------------------------------------------------------------------------
 // Application
 //----------------------------------------------------------------------------------------------------------------------
-if (project.hasProperty('application')) {
+if (project.hasProperty('application') && project.application.mainClass.isPresent()) {
     application {
         if (applicationDefaultJvmArgs.isEmpty()) {
-            applicationDefaultJvmArgs = ['-XX:+UseG1GC', '-Djava.net.preferIPv4Stack=true', '-Duser.country=US', '-Duser.language=en', '-Dorg.freemarker.loggerLibrary=none', '-Dfile.encoding=utf-8']
+            applicationDefaultJvmArgs = ['-XX:+UseG1GC']
         }
     }
 }
@@ -390,7 +390,7 @@ if (project.hasProperty('startScripts')) {
 //----------------------------------------------------------------------------------------------------------------------
 // IntelliJ IDEA
 //----------------------------------------------------------------------------------------------------------------------
-task prepareRunInIDEA(type: Copy) {
+tasks.register('prepareRunInIDEA', Copy) {
     group 'fmake'
     into "${projectDir}/out/production/resources"
     from "src/main/dist/bin"
@@ -398,12 +398,11 @@ task prepareRunInIDEA(type: Copy) {
     from "../deployment/${project.name}"
 }
 
-task prepareRunInIDEA2021(type: Copy) {
+tasks.register('prepareRunInIDEA2021', Copy) {
     group 'fmake'
     into "${projectDir}/build/resources/main"
     from "src/main/dist/bin"
     from "config"
-    from "../deployment/common"
     from "../deployment/${project.name}"
 }
 
@@ -411,7 +410,7 @@ task prepareRunInIDEA2021(type: Copy) {
 //----------------------------------------------------------------------------------------------------------------------
 // Eclipse
 //----------------------------------------------------------------------------------------------------------------------
-task prepareRunInEclipse(type: Copy) {
+tasks.register('prepareRunInEclipse', Copy) {
     group 'fmake'
     into "${projectDir}/bin/main"
     from "src/main/dist/bin"
@@ -423,7 +422,7 @@ task prepareRunInEclipse(type: Copy) {
 //----------------------------------------------------------------------------------------------------------------------
 // RUN
 //----------------------------------------------------------------------------------------------------------------------
-task prepareRun(type: Copy) {
+tasks.register('prepareRun', Copy) {
     group 'fmake'
     into "${projectDir}/build"
     into("bin") {
@@ -497,7 +496,7 @@ pluginManager.withPlugin('maven-publish') {
                 from components.java
                 pom {
                     name = "${project.group}:${project.name}"
-                    description = 'MicroDMS project'
+                    description = 'wstemplate project'
                     developers {
                         developer {
                             id = 'nagypet'
@@ -507,6 +506,12 @@ pluginManager.withPlugin('maven-publish') {
                     }
                 }
             }
+        }
+    }
+
+    pluginManager.withPlugin('signing') {
+        signing {
+            sign publishing.publications.mavenJava
         }
     }
 }

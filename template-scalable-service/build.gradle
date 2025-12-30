@@ -35,7 +35,7 @@ repositories {
 
 
 application {
-    mainClassName = 'hu.perit.template.scalableservice.ScalableServiceApplication'
+    mainClass = 'hu.perit.template.scalableservice.ScalableServiceApplication'
     // Some JVM options already set in common.gradle
     applicationDefaultJvmArgs += ['-Xmx512m', '-Xms32m']
 }
@@ -84,6 +84,7 @@ dependencies {
     // Micrometer tracing
     implementation 'io.micrometer:micrometer-tracing'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation 'org.springframework.boot:spring-boot-micrometer-tracing-brave'
 
     // Guava
     implementation libs.guava

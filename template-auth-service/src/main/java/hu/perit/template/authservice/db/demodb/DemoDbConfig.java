@@ -16,14 +16,19 @@
 
 package hu.perit.template.authservice.db.demodb;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import hu.perit.spvitamin.spring.data.config.DatasourceCollectionProperties;
+import hu.perit.spvitamin.spring.data.dynamicdatasource.ConnectionParam;
+import hu.perit.spvitamin.spring.data.dynamicdatasource.DynamicDataSource;
 import jakarta.persistence.EntityManagerFactory;
-import org.hibernate.cfg.*;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.cfg.BatchSettings;
+import org.hibernate.cfg.JdbcSettings;
+import org.hibernate.cfg.SchemaToolingSettings;
+import org.hibernate.cfg.TransactionSettings;
 import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
+import org.springframework.boot.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -36,12 +41,9 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import hu.perit.spvitamin.spring.data.config.DatasourceCollectionProperties;
-import hu.perit.spvitamin.spring.data.dynamicdatasource.ConnectionParam;
-import hu.perit.spvitamin.spring.data.dynamicdatasource.DynamicDataSource;
-import lombok.extern.slf4j.Slf4j;
-
 import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * #know-how:hibernate-configuration
@@ -68,6 +70,7 @@ public class DemoDbConfig
 
     private final ConnectionParam connectionParam;
 
+
     public DemoDbConfig(DatasourceCollectionProperties dbProperties)
     {
         this.connectionParam = new ConnectionParam(dbProperties.getDatasource().get(PERSISTENCE_UNIT));
@@ -89,6 +92,7 @@ public class DemoDbConfig
         return ds;
     }
 
+
     @Primary
     @Bean(name = ENTITY_MANAGER_FACTORY)
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder, @Qualifier(DATASOURCE) DataSource dataSource)
@@ -107,12 +111,14 @@ public class DemoDbConfig
         return builder.dataSource(dataSource).packages(PACKAGES).persistenceUnit(PERSISTENCE_UNIT).properties(properties).build();
     }
 
+
     @Primary
     @Bean(name = TRANSACTION_MANAGER)
     public PlatformTransactionManager transactionManager(@Qualifier(ENTITY_MANAGER_FACTORY) EntityManagerFactory entityManagerFactory)
     {
         return new JpaTransactionManager(entityManagerFactory);
     }
+
 
     /**
      * #know-how:jpa-auditing

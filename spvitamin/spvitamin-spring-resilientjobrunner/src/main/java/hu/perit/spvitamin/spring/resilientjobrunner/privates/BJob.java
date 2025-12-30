@@ -1,0 +1,136 @@
+/*
+ * Copyright 2020-2025 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package hu.perit.spvitamin.spring.resilientjobrunner.privates;
+
+import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.core.exception.ExceptionWrapper;
+import hu.perit.spvitamin.core.timeformatter.TimeFormatter;
+import hu.perit.spvitamin.spring.batchprocessing.ContextAwareBatchJob;
+import hu.perit.spvitamin.spring.config.SpringContext;
+import hu.perit.spvitamin.spring.resilientjobrunner.AbstractProcessor;
+import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus;
+import hu.perit.spvitamin.spring.resilientjobrunner.db.entity.AbstractResilientJobEntity;
+import hu.perit.spvitamin.spring.resilientjobrunner.service.api.ResilientJobEntityService;
+import hu.perit.spvitamin.spring.threadcontext.ThreadContextDecorator;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import java.time.Duration;
+import java.time.OffsetDateTime;
+
+@RequiredArgsConstructor
+@Slf4j
+class BJob extends ContextAwareBatchJob
+{
+    private final AbstractResilientJobEntity entity;
+    private final AbstractProcessor processor;
+
+    private final ResilientJobEntityService<?> resilientJobEntityService = SpringContext.getBean(ResilientJobEntityService.class);
+
+
+    @Override
+    protected Void execute() throws Exception
+    {
+        try (var ctx = new ThreadContextDecorator(processor.getProperties().getContextDecoratorTag(), BJobHelper.getBatchId(processor.getProcessorType(), entity.getId())))
+        {
+            try
+            {
+                processEntity();
+            }
+            catch (Exception e)
+            {
+                ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(e);
+                log.error(exceptionWrapper.toStringWithCauses());
+                log.error("Exception. Retried {} times. Remaining time for retries: {}.",
+                        entity.getRetryCount(),
+                        calculateRemainingTime(entity.getCreationTimestamp()));
+
+                boolean isItemRelated = this.processor.isItemRelatedException(e);
+                boolean isRetryable = this.processor.isRetryableException(e);
+
+                if (isRetryable || !isItemRelated)
+                {
+                    // retryable or unknown error => we will retry the job
+                    this.resilientJobEntityService.saveError(entity.getId(), ResilientJobStatus.CREATED, e);
+
+                    // If retryable and not item-related: this is most probably an infrastructure problem, the batch should be interrupted
+                    if (isRetryable && !isItemRelated)
+                    {
+                        throw e;
+                    }
+                }
+                else // item-related && not-retryable
+                {
+                    // job should be set in error, but the batch should continue
+                    this.resilientJobEntityService.saveError(entity.getId(), ResilientJobStatus.ERROR, e);
+                    onError(e);
+                }
+            }
+        }
+
+        return null;
+    }
+
+
+    String calculateRemainingTime(OffsetDateTime creationTimestamp)
+    {
+        long elapsedSeconds = Duration.between(creationTimestamp, OffsetDateTime.now()).toSeconds();
+        long remainingSeconds = this.processor.getProperties().getRetryTimeout().getSeconds() - elapsedSeconds;
+        return TimeFormatter.getHumanReadableDuration(remainingSeconds * 1000);
+    }
+
+
+    void processEntity() throws Exception
+    {
+        log.info("Processing entity");
+
+        // Calling processor
+        if (this.processor != null)
+        {
+            this.processor.processJob(this.entity);
+        }
+        else
+        {
+            throw new RuntimeException("Job parameters could not be retrieved!");
+        }
+
+        log.info("Processed successfully");
+
+        // Deleting the entity after successful processing
+        this.resilientJobEntityService.deleteById(this.entity.getId());
+    }
+
+
+    void onError(Exception e)
+    {
+        try
+        {
+            this.processor.onError(entity, e);
+        }
+        catch (Exception ex)
+        {
+            log.error("Error in onError method: {}", StackTracer.toString(ex));
+        }
+    }
+
+
+    @Override
+    public boolean isFatalException(Throwable ex)
+    {
+        return true;
+    }
+}

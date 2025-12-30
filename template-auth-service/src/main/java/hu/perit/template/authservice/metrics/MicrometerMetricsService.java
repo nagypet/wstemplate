@@ -23,12 +23,13 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.actuate.health.CompositeHealthContributor;
-import org.springframework.boot.actuate.health.HealthContributor;
-import org.springframework.boot.actuate.health.HealthContributorRegistry;
-import org.springframework.boot.actuate.health.HealthIndicator;
-import org.springframework.boot.actuate.health.NamedContributor;
-import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.health.contributor.CompositeHealthContributor;
+import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.health.contributor.HealthContributor;
+import org.springframework.boot.health.contributor.HealthContributors;
+import org.springframework.boot.health.contributor.HealthIndicator;
+import org.springframework.boot.health.contributor.Status;
+import org.springframework.boot.health.registry.HealthContributorRegistry;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,6 +48,7 @@ public class MicrometerMetricsService
     private final MetricsProviderService metricsProviderService;
     private final List<HealthIndicator> healthIndicators;
 
+
     public MicrometerMetricsService(MeterRegistry registry, HealthContributorRegistry healthContributorRegistry, MetricsProviderService metricsProviderService)
     {
         this.metricsProviderService = metricsProviderService;
@@ -63,11 +65,12 @@ public class MicrometerMetricsService
                 .description(String.format("The total count of users in the %s table", UserEntity.TABLE_NAME)).baseUnit("pcs").register(registry);
     }
 
-    private HealthIndicator getIndicatorFromContributor(NamedContributor<HealthContributor> namedContributor)
-    {
-        log.debug(String.format("Using health contributor: '%s'", namedContributor.getName()));
 
-        HealthContributor contributor = namedContributor.getContributor();
+    private HealthIndicator getIndicatorFromContributor(HealthContributors.Entry entry)
+    {
+        log.debug(String.format("Using health contributor: '%s'", entry.name()));
+
+        HealthContributor contributor = entry.contributor();
         if (contributor instanceof HealthIndicator healthIndicator)
         {
             return healthIndicator;
@@ -75,7 +78,7 @@ public class MicrometerMetricsService
 
         if (contributor instanceof CompositeHealthContributor compositeHealthContributor)
         {
-            for (NamedContributor<HealthContributor> elementOfComposite : compositeHealthContributor)
+            for (HealthContributors.Entry elementOfComposite : compositeHealthContributor)
             {
                 return getIndicatorFromContributor(elementOfComposite); // NOSONAR
             }
@@ -84,12 +87,13 @@ public class MicrometerMetricsService
         throw new UnexpectedConditionException();
     }
 
+
     private static int healthToCode(List<HealthIndicator> indicators)
     {
         for (HealthIndicator indicator : indicators)
         {
-            Status status = indicator.health().getStatus();
-            if (Status.DOWN.equals(status))
+            Health health = indicator.health();
+            if (health == null || health.getStatus() == Status.DOWN)
             {
                 return 0;
             }

@@ -24,8 +24,8 @@ import hu.perit.template.authservice.db.demodb.repo.NativeQueryRepo;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
-import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.health.contributor.AbstractHealthIndicator;
+import org.springframework.boot.health.contributor.Health;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
@@ -49,11 +49,13 @@ public class HealthIndicatorDatabase extends AbstractHealthIndicator
 
     private TimeoutLatch timeoutLatch;
 
+
     @PostConstruct
     void postConstruct()
     {
         this.timeoutLatch = new TimeoutLatch(SysConfig.getMetricsProperties().getMetricsGatheringHysteresisMillis());
     }
+
 
     @Override
     protected void doHealthCheck(Health.Builder builder) throws Exception
@@ -100,6 +102,7 @@ public class HealthIndicatorDatabase extends AbstractHealthIndicator
             builder.withDetail(STATUS, "Database server cannot be reached (timeout)!");
         }
     }
+
 
     boolean checkDbUpAndRunning()
     {
