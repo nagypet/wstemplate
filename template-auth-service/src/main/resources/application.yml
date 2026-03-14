@@ -82,9 +82,9 @@ admin:
 # * or comma separated roles (e.g. ADMIN)
 security:
   swagger-access: ADMIN
-  management-endpoints-access: ADMIN
+  management-endpoints-access: "*"
   admin-gui-access: "*"
-  admin-endpoints-access: ADMIN
+  admin-endpoints-access: "*"
   mode: authorization_server
   auth:
     client-id: e89f64cf-43ff-49e8-acf2-45c3cc44303d

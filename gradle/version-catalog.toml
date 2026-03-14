@@ -2,8 +2,8 @@
 
 [versions]
 aspectj = '1.9.22.1'
-jackson-annotations = '2.20'
-jackson3 = '3.0.3'
+jackson-annotations = '2.21'
+jackson3 = '3.1.0'
 jsonwebtoken = '0.12.6'
 junit = '6.0.1'
 logback = '1.5.22'
@@ -17,7 +17,7 @@ ben-manes-versions = { id = 'com.github.ben-manes.versions', version = '0.51.0' 
 habarta-typescript-generator = { id = 'cz.habarta.typescript-generator', version.ref = 'czhabarta' }
 io-spring-dependency-management = { id = 'io.spring.dependency-management', version = '1.1.7' }
 johnrengelman-shadow = { id = 'com.github.johnrengelman.shadow', version = '8.1.1' }
-org-springframework-boot = { id = 'org.springframework.boot', version = '4.0.1' }
+org-springframework-boot = { id = 'org.springframework.boot', version = '4.0.3' }
 sonarqube = { id = 'org.sonarqube', version = '5.1.0.4882' }
 thin-launcher = { id = 'org.springframework.boot.experimental.thin-launcher', version = '1.0.31.RELEASE' }
 
@@ -36,7 +36,7 @@ commons-cli = 'commons-cli:commons-cli:1.9.0'
 commons-codec = 'commons-codec:commons-codec:1.17.1'
 commons-collections4 = 'org.apache.commons:commons-collections4:4.5.0-M2'
 commons-io = 'commons-io:commons-io:2.16.1'
-commons-lang3 = 'org.apache.commons:commons-lang3:3.17.0'
+commons-lang3 = 'org.apache.commons:commons-lang3:3.19.0'
 guava = 'com.google.guava:guava:33.3.0-jre'
 hibernate-validator = 'org.hibernate:hibernate-validator:8.0.1.Final'
 hierynomus-smbj = 'com.hierynomus:smbj:0.13.0'
