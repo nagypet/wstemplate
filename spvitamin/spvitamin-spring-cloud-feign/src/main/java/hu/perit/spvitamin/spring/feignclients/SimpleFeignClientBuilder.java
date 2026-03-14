@@ -16,21 +16,20 @@
 
 package hu.perit.spvitamin.spring.feignclients;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Client;
 import feign.Feign;
 import feign.Logger;
+import feign.Request;
 import feign.RequestInterceptor;
 import feign.Retryer;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
 import feign.form.spring.SpringFormEncoder;
-import feign.jackson.JacksonEncoder;
 import feign.optionals.OptionalDecoder;
 import feign.slf4j.Slf4jLogger;
+import hu.perit.spvitamin.json.SpvitaminObjectMapper;
 import hu.perit.spvitamin.spring.config.FeignProperties;
-import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.objectprovider.StaticObjectProvider;
 import org.springframework.beans.factory.ObjectProvider;
@@ -41,7 +40,9 @@ import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.List;
 
@@ -60,6 +61,7 @@ public class SimpleFeignClientBuilder
     private Retryer retryer;
     private Client client;
     private boolean allowCookies = false;
+    private Request.Options options;
 
 
     public static SimpleFeignClientBuilder newInstance()
@@ -73,11 +75,11 @@ public class SimpleFeignClientBuilder
         // Adding the TracingFeignInterceptor
         this.requestInterceptorAdapter.addInterceptor(new TracingFeignInterceptor());
 
-        ObjectMapper objectMapper = SpringContext.getBean(ObjectMapper.class);
+        JsonMapper jsonMapper = SpvitaminObjectMapper.getJsonMapper();
         FeignProperties feignProperties = SysConfig.getFeignProperties();
 
         // Encoder
-        this.encoder = new JacksonEncoder(objectMapper); // default encoder
+        this.encoder = new Jackson3Encoder(jsonMapper); // default encoder
 
         // Decoder
         FeignHttpMessageConverters converters = new FeignHttpMessageConverters(
@@ -117,10 +119,10 @@ public class SimpleFeignClientBuilder
 
     public SimpleFeignClientBuilder withMultipartEncoder()
     {
-        //ObjectMapper objectMapper = SpringContext.getBean(ObjectMapper.class);
+        JsonMapper jsonMapper = SpvitaminObjectMapper.getJsonMapper();
         List<HttpMessageConverter<?>> converterList = new RestTemplate().getMessageConverters();
-        //converterList.removeIf(c -> c instanceof MappingJackson2HttpMessageConverter);
-        //converterList.add(new MappingJackson2HttpMessageConverter(objectMapper));
+        converterList.removeIf(c -> c instanceof JacksonJsonHttpMessageConverter);
+        converterList.add(new JacksonJsonHttpMessageConverter(jsonMapper));
 
         ObjectProvider<FeignHttpMessageConverters> feignHttpMessageConverters = StaticObjectProvider.of(new FeignHttpMessageConverters(StaticObjectProvider.of(converterList), null));
         this.encoder = new SpringFormEncoder(new SpringEncoder(feignHttpMessageConverters));
@@ -183,6 +185,13 @@ public class SimpleFeignClientBuilder
     }
 
 
+    public SimpleFeignClientBuilder options(Request.Options options)
+    {
+        this.options = options;
+        return this;
+    }
+
+
     public <T> T build(Class<T> apiType, String url)
     {
         this.builder.encoder(this.encoder);
@@ -196,6 +205,10 @@ public class SimpleFeignClientBuilder
         else
         {
             this.builder.client(new HeaderFilterFeignClient(this.client));
+        }
+        if (this.options != null)
+        {
+            this.builder.options(this.options);
         }
 
         return this.builder.target(apiType, url);

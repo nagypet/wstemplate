@@ -16,11 +16,13 @@
 
 package hu.perit.spvitamin.spring.resilientjobrunner.config;
 
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Setter;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -31,11 +33,14 @@ public class ResilientJobProperties
     @NotNull
     private String processorClass;
     private int threadPoolSize = 10;
+    private Duration pollingInterval = Duration.ofSeconds(10);
     private Duration retryTimeout = Duration.ofHours(24);
     private Duration processingTimeout = Duration.ofMinutes(5);
+    private Duration initialRetryDelay = Duration.ofSeconds(5);
+    private Duration maxRetryDelay = Duration.ofMinutes(5);
     private String contextDecoratorTag = "batchId";
-    @NotEmpty
-    private List<String> retryableExceptions;
-    @NotEmpty
-    private List<String> itemRelatedExceptions;
+    @Setter(AccessLevel.NONE)
+    private List<String> retryableExceptions = new ArrayList<>();
+    @Setter(AccessLevel.NONE)
+    private List<String> itemRelatedExceptions = new ArrayList<>();
 }

@@ -14,16 +14,4 @@
  * limitations under the License.
  */
 
-package hu.perit.spvitamin.spring.jobexecutor;
-
-import hu.perit.spvitamin.core.jobexecutor.CancellableJob;
-import hu.perit.spvitamin.spring.security.AuthenticatedUser;
-
-// Use ContextAwareCancellableJob instead
-@Deprecated
-public abstract class CancelableJobWithSecurityContext extends CancellableJob
-{
-    abstract AuthenticatedUser getAuthenticatedUser();
-
-    abstract void setAuthenticatedUser(AuthenticatedUser authenticatedUser);
-}
+rootProject.name = 'spvitamin-core'

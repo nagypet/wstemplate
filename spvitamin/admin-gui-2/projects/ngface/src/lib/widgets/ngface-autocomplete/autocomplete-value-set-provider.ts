@@ -18,7 +18,7 @@ import {BehaviorSubject, Observable, Subscription} from 'rxjs';
 import {Ngface} from '../../ngface-models';
 import {ValueSetItem} from '../types';
 import {map} from 'rxjs/operators';
-import {DistinctBehaviorSubject} from './distinct-behavior-subject';
+import {DistinctBehaviorSubject} from '../../utils/distinct-behavior-subject';
 
 
 export class AutocompleteValueSetProvider

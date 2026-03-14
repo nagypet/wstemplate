@@ -16,11 +16,7 @@
 
 package hu.perit.spvitamin.spring.resilientjobrunner.db.entity;
 
-import hu.perit.spvitamin.core.exception.ServerException;
-import hu.perit.spvitamin.json.SpvitaminObjectMapper;
 import hu.perit.spvitamin.spring.data.converter.OffsetDateTimeToUTCConverter;
-import hu.perit.spvitamin.spring.json.JSonSerializer;
-import hu.perit.spvitamin.spring.json.SpvitaminSpringObjectMapper;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatusConverter;
 import jakarta.persistence.Column;
@@ -30,17 +26,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
+import lombok.ToString;
 
 import java.time.OffsetDateTime;
 
 @Getter
 @Setter
 @MappedSuperclass
+@ToString
 public class AbstractResilientJobEntity
 {
     public static final String COL_ID = "id";
@@ -50,7 +45,9 @@ public class AbstractResilientJobEntity
     public static final String COL_PARAMETER_VERSION = "parameter_version";
     public static final String COL_PARAMETERS = "parameters";
     public static final String COL_RETRY_COUNT = "retry_count";
-    public static final String COL_PROCESSING_STARTED_TIMESTAMP = "processing_started_timestamp";
+    public static final String COL_PROCESSING_FIRST_STARTED_TIMESTAMP = "processing_first_started_timestamp";
+    public static final String COL_PROCESSING_LAST_STARTED_TIMESTAMP = "processing_last_started_timestamp";
+    public static final String COL_NEXT_RETRY_TIMESTAMP = "next_retry_timestamp";
     public static final String COL_EROR_TEXT = "error_text";
 
     @Id
@@ -76,48 +73,25 @@ public class AbstractResilientJobEntity
     @Column(name = COL_PARAMETER_VERSION, nullable = false)
     private Integer parameterVersion;
 
-    @Setter(AccessLevel.NONE)
-    @Getter(AccessLevel.NONE)
     @NotNull
     @Column(name = COL_PARAMETERS, nullable = false, columnDefinition = "TEXT")
     private String parameters;
 
-    @Column(name = COL_PROCESSING_STARTED_TIMESTAMP)
+    @Column(name = COL_PROCESSING_FIRST_STARTED_TIMESTAMP)
     @Convert(converter = OffsetDateTimeToUTCConverter.class)
-    private OffsetDateTime processingStartedTimestamp;
+    private OffsetDateTime processingFirstStartedTimestamp;
+
+    @Column(name = COL_PROCESSING_LAST_STARTED_TIMESTAMP)
+    @Convert(converter = OffsetDateTimeToUTCConverter.class)
+    private OffsetDateTime processingLastStartedTimestamp;
+
+    @Column(name = COL_NEXT_RETRY_TIMESTAMP)
+    @Convert(converter = OffsetDateTimeToUTCConverter.class)
+    private OffsetDateTime nextRetryTimestamp;
 
     @Column(name = COL_EROR_TEXT, columnDefinition = "TEXT")
     private String errorText;
 
     @Column(name = COL_RETRY_COUNT)
     private Long retryCount;
-
-
-    public void setParameters(Object data)
-    {
-        try
-        {
-            ObjectMapper mapper = SpvitaminSpringObjectMapper.createMapper(SpvitaminObjectMapper.MapperType.JSON);
-            // TODO
-            //mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-            this.parameters = mapper.writeValueAsString(data);
-        }
-        catch (JacksonException e)
-        {
-            ServerException.throwFrom(e);
-        }
-    }
-
-
-    public <T> T getParameters(Class<T> clazz)
-    {
-        try
-        {
-            return JSonSerializer.fromJson(this.parameters, clazz);
-        }
-        catch (JacksonException e)
-        {
-            return ServerException.throwFrom(e);
-        }
-    }
 }

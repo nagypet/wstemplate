@@ -16,28 +16,59 @@
 
 package hu.perit.spvitamin.spring.metrics;
 
+import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.core.exception.ThrowingRunnable;
+import hu.perit.spvitamin.spring.config.SysConfig;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.ThreadContext;
+
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
-import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.spring.config.SysConfig;
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
-public class AsyncExecutor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class AsyncExecutor
 {
 
     public static <T> T invoke(Supplier<T> supplier, T returnValueOnError) throws TimeoutException
     {
+        return invoke(supplier, returnValueOnError, Duration.ofMillis(SysConfig.getMetricsProperties().getTimeoutMillis()));
+    }
+
+
+    public static <T> T invoke(Supplier<T> supplier, T returnValueOnError, Duration timeout) throws TimeoutException
+    {
         CompletableFuture<T> completableFuture = null;
         try
         {
-            completableFuture = CompletableFuture.supplyAsync(supplier);
+            // Capture the current thread's logging context (Log4j ThreadContext)
+            final var parentThreadContext = ThreadContext.getContext();
 
-            return completableFuture.get(SysConfig.getMetricsProperties().getTimeoutMillis(), TimeUnit.MILLISECONDS);
+            completableFuture = CompletableFuture.supplyAsync(() -> {
+                try
+                {
+                    // Propagate the parent thread's context to the async thread
+                    if (parentThreadContext != null && !parentThreadContext.isEmpty())
+                    {
+                        ThreadContext.putAll(parentThreadContext);
+                    }
+
+                    return supplier.get();
+                }
+                finally
+                {
+                    // Clean up the ThreadContext in the async thread to avoid leaking data
+                    ThreadContext.clearMap();
+                }
+            });
+
+            return completableFuture.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
         }
         catch (ExecutionException ex)
         {
@@ -57,4 +88,56 @@ public class AsyncExecutor
         return returnValueOnError;
     }
 
+
+    public static void invokeVoid(ThrowingRunnable runnable, Duration timeout) throws Exception
+    {
+        CompletableFuture<Void> completableFuture = null;
+        try
+        {
+            // Capture the current thread's logging context (Log4j ThreadContext)
+            final var parentThreadContext = ThreadContext.getContext();
+
+            completableFuture = CompletableFuture.supplyAsync(() -> {
+                try
+                {
+                    // Propagate the parent thread's context to the async thread
+                    if (parentThreadContext != null && !parentThreadContext.isEmpty())
+                    {
+                        ThreadContext.putAll(parentThreadContext);
+                    }
+
+                    runnable.run();
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException(e);
+                }
+                finally
+                {
+                    // Clean up the ThreadContext in the async thread to avoid leaking data
+                    ThreadContext.clearMap();
+                }
+            });
+            completableFuture.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+        }
+        catch (ExecutionException ex)
+        {
+            if (ex.getCause() instanceof Exception exception)
+            {
+                throw (Exception) exception.getCause();
+            }
+            log.error(StackTracer.toString(ex));
+        }
+        catch (TimeoutException ex)
+        {
+            completableFuture.cancel(true);
+            throw ex;
+        }
+        catch (InterruptedException ex)
+        {
+            log.warn(StackTracer.toString(ex));
+            Thread.currentThread().interrupt();
+        }
+    }
 }

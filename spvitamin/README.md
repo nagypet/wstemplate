@@ -59,7 +59,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '4.0.1-1-RELEASE')
+    set('spvitaminVersion', '4.0.3-1-RELEASE')
 }
 
 dependencies {
@@ -96,9 +96,37 @@ dependencyManagement {
 
 ## Release history
 
+### 4.0.3-1-RELEASE not yet released
+
+- 2025-02-28: Java21, SpringBoot 4.0.3
+- 2026-03-08: CancelableJobExecutorWithSecurityContext and CancelableJobWithSecurityContext removed.
+- 2026-03-08: BatchProcessor and BatchProcessorWithSecurityContext are not abstract anymore
+- 2026-03-08: SpvitanObjectMapper improved
+- 2026-03-08: SimpleFeignClientBuilder improved
+- 2026-03-09: uri=/.well-known/appspecific/com.chrome.devtools.json ignored
+
+
 ### 4.0.1-1-RELEASE not yet released
 
 - 2025-12-31: Java21, SpringBoot 4.0.1
+- 2025-12-31: bugfix in resilientjobrunner
+- 2025-01-14: AsyncExecutor improved
+- 2025-01-22: Putting the sessionId in ThreadContext
+- 2025-01-22: PessimisticJpaRepository fixed
+- 2025-01-23: AsyncExecutor: delegating ThreadContext
+- 2025-01-25: credentialType added to AuthorizationToken
+- 2025-01-25: AuthorizationException handled in GenericRestExceptionResponseBuilder
+- 2026-02-10: New module: spvitamin-pdf
+- 2026-02-14: ResilientJobRunner implements an exponential back-off strategy for retry
+- 2026-02-14: TokenCache put in spvitamin-spring-cloud-feign
+- 2026-02-28: BatchProcessor: nulls filtered out
+- 2026-02-28: new typehelper: IntUtils
+- 2026-02-28: Security:
+  - token validation fixed
+  - there is no refresh token for technical users
+  - session lifetime equals with access token validity for technical users
+  - /authenticate endpoint: only basic authentication creates a nes session
+- 2026-02-28: StringUtils -> Strings.CI/Strings.CS
 
 
 ### 3.4.3-1-RELEASE not yet released
@@ -175,6 +203,23 @@ dependencyManagement {
 - GenericRestExceptionResponseBuilder creates HTTP 400 response in case of database level ValidationExceptions
 - New module: spvitamin-spring-resilientjobrunner added
 - NumberConverter improved
+- 2025-01-22: Putting the sessionId in ThreadContext
+- 2025-01-22: PessimisticJpaRepository fixed
+- 2025-01-23: AsyncExecutor: delegating ThreadContext
+- 2025-01-25: credentialType added to AuthorizationToken
+- 2025-01-25: AuthorizationException handled in GenericRestExceptionResponseBuilder
+- 2026-02-10: New module: spvitamin-pdf
+- 2026-02-10: ResilientJobRunner fixes ported back from 4.0.1
+- 2026-02-14: ResilientJobRunner implements an exponential back-off strategy for retry
+- 2026-02-14: TokenCache put in spvitamin-spring-cloud-feign
+- 2026-02-28: BatchProcessor: nulls filtered out
+- 2026-02-28: new typehelper: IntUtils
+- 2026-02-28: Security:
+    - token validation fixed
+    - there is no refresh token for technical users
+    - session lifetime equals with access token validity for technical users
+    - /authenticate endpoint: only basic authentication creates a nes session
+- 2026-02-28: StringUtils -> Strings.CI/Strings.CS
 
 
 ### 3.3.3-2-RELEASE not yet released

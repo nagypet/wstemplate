@@ -46,6 +46,7 @@ dependencies {
         api project(":spvitamin-file-storage")
         api project(":spvitamin-file-storage-spring-sftp")
         api project(":spvitamin-json-time")
+        api project(":spvitamin-pdf")
         api project(":spvitamin-spring-admin")
         api project(":spvitamin-spring-cloud-client")
         api project(":spvitamin-spring-cloud-feign")
@@ -108,7 +109,7 @@ def customizePom(pom) {
             resolveStrategy = Closure.DELEGATE_FIRST
 
             name "${project.group}:${project.name}"
-            description 'A general purpose library to use in a spring based microservice environment.'
+            description = 'A general purpose library to use in a spring based microservice environment.'
             url 'https://github.com/nagypet/spvitamin'
 
             scm {

@@ -23,16 +23,19 @@ import hu.perit.spvitamin.spring.config.SessionProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
+import hu.perit.spvitamin.spring.security.BasicOnlySessionSecurityContextRepository;
 import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.SecurityContextRemoverFilter;
 import hu.perit.spvitamin.spring.security.auth.proxy.AuthorizationServerProxy;
+import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.LocalUserAuthenticationProvider;
 import jakarta.servlet.Filter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -141,6 +144,20 @@ public class SimpleHttpSecurityBuilder
                 http.headers(i -> i.addHeaderWriter(new StaticHeadersWriter(headerParts[0], headerParts[1])));
             }
         }
+
+        return this;
+    }
+
+
+    public SimpleHttpSecurityBuilder createSessionOnlyForBasicAuthentication() throws Exception
+    {
+        SessionAuthenticationStrategy authenticationStrategy = SpringContext.getBean(SessionAuthenticationStrategy.class);
+        this.http
+                .sessionManagement(i -> i
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                        .sessionAuthenticationStrategy(authenticationStrategy)
+                )
+                .securityContext(ctx -> ctx.securityContextRepository(new BasicOnlySessionSecurityContextRepository()));
 
         return this;
     }
@@ -298,9 +315,29 @@ public class SimpleHttpSecurityBuilder
                 .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
                 .ignorePersistedSecurity()
                 .authorizeRequests(r -> r.anyRequest().authenticated())
+                .addLocalUserAuthenticationProvider()
                 .basicAuth()
                 .jwtAuth()
-                .createSession();
+                .createSessionOnlyForBasicAuthentication();
+
+        return this;
+    }
+
+
+    private SimpleHttpSecurityBuilder addLocalUserAuthenticationProvider()
+    {
+        try
+        {
+            LocalUserAuthenticationProvider provider = SpringContext.getBean(LocalUserAuthenticationProvider.class);
+            AuthenticationManagerBuilder authenticationManagerBuilder = SpringContext.getBean(AuthenticationManagerBuilder.class);
+            http.authenticationProvider(provider);
+            authenticationManagerBuilder.authenticationProvider(provider);
+            log.debug("{} applied to the security.", LocalUserAuthenticationProvider.class.getSimpleName());
+        }
+        catch (Exception e)
+        {
+            log.info("{} is not configured!", LocalUserAuthenticationProvider.class.getSimpleName());
+        }
 
         return this;
     }
@@ -311,7 +348,7 @@ public class SimpleHttpSecurityBuilder
         this
                 .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
                 .authorizeRequests(r -> r.anyRequest().permitAll())
-                .createSession();
+                .createSessionOnlyForBasicAuthentication();
 
         return this;
     }

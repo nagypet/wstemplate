@@ -1,7 +1,7 @@
 [versions]
 aspectj = '1.9.22.1'
-jackson-annotations = '2.20'
-jackson3 = '3.0.3'
+jackson-annotations = '2.21'
+jackson3 = '3.1.0'
 jsonwebtoken = '0.12.6'
 junit = '6.0.1'
 logback = '1.5.22'
@@ -14,7 +14,7 @@ czhabarta = '3.2.1263'
 ben-manes-versions = { id = 'com.github.ben-manes.versions', version = '0.51.0' }
 habarta-typescript-generator = { id = 'cz.habarta.typescript-generator', version.ref = 'czhabarta' }
 io-spring-dependency-management = { id = 'io.spring.dependency-management', version = '1.1.7' }
-org-springframework-boot = { id = 'org.springframework.boot', version = '4.0.1' }
+org-springframework-boot = { id = 'org.springframework.boot', version = '4.0.3' }
 sonarqube = { id = 'org.sonarqube', version = '5.1.0.4882' }
 
 [libraries]
@@ -24,7 +24,7 @@ assertj = 'org.assertj:assertj-core:3.27.6'
 awaitility = 'org.awaitility:awaitility:4.3.0'
 commons-collections4 = 'org.apache.commons:commons-collections4:4.5.0-M2'
 commons-io = 'commons-io:commons-io:2.16.1'
-commons-lang3 = 'org.apache.commons:commons-lang3:3.17.0'
+commons-lang3 = 'org.apache.commons:commons-lang3:3.19.0'
 guava = 'com.google.guava:guava:33.3.0-jre'
 hibernate-validator = 'org.hibernate:hibernate-validator:8.0.1.Final'
 jackson-annotations = { module = 'com.fasterxml.jackson.core:jackson-annotations', version.ref = 'jackson-annotations' }
@@ -54,6 +54,8 @@ nimbus-jose-jwt = 'com.nimbusds:nimbus-jose-jwt:10.5'
 nv-i18n = 'com.neovisionaries:nv-i18n:1.29'
 openapi-api = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-api', version.ref = 'springdoc' }
 openapi-ui = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-ui', version.ref = 'springdoc' }
+pdfbox = 'org.apache.pdfbox:pdfbox:3.0.3'
+pdfbox-fontbox = 'org.apache.pdfbox:fontbox:3.0.3'
 reflections = 'org.reflections:reflections:0.10.2'
 slf4j-api = 'org.slf4j:slf4j-api:2.0.17'
 slf4j-log4j12 = 'org.slf4j:slf4j-log4j12:2.0.17'

@@ -66,8 +66,8 @@ class BJobProcessorTest
         p.setThreadPoolSize(1);
         p.setRetryTimeout(Duration.ofMinutes(30));
         p.setContextDecoratorTag("batchId");
-        p.setRetryableExceptions(Arrays.asList(RuntimeException.class.getName()));
-        p.setItemRelatedExceptions(Arrays.asList(IllegalArgumentException.class.getName()));
+        p.getRetryableExceptions().addAll(Arrays.asList(RuntimeException.class.getName()));
+        p.getRetryableExceptions().addAll(Arrays.asList(IllegalArgumentException.class.getName()));
         return p;
     }
 
@@ -232,7 +232,14 @@ class BJobProcessorTest
 
 
         @Override
-        public OffsetDateTime getProcessingStartedTimestamp()
+        public OffsetDateTime getProcessingFirstStartedTimestamp()
+        {
+            return null;
+        }
+
+
+        @Override
+        public OffsetDateTime getProcessingLastStartedTimestamp()
         {
             return null;
         }
@@ -253,7 +260,7 @@ class BJobProcessorTest
 
 
         @Override
-        public <T> T getParameters(Class<T> clazz)
+        public String getParameters()
         {
             return null;
         }
