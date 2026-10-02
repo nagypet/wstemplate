@@ -5,6 +5,16 @@ please visit my [wstemplate](https://github.com/nagypet/wstemplate) project.
 
 ## Current releases:
 
+### 4.1.0-1-RELEASE
+
+- SpringBoot 4.1.0
+- SpingCloud 2025.1.2
+
+### 4.0.3-1-RELEASE
+
+- SpringBoot 4.0.3
+- SpingCloud 2025.1.0
+
 ### 4.0.1-1-RELEASE
 
 - SpringBoot 4.0.1
@@ -59,7 +69,7 @@ repositories {
 }
 
 ext {
-    set('spvitaminVersion', '4.0.3-1-RELEASE')
+    set('spvitaminVersion', '4.1.0-1-RELEASE')
 }
 
 dependencies {
@@ -96,14 +106,88 @@ dependencyManagement {
 
 ## Release history
 
-### 4.0.3-1-RELEASE not yet released
+### 4.1.0-1-RELEASE not yet released
+- 2026-06-13: SpringBoot 4.1.0
+- 2026-06-14: Security module improvements
+- 2026-06-15: Non-existing REST endpoint returns HTTP 404 Not Found (NoResourceFoundException: No static resource)
+- 2026-06-28: CheckedExceptionConverter only wrapes check exceptions into a ServerException
+- 2026-06-28: StateMachine support now conditions
+- 2026-06-28: GenericRestExceptionResponseBuilder improved
+- 2026-06-28: AbstractStringValue to make String usage type-safe
+- 2026-07-12: HttpRequestMethodNotSupportedException produces HTTP 400 instead og HTTP 500
+- 2026-07-19: spvitamin-core:
+  - StateMachine.getStateForEvent fixed
+  - CharsetSanitizer multichar replacement fixed
+- 2026-07-19: spvitamin-spring-data: 
+  - PessimisticJpaRepository findByIdReadOnly uses a read-only session
+- 2026-07-19: spvitamin-spring-general:
+  - HttpMediaTypeNotSupportedException produces HTTP 400 instead og HTTP 500
+  - ManifestReader fixed
+- 2026-07-19: spvitamin-spring-resilientjobrunner
+  - terminatePermanentlyFailingEntities removed
+- 2026-08-02:
+  - SftpStorage newOutputStream handles apped and overwrite modes
+  - In production-mode there is no stack trace in the rest response
+  - PessimisticJpaRepository condition for read-only session fixed
+  - In production-mode all cookies are secured
+  - Protection against brute-force attacks
+  - XssFilter to remove scripts from JSON inputs
+- 2026-08-22:
+  - AbstractTokenCache can handle unencrypted credentials as well
+  - PessimisticJpaRepository throws exception on save if the session is read-only
+  - RedisLoginAttemptService fix in case the Redis is temporarily unavailable
+- 2026-08-23: AuthenticationManager created only if the security mode is either AUTHORIZATION_SERVER or RESOURCE_SERVER
+- 2026-09-06: 
+  - Currency introduced
+  - OAuth2 authentication fixed
+  - UnprocessableContentException produces HTTP 422 Unprocessable Content
+  - StateMachine new method: getDefinedEvents
+  - Case class extended by toUpper()
+  - VersionedResilientJobParameter
+- 2026-10-02:
+  - AbstractPooledStringValue to support == operation
+  - Currency inherited from AbstractPooledStringValue
+  - RestExceptionResponse message propagated to frontend
+  - LocalUserProperties supports id field
+  - EmptyStringToNullConverter
+  - @StandardApiResponses annotation
+  - @SuppressRestEndpoints annotation
+  - admin-gui updated to Angular 21
 
-- 2025-02-28: Java21, SpringBoot 4.0.3
+
+### 4.0.3-1-RELEASE not yet released
+- 2026-02-28: Java21, SpringBoot 4.0.3
 - 2026-03-08: CancelableJobExecutorWithSecurityContext and CancelableJobWithSecurityContext removed.
 - 2026-03-08: BatchProcessor and BatchProcessorWithSecurityContext are not abstract anymore
 - 2026-03-08: SpvitanObjectMapper improved
 - 2026-03-08: SimpleFeignClientBuilder improved
 - 2026-03-09: uri=/.well-known/appspecific/com.chrome.devtools.json ignored
+- 2026-03-17: New class: NonNull
+- 2026-03-17: AbstractResilientJobRepo uses timeout = -2: SKIP_LOCKED
+- 2026-03-28: ResilientJobEntity has parameterHash
+- 2026-03-28: new class HashUtils
+- 2026-04-05: SpvitaminObjectMapper: builder is public to create locally used mapper with special settings
+- 2026-04-05: SpringContext new method: getBeansOfType
+- 2026-04-05: SimpleHttpSecurityBuilder using the new bean AuthenticationManager
+- 2026-04-05: LDAP authentication provider is now a bean
+- 2026-04-06: DefaultRestExceptionLoggerImpl: ignore .*/sse/subscribe
+- 2026-04-06: SpvitaminObjectMapper: UnderscoreNamingStrategy is now the default
+- 2026-04-11: TimeFormatter improved
+- 2026-04-11: SimpleHttpSecurityBuilder: H2 console path is now retrieved from H2ConsoleProperties bean
+- 2026-04-11: Logging improved in ResilientJobRunner's BJob
+- 2026-04-11: HttpMessageNotReadableException handled in GenericRestExceptionResponseBuilder, producing HTTP 400 Bad Request
+- 2026-04-12: Browser mode in the SimpleFeignClientBuilder: sending cookies
+- 2026-04-14: ResilientJobRunner fix: the onError method of the processor is called in case the total retry timeout is reached
+- 2026-04-27: ResilientJobRunner fix: terminatePermanentlyFailingEntities terminates jobs only if there are no more scheduled retries
+- 2026-04-27: AsyncExecutor: on timeout the asynchroneous job is interrupted
+- 2026-04-29: ReflectionUtils.isTerminalType fixed => the logging of XmlGregorianCalendar is now correct
+- 2026-05-05: LocalDateUtils fixed: fromDate can handle also java.sql.Date
+- 2026-06-12: ForwardingAuthRequestInterceptor bugfix
+- 2026-06-12: ResilientJobRunner improvements and bugfix:
+  - SagaExecutor
+  - a missing catch-block caused the whole processing to stop in some rare circumstances
+- 2026-06-12: IbanConverter and CharsetSanitizer
+- 2026-06-12: a new validator to provide reasoning
 
 
 ### 4.0.1-1-RELEASE not yet released
@@ -220,6 +304,33 @@ dependencyManagement {
     - session lifetime equals with access token validity for technical users
     - /authenticate endpoint: only basic authentication creates a nes session
 - 2026-02-28: StringUtils -> Strings.CI/Strings.CS
+- 2026-03-08: CancelableJobExecutorWithSecurityContext and CancelableJobWithSecurityContext removed.
+- 2026-03-08: BatchProcessor and BatchProcessorWithSecurityContext are not abstract anymore
+- 2026-03-09: uri=/.well-known/appspecific/com.chrome.devtools.json ignored
+- 2026-03-17: New class: NonNull
+- 2026-03-17: AbstractResilientJobRepo uses timeout = -2: SKIP_LOCKED
+- 2026-03-28: ResilientJobEntity has parameterHash
+- 2026-03-28: new class HashUtils
+- 2026-04-05: SpringContext new method: getBeansOfType
+- 2026-04-05: SimpleHttpSecurityBuilder using the new bean AuthenticationManager
+- 2026-04-05: LDAP authentication provider is now a bean
+- 2026-04-06: DefaultRestExceptionLoggerImpl: ignore .*/sse/subscribe
+- 2026-04-11: TimeFormatter improved
+- 2026-04-11: SimpleHttpSecurityBuilder: H2 console path is now retrieved from H2ConsoleProperties bean
+- 2026-04-11: Logging improved in ResilientJobRunner's BJob
+- 2026-04-11: HttpMessageNotReadableException handled in GenericRestExceptionResponseBuilder, producing HTTP 400 Bad Request
+- 2026-04-12: Browser mode in the SimpleFeignClientBuilder: sending cookies
+- 2026-04-14: ResilientJobRunner fix: the onError method of the processor is called in case the total retry timeout is reached
+- 2026-04-27: ResilientJobRunner fix: terminatePermanentlyFailingEntities terminates jobs only if there are no more scheduled retries
+- 2026-04-27: AsyncExecutor: on timeout the asynchroneous job is interrupted
+- 2026-04-29: ReflectionUtils.isTerminalType fixed => the logging of XmlGregorianCalendar is now correct
+- 2026-05-05: LocalDateUtils fixed: fromDate can handle also java.sql.Date
+- 2026-06-12: ForwardingAuthRequestInterceptor bugfix
+- 2026-06-12: ResilientJobRunner improvements and bugfix: 
+  - SagaExecutor
+  - a missing catch-block caused the whole processing to stop in some rare circumstances
+- 2026-06-12: IbanConverter and CharsetSanitizer
+- 2026-06-12: a new validator to provide reasoning
 
 
 ### 3.3.3-2-RELEASE not yet released

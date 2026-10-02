@@ -26,6 +26,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
@@ -53,6 +54,28 @@ public final class LocalDateUtils
 
         Instant instant = date.toInstant();
         return LocalDate.ofInstant(instant, ZoneId.systemDefault());
+    }
+
+
+    public static LocalDate fromInstant(Instant instant)
+    {
+        if (instant == null)
+        {
+            return null;
+        }
+
+        return LocalDate.ofInstant(instant, ZoneId.systemDefault());
+    }
+
+
+    public static LocalDate fromOffsetDateTime(OffsetDateTime offsetDateTime)
+    {
+        if (offsetDateTime == null)
+        {
+            return null;
+        }
+
+        return offsetDateTime.atZoneSameInstant(ZoneId.systemDefault()).toLocalDate();
     }
 
 

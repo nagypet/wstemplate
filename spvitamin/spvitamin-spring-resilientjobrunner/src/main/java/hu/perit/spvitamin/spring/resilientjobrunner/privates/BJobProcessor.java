@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.spring.resilientjobrunner.privates;
 
+import hu.perit.spvitamin.core.StackTracer;
 import hu.perit.spvitamin.core.exception.ServerException;
 import hu.perit.spvitamin.core.typehelpers.ListUtils;
 import hu.perit.spvitamin.spring.resilientjobrunner.AbstractProcessor;
@@ -123,16 +124,12 @@ class BJobProcessor
     }
 
 
+    // This method must not throw any exception, otherwise the scheduled process will be stopped.
     void process(ProcessorType processorType)
     {
-        ResilientJobProperties properties = getProperties(processorType);
-        try (var ctx = new ThreadContextDecorator(properties.getContextDecoratorTag(), BJobHelper.getBatchId(processorType, null)))
+        try (var ctx = ThreadContextDecorator.with(processorType.getName(), null))
         {
-            int countTerminatedEntities = this.resilientJobEntityService.terminatePermanentlyFailingEntities(processorType, properties.getRetryTimeout());
-            if (countTerminatedEntities > 0)
-            {
-                log.info("{} jobs have been terminated due to permanent errors", countTerminatedEntities);
-            }
+            ResilientJobProperties properties = getProperties(processorType);
 
             int countResetedEntities = this.resilientJobEntityService.resetStuckInProgressEntities(processorType, properties.getProcessingTimeout());
             if (countResetedEntities > 0)
@@ -182,6 +179,11 @@ class BJobProcessor
                     }
                 }
             }
+        }
+        catch (Exception e)
+        {
+            log.error("Unexpected error in scheduled process for {}, will retry on next poll", processorType);
+            log.error(StackTracer.toString(e));
         }
     }
 

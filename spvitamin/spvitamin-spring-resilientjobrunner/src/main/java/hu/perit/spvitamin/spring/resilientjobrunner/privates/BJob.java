@@ -17,11 +17,11 @@
 package hu.perit.spvitamin.spring.resilientjobrunner.privates;
 
 import hu.perit.spvitamin.core.StackTracer;
-import hu.perit.spvitamin.core.exception.ExceptionWrapper;
 import hu.perit.spvitamin.core.timeformatter.TimeFormatter;
 import hu.perit.spvitamin.spring.batchprocessing.ContextAwareBatchJob;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.resilientjobrunner.AbstractProcessor;
+import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobContext;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus;
 import hu.perit.spvitamin.spring.resilientjobrunner.db.entity.AbstractResilientJobEntity;
 import hu.perit.spvitamin.spring.resilientjobrunner.service.api.ResilientJobEntityService;
@@ -45,7 +45,8 @@ class BJob extends ContextAwareBatchJob
     @Override
     protected Void execute() throws Exception
     {
-        try (var ctx = new ThreadContextDecorator(processor.getProperties().getContextDecoratorTag(), BJobHelper.getBatchId(processor.getProcessorType(), entity.getId())))
+        try (var ctx = ThreadContextDecorator.with(processor.getProcessorType().getName(), BJobHelper.getTraceId(processor.getProcessorType(), entity.getId()));
+             var jobCtx = ResilientJobContext.bind(entity.getOperationId()))
         {
             try
             {
@@ -53,11 +54,7 @@ class BJob extends ContextAwareBatchJob
             }
             catch (Exception e)
             {
-                ExceptionWrapper exceptionWrapper = ExceptionWrapper.of(e);
-                log.error(exceptionWrapper.toStringWithCauses());
-                log.error("Exception. Retried {} times. Remaining time for retries: {}.",
-                        entity.getRetryCount(),
-                        calculateRemainingTime(entity.getProcessingFirstStartedTimestamp()));
+                log.error(StackTracer.toString(e));
 
                 boolean isItemRelated = this.processor.isItemRelatedException(e);
                 boolean isRetryable = this.processor.isRetryableException(e);
@@ -65,21 +62,49 @@ class BJob extends ContextAwareBatchJob
                 if (isRetryable || !isItemRelated)
                 {
                     // retryable or unknown error => we will retry the job
-                    this.resilientJobEntityService.saveError(
-                            entity.getId(),
-                            ResilientJobStatus.CREATED,
-                            calculateNextRetryTimestamp(entity.getRetryCount()),
-                            e
-                    );
+                    OffsetDateTime nextRetryTimestamp = calculateNextRetryTimestamp(entity.getRetryCount());
+                    boolean canRetryAgain = shouldRetryAgain(nextRetryTimestamp);
 
-                    // If retryable and not item-related: this is most probably an infrastructure problem, the batch should be interrupted
-                    if (isRetryable && !isItemRelated)
+                    if (canRetryAgain)
                     {
-                        throw e;
+                        log.info("Job id: {} retried {} times. Remaining time for retries: {}. Next retry in {}.",
+                                entity.getId(),
+                                entity.getRetryCount(),
+                                calculateRemainingTime(entity.getProcessingFirstStartedTimestamp()),
+                                formatDurationUntil(nextRetryTimestamp)
+                        );
+                        this.resilientJobEntityService.saveError(
+                                entity.getId(),
+                                ResilientJobStatus.CREATED,
+                                nextRetryTimestamp,
+                                e
+                        );
+
+                        // If retryable and not item-related: this is most probably an infrastructure problem, the batch should be interrupted
+                        if (isRetryable && !isItemRelated)
+                        {
+                            throw e;
+                        }
+                    }
+                    else
+                    {
+                        log.info("Job id: {} retried {} times. Retry timeout reached.",
+                                entity.getId(),
+                                entity.getRetryCount()
+                        );
+                        // This is the final execution cycle, the error remained, there is no more retry
+                        this.resilientJobEntityService.saveError(
+                                entity.getId(),
+                                ResilientJobStatus.ERROR,
+                                null,
+                                e
+                        );
+                        onError(e);
                     }
                 }
                 else // item-related && not-retryable
                 {
+                    log.info("Job id: {} will not be retried", entity.getId());
                     // job should be set in error, but the batch should continue
                     this.resilientJobEntityService.saveError(entity.getId(), ResilientJobStatus.ERROR, null, e);
                     onError(e);
@@ -91,6 +116,13 @@ class BJob extends ContextAwareBatchJob
     }
 
 
+    private String formatDurationUntil(OffsetDateTime futureTimestamp)
+    {
+        long millis = Math.max(Duration.between(OffsetDateTime.now(), futureTimestamp).toMillis(), 0L);
+        return TimeFormatter.getHumanReadableDuration(millis);
+    }
+
+
     String calculateRemainingTime(OffsetDateTime creationTimestamp)
     {
         long elapsedSeconds = 0;
@@ -98,7 +130,7 @@ class BJob extends ContextAwareBatchJob
         {
             elapsedSeconds = Duration.between(creationTimestamp, OffsetDateTime.now()).toSeconds();
         }
-        long remainingSeconds = this.processor.getProperties().getRetryTimeout().getSeconds() - elapsedSeconds;
+        long remainingSeconds = Math.max(this.processor.getProperties().getRetryTimeout().getSeconds() - elapsedSeconds, 0);
         return TimeFormatter.getHumanReadableDuration(remainingSeconds * 1000);
     }
 
@@ -120,7 +152,17 @@ class BJob extends ContextAwareBatchJob
         log.info("Processor {} finished entity {}", this.processor.getClass().getSimpleName(), this.entity);
 
         // Deleting the entity after successful processing
-        this.resilientJobEntityService.deleteById(this.entity.getId());
+        try
+        {
+            this.resilientJobEntityService.deleteById(this.entity.getId());
+        }
+        catch (Exception e)
+        {
+            // The job was processed successfully, but deletion failed (likely a transient DB issue).
+            // The entity stays IN_PROGRESS and will eventually be reset by resetStuckInProgressEntities.
+            // When that happens, processJob will run again - the processor must be idempotent (use operationId as idempotency key).
+            log.error("Failed to delete job entity {} after successful processing: {}", entity.getId(), StackTracer.toString(e));
+        }
     }
 
 
@@ -134,6 +176,20 @@ class BJob extends ContextAwareBatchJob
         {
             log.error("Error in onError method: {}", StackTracer.toString(ex));
         }
+    }
+
+
+    private boolean shouldRetryAgain(OffsetDateTime nextRetryTimestamp)
+    {
+        OffsetDateTime processingFirstStartedTimestamp = this.entity.getProcessingFirstStartedTimestamp();
+        if (processingFirstStartedTimestamp == null)
+        {
+            // First failure cycle: retry is still allowed
+            return true;
+        }
+
+        OffsetDateTime retryDeadline = processingFirstStartedTimestamp.plus(this.processor.getProperties().getRetryTimeout());
+        return nextRetryTimestamp.isBefore(retryDeadline) || nextRetryTimestamp.isEqual(retryDeadline);
     }
 
 

@@ -1,23 +1,23 @@
 #know-how:version-catalog
 
 [versions]
-aspectj = '1.9.22.1'
-jackson-annotations = '2.21'
-jackson3 = '3.1.0'
-jsonwebtoken = '0.12.6'
-junit = '6.0.1'
-logback = '1.5.22'
+aspectj = '1.9.25.1'
+jackson-annotations = '2.22'
+jackson3 = '3.2.0'
+jsonwebtoken = '0.13.0'
+junit = '6.1.0'
+logback = '1.5.34'
 mapstruct = '1.6.0'
-springdoc = '3.0.0'
-czhabarta = '3.2.1263'
+springdoc = '3.0.3'
+czhabarta = '4.1.1'
 
 
 [plugins]
-ben-manes-versions = { id = 'com.github.ben-manes.versions', version = '0.51.0' }
+ben-manes-versions = { id = 'com.github.ben-manes.versions', version = '0.54.0' }
 habarta-typescript-generator = { id = 'cz.habarta.typescript-generator', version.ref = 'czhabarta' }
 io-spring-dependency-management = { id = 'io.spring.dependency-management', version = '1.1.7' }
 johnrengelman-shadow = { id = 'com.github.johnrengelman.shadow', version = '8.1.1' }
-org-springframework-boot = { id = 'org.springframework.boot', version = '4.0.3' }
+org-springframework-boot = { id = 'org.springframework.boot', version = '4.1.0' }
 sonarqube = { id = 'org.sonarqube', version = '5.1.0.4882' }
 thin-launcher = { id = 'org.springframework.boot.experimental.thin-launcher', version = '1.0.31.RELEASE' }
 
@@ -34,10 +34,10 @@ bouncycastle-bcprov = 'org.bouncycastle:bcprov-jdk15on:1.70'
 caffeine = 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 commons-cli = 'commons-cli:commons-cli:1.9.0'
 commons-codec = 'commons-codec:commons-codec:1.17.1'
-commons-collections4 = 'org.apache.commons:commons-collections4:4.5.0-M2'
-commons-io = 'commons-io:commons-io:2.16.1'
-commons-lang3 = 'org.apache.commons:commons-lang3:3.19.0'
-guava = 'com.google.guava:guava:33.3.0-jre'
+commons-collections4 = 'org.apache.commons:commons-collections4:4.5.0'
+commons-io = 'commons-io:commons-io:2.22.0'
+commons-lang3 = 'org.apache.commons:commons-lang3:3.20.0'
+guava = 'com.google.guava:guava:33.6.0-jre'
 hibernate-validator = 'org.hibernate:hibernate-validator:8.0.1.Final'
 hierynomus-smbj = 'com.hierynomus:smbj:0.13.0'
 integralblue = 'com.integralblue:log4jdbc-spring-boot-starter:2.0.0'
@@ -60,7 +60,8 @@ jaxws-rt = 'com.sun.xml.ws:jaxws-rt:4.0.3'
 jaxws-tools = 'com.sun.xml.ws:jaxws-tools:4.0.3'
 jcifs-ng = 'eu.agno3.jcifs:jcifs-ng:2.1.10'
 jetbrains-annotations = 'org.jetbrains:annotations:24.1.0'
-jimfs = 'com.google.jimfs:jimfs:1.3.0'
+jimfs = 'com.google.jimfs:jimfs:1.3.1'
+jsoup = 'org.jsoup:jsoup:1.22.2'
 jsonwebtoken-api = { module = 'io.jsonwebtoken:jjwt-api', version.ref = 'jsonwebtoken' }
 jsonwebtoken-impl = { module = 'io.jsonwebtoken:jjwt-impl', version.ref = 'jsonwebtoken' }
 jsonwebtoken-jackson = { module = 'io.jsonwebtoken:jjwt-jackson', version.ref = 'jsonwebtoken' }
@@ -75,22 +76,22 @@ log4j-log4j = 'log4j:log4j:1.2.17'
 logback-classic = { module = 'ch.qos.logback:logback-classic', version.ref = 'logback' }
 logback-core = { module = 'ch.qos.logback:logback-core', version.ref = 'logback' }
 logstash-logback-encoder = 'net.logstash.logback:logstash-logback-encoder:7.2'
-lombok = 'org.projectlombok:lombok:1.18.34'
+lombok = 'org.projectlombok:lombok:1.18.46'
 mapstruct = { module = 'org.mapstruct:mapstruct', version.ref = 'mapstruct' }
 mapstruct-processor = { module = 'org.mapstruct:mapstruct-processor', version.ref = 'mapstruct' }
 mssql-jdbc = 'com.microsoft.sqlserver:mssql-jdbc:12.6.2.jre11'
-nimbus-jose-jwt = 'com.nimbusds:nimbus-jose-jwt:10.5'
+nimbus-jose-jwt = 'com.nimbusds:nimbus-jose-jwt:10.9.1'
 nv-i18n = 'com.neovisionaries:nv-i18n:1.29'
 openapi-api = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-api', version.ref = 'springdoc' }
 openapi-ui = { module = 'org.springdoc:springdoc-openapi-starter-webmvc-ui', version.ref = 'springdoc' }
 opencsv = 'com.opencsv:opencsv:5.9'
-pdfbox = 'org.apache.pdfbox:pdfbox:3.0.3'
-pdfbox-fontbox = 'org.apache.pdfbox:fontbox:3.0.3'
+pdfbox = 'org.apache.pdfbox:pdfbox:3.0.7'
+pdfbox-fontbox = 'org.apache.pdfbox:fontbox:3.0.7'
 reflections = 'org.reflections:reflections:0.10.2'
 slf4j-api = 'org.slf4j:slf4j-api:2.0.17'
 slf4j-log4j12 = 'org.slf4j:slf4j-log4j12:2.0.17'
 smb-nio = 'ch.pontius.nio:smb-nio:0.13.0'
-spring-cloud = 'org.springframework.cloud:spring-cloud-dependencies:2025.1.0'
+spring-cloud = 'org.springframework.cloud:spring-cloud-dependencies:2025.1.2'
 #spvitamin = 'hu.perit.spvitamin:spvitamin-dependencies:3.4.3-1-RELEASE'
 tika = 'org.apache.tika:tika-core:2.9.2'
 tika-parsers-standard-package = 'org.apache.tika:tika-parsers-standard-package:2.9.2'

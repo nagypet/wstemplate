@@ -18,24 +18,26 @@ package hu.perit.spvitamin.spring.security.auth;
 
 import hu.perit.spvitamin.core.reflection.Property;
 import hu.perit.spvitamin.core.reflection.ReflectionUtils;
+import hu.perit.spvitamin.core.thing.Thing;
+import hu.perit.spvitamin.core.thing.Value;
+import hu.perit.spvitamin.core.thing.ValueMap;
 import hu.perit.spvitamin.spring.config.SecurityProperties;
 import hu.perit.spvitamin.spring.config.SessionProperties;
 import hu.perit.spvitamin.spring.config.SpringContext;
 import hu.perit.spvitamin.spring.config.SysConfig;
 import hu.perit.spvitamin.spring.rest.api.AuthApi;
-import hu.perit.spvitamin.spring.security.BasicOnlySessionSecurityContextRepository;
+import hu.perit.spvitamin.spring.security.SelectiveSessionSecurityContextRepositor;
 import hu.perit.spvitamin.spring.security.auth.filter.Role2PermissionMapperFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.jwt.JwtAuthenticationFilter;
 import hu.perit.spvitamin.spring.security.auth.filter.securitycontextremover.SecurityContextRemoverFilter;
 import hu.perit.spvitamin.spring.security.auth.proxy.AuthorizationServerProxy;
-import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.LocalUserAuthenticationProvider;
 import jakarta.servlet.Filter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -54,6 +56,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * #know-how:simple-httpsecurity-builder
@@ -80,14 +84,14 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder defaultCors() throws Exception
+    public SimpleHttpSecurityBuilder defaultCors()
     {
         http.cors(i -> i.configurationSource(corsConfigurationSource()));
         return this;
     }
 
 
-    public SimpleHttpSecurityBuilder defaultCsrf() throws Exception
+    public SimpleHttpSecurityBuilder defaultCsrf()
     {
         http.csrf(i -> i.disable());
         return this;
@@ -95,7 +99,7 @@ public class SimpleHttpSecurityBuilder
 
 
     public SimpleHttpSecurityBuilder exceptionHandler(AuthenticationEntryPoint authenticationEntryPoint,
-                                                      AccessDeniedHandler accessDeniedHandler) throws Exception
+                                                      AccessDeniedHandler accessDeniedHandler)
     {
         http.exceptionHandling(i -> i.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler));
         return this;
@@ -131,17 +135,21 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder allowAdditionalSecurityHeaders() throws Exception
+    public SimpleHttpSecurityBuilder allowAdditionalSecurityHeaders()
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
 
         if (securityProperties.getAdditionalSecurityHeaders() != null)
         {
-            for (String header : securityProperties.getAdditionalSecurityHeaders().values())
+            for (Map.Entry<String, String> header : securityProperties.getAdditionalSecurityHeaders().entrySet())
             {
-                // pl: X-Content-Security-Policy=default-src 'self'
-                String[] headerParts = header.split("=");
-                http.headers(i -> i.addHeaderWriter(new StaticHeadersWriter(headerParts[0], headerParts[1])));
+                /**
+                 * security:
+                 *   additional-security-headers:
+                 *     Content-Security-Policy: "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; frame-ancestors 'self'; base-uri 'self'; report-uri /api/spvitamin/admin/csp_violations;"
+                 *     Permissions-Policy: "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=(), document-domain=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=()"
+                 */
+                http.headers(i -> i.addHeaderWriter(new StaticHeadersWriter(header.getKey(), header.getValue())));
             }
         }
 
@@ -149,7 +157,8 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder createSessionOnlyForBasicAuthentication() throws Exception
+    // Creating a session only in case of Basic Authentication or OAuth2
+    public SimpleHttpSecurityBuilder createSessionSelectively()
     {
         SessionAuthenticationStrategy authenticationStrategy = SpringContext.getBean(SessionAuthenticationStrategy.class);
         this.http
@@ -157,13 +166,13 @@ public class SimpleHttpSecurityBuilder
                         .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                         .sessionAuthenticationStrategy(authenticationStrategy)
                 )
-                .securityContext(ctx -> ctx.securityContextRepository(new BasicOnlySessionSecurityContextRepository()));
+                .securityContext(ctx -> ctx.securityContextRepository(new SelectiveSessionSecurityContextRepositor()));
 
         return this;
     }
 
 
-    public SimpleHttpSecurityBuilder createSession() throws Exception
+    public SimpleHttpSecurityBuilder createSession()
     {
         SessionAuthenticationStrategy authenticationStrategy = SpringContext.getBean(SessionAuthenticationStrategy.class);
         this.http
@@ -176,9 +185,13 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder basicAuth() throws Exception
+    public SimpleHttpSecurityBuilder basicAuth()
     {
         CustomAuthenticationEntryPoint authenticationEntryPoint = SpringContext.getBean(CustomAuthenticationEntryPoint.class);
+
+        // Adding Authentication Manager
+        AuthenticationManager authenticationManager = SpringContext.getBean(AuthenticationManager.class);
+        this.http.authenticationManager(authenticationManager);
 
         this.http.httpBasic(i -> i.authenticationEntryPoint(authenticationEntryPoint));
 
@@ -280,7 +293,7 @@ public class SimpleHttpSecurityBuilder
     }
 
 
-    public SimpleHttpSecurityBuilder allowFrames() throws Exception
+    public SimpleHttpSecurityBuilder allowFrames()
     {
         this.http.headers(i -> i.frameOptions(j -> j.sameOrigin()));
         return this;
@@ -289,9 +302,44 @@ public class SimpleHttpSecurityBuilder
 
     public SimpleHttpSecurityBuilder h2() throws Exception
     {
-        allowFrames();
-        this.http.authorizeHttpRequests(r -> r.requestMatchers(PathRequest.toH2Console()).permitAll());
+        String h2ConsolePath = getH2ConsolePath().orElse(null);
+        if (h2ConsolePath != null)
+        {
+            String serviceUrl = SysConfig.getServerProperties().getServiceUrl();
+            log.info("H2 console available: {}{}", serviceUrl, h2ConsolePath);
+            allowFrames();
+            this.http.authorizeHttpRequests(r -> r.requestMatchers(PathRequest.toH2Console()).permitAll());
+        }
+        else
+        {
+            log.warn("*** H2 console is not available!");
+        }
         return this;
+    }
+
+
+    public static Optional<String> getH2ConsolePath()
+    {
+        try
+        {
+            Class<?> h2PropsClass = Class.forName("org.springframework.boot.h2console.autoconfigure.H2ConsoleProperties");
+            if (SpringContext.isBeanAvailable(h2PropsClass))
+            {
+                Thing h2ConsoleProperties = Thing.from(SpringContext.getBean(h2PropsClass));
+                if (h2ConsoleProperties instanceof ValueMap valueMap)
+                {
+                    if (valueMap.getProperties().get("path") instanceof Value value)
+                    {
+                        return Optional.of(value.getValue().toString());
+                    }
+                }
+            }
+        }
+        catch (ClassNotFoundException e)
+        {
+            // H2ConsoleProperties class does not exist, so we don't care'
+        }
+        return Optional.empty();
     }
 
 
@@ -313,31 +361,11 @@ public class SimpleHttpSecurityBuilder
     {
         this
                 .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
-                .ignorePersistedSecurity()
+                //.ignorePersistedSecurity() is commented out with reason: in case of OAuth2 authentication, the token is saved in the session
                 .authorizeRequests(r -> r.anyRequest().authenticated())
-                .addLocalUserAuthenticationProvider()
                 .basicAuth()
                 .jwtAuth()
-                .createSessionOnlyForBasicAuthentication();
-
-        return this;
-    }
-
-
-    private SimpleHttpSecurityBuilder addLocalUserAuthenticationProvider()
-    {
-        try
-        {
-            LocalUserAuthenticationProvider provider = SpringContext.getBean(LocalUserAuthenticationProvider.class);
-            AuthenticationManagerBuilder authenticationManagerBuilder = SpringContext.getBean(AuthenticationManagerBuilder.class);
-            http.authenticationProvider(provider);
-            authenticationManagerBuilder.authenticationProvider(provider);
-            log.debug("{} applied to the security.", LocalUserAuthenticationProvider.class.getSimpleName());
-        }
-        catch (Exception e)
-        {
-            log.info("{} is not configured!", LocalUserAuthenticationProvider.class.getSimpleName());
-        }
+                .createSessionSelectively();
 
         return this;
     }
@@ -348,7 +376,7 @@ public class SimpleHttpSecurityBuilder
         this
                 .scope(AuthApi.BASE_URL_AUTHENTICATE + "/**")
                 .authorizeRequests(r -> r.anyRequest().permitAll())
-                .createSessionOnlyForBasicAuthentication();
+                .createSessionSelectively();
 
         return this;
     }
@@ -378,21 +406,27 @@ public class SimpleHttpSecurityBuilder
     public static CorsConfigurationSource corsConfigurationSource()
     {
         SecurityProperties securityProperties = SysConfig.getSecurityProperties();
+        boolean productionMode = securityProperties.isProductionMode();
 
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(getListFromArray(securityProperties.getAllowedOrigins()));
-        configuration.setAllowedHeaders(getListFromArray(securityProperties.getAllowedHeaders()));
-        configuration.setAllowedMethods(getListFromArray(securityProperties.getAllowedMethods()));
+        configuration.setAllowedOrigins(getListFromArray(securityProperties.getAllowedOrigins(), productionMode));
+        configuration.setAllowedHeaders(getListFromArray(securityProperties.getAllowedHeaders(), productionMode));
+        configuration.setAllowedMethods(getListFromArray(securityProperties.getAllowedMethods(), productionMode));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 
 
-    private static List<String> getListFromArray(String[] input)
+    private static List<String> getListFromArray(String[] input, boolean productionMode)
     {
         if (input == null || input.length == 0)
         {
+            if (productionMode)
+            {
+                log.warn("CORS configuration is missing in production mode — CORS requests will be blocked!");
+                return List.of();
+            }
             return List.of("*");
         }
         else

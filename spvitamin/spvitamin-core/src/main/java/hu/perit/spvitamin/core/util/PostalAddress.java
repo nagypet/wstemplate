@@ -16,6 +16,7 @@
 
 package hu.perit.spvitamin.core.util;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.neovisionaries.i18n.CountryCode;
 import hu.perit.spvitamin.core.typehelpers.ListUtils;
 import lombok.Data;
@@ -38,6 +39,20 @@ public class PostalAddress
     private String address2;
 
 
+    @JsonIgnore
+    public boolean isEmpty()
+    {
+        return StringUtils.isAllBlank(this.fullAddress, this.countryCode, this.zip, this.city, this.address1, this.address2);
+    }
+
+
+    @JsonIgnore
+    public boolean isValid()
+    {
+        return StringUtils.isNotBlank(this.fullAddress) || StringUtils.isNoneEmpty(this.countryCode, this.zip, this.city, this.address1);
+    }
+
+
     public static PostalAddress fromAddressParts(String countryCode, String zip, String city, String address1, String address2)
     {
         PostalAddress address = new PostalAddress();
@@ -52,10 +67,14 @@ public class PostalAddress
 
     private static String getCountryCode(String countryCode)
     {
+
         if (StringUtils.isBlank(countryCode))
         {
             return null;
         }
+        // Remove everything but letters
+        countryCode = countryCode.replaceAll("[^a-zA-Z]", "");
+
         // Is this a valid country code?
         CountryCode cc = CountryCode.getByCode(countryCode);
         if (cc != null)
@@ -101,10 +120,16 @@ public class PostalAddress
         }
 
         String regionCodeString = countryCode == null || Strings.CI.equals(DEFAULT_REGION_CODE, countryCode) ? "" : String.format(" (%s)", countryCode);
+
+        String zipPart = StringUtils.isBlank(zip) ? "" : (zip + " ");
+        String cityPart = StringUtils.defaultString(city);
+        String line1 = MessageFormat.format("{0}{1}{2}, {3}", zipPart, cityPart, regionCodeString, StringUtils.defaultString(address1));
+
         if (address2 == null)
         {
-            return MessageFormat.format("{0} {1}{2}, {3}", zip, city, regionCodeString, address1);
+            return line1;
         }
-        return MessageFormat.format("{0} {1}{2}, {3}, {4}", zip, city, regionCodeString, address1, address2);
+
+        return MessageFormat.format("{0}, {1}", line1, address2);
     }
 }

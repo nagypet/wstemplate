@@ -29,21 +29,11 @@ import org.springframework.data.jpa.repository.QueryHints;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> extends JpaRepository<T, Long>
 {
-    // By using the whereState this method will work fine even if the DONE records are not deleted.
-    @Modifying
-    @Query("update #{#entityName} e set e.status = :errorState where e.processorType = :processorType and e.status in :whereStates and e.processingFirstStartedTimestamp < :timestamp")
-    int terminatePermanentlyFailingEntities(
-            Long processorType,
-            OffsetDateTime timestamp,
-            Set<ResilientJobStatus> whereStates,
-            ResilientJobStatus errorState
-    );
-
-
     // The 'coalesce(e.processingLastStartedTimestamp, e.creationTimestamp)' is only necessary for the database migration
     @Modifying
     @Query("update #{#entityName} e set e.status = :targetState, e.retryCount = e.retryCount + 1 where e.processorType = :processorType and e.status = :whereState and coalesce(e.processingLastStartedTimestamp, e.creationTimestamp) < :timestamp")
@@ -55,9 +45,13 @@ public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> 
     );
 
 
-    // We use here timeout = 0 which means, do not wait for locked rows.
+    // We use timeout = -2 which means, skip locked rows. If the underlying database doesn't support SKIP LOCKED,
+    // use timeout = 0 which means, do not wait for locked rows.
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @QueryHints({@QueryHint(name = "jakarta.persistence.lock.timeout", value = "0")})
+    @QueryHints({
+            @QueryHint(name = "jakarta.persistence.lock.timeout", value = "-2"),
+            @QueryHint(name = "org.hibernate.lock.timeout", value = "-2")
+    })
     @Query("""
             select e from #{#entityName} e
             where e.processorType = :processorType
@@ -102,4 +96,11 @@ public interface AbstractResilientJobRepo<T extends AbstractResilientJobEntity> 
     @Modifying
     @Query("update #{#entityName} e set e.status = :status where e.id in :ids and e.status = :criteria")
     int updateStatusWhere(List<Long> ids, ResilientJobStatus status, ResilientJobStatus criteria);
+
+
+    Optional<T> findByStatusInAndProcessorTypeAndParameterHash(Set<ResilientJobStatus> status, Long processorType, String parameterHash);
+
+    @Modifying
+    @Query("update #{#entityName} e set e.sagaContext = :contextJson, e.sagaContextVersion = :contextVersion, e.sagaLastStep = :lastStep where e.id = :id")
+    void updateSaga(Long id, String contextJson, int contextVersion, String lastStep);
 }

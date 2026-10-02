@@ -18,6 +18,7 @@ package hu.perit.spvitamin.spring.resilientjobrunner.service.impl.entity;
 
 import com.google.common.collect.Lists;
 import hu.perit.spvitamin.core.StackTracer;
+import hu.perit.spvitamin.core.crypto.HashUtils;
 import hu.perit.spvitamin.spring.resilientjobrunner.ProcessorType;
 import hu.perit.spvitamin.spring.resilientjobrunner.ResilientJobStatus;
 import hu.perit.spvitamin.spring.resilientjobrunner.config.ResilientJobProperties;
@@ -26,15 +27,20 @@ import hu.perit.spvitamin.spring.resilientjobrunner.db.repo.AbstractResilientJob
 import hu.perit.spvitamin.spring.resilientjobrunner.service.api.ResilientJobEntityService;
 import hu.perit.spvitamin.spring.resilientjobrunner.service.api.ResilientJobParameter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RequiredArgsConstructor
+@Slf4j
 public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractResilientJobEntity> implements ResilientJobEntityService<T>
 {
     public static final int MAX_CRITERIA_IN_QUERIES = 1000;
@@ -44,30 +50,46 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
 
     protected abstract T supplyEntity();
 
+
     @Override
+    @Transactional
     public T createNew(ResilientJobProperties jobProperties, ResilientJobParameter parameter)
     {
+        // Checking if there is already an ongoing job with the same parameters
+        // NOTE: This check-then-insert is not atomic. A race condition can create duplicate jobs if two threads
+        // call createNew concurrently with the same parameters and no active job exists yet.
+        // The reliable fix requires a DB-level UNIQUE constraint on (processor_type, parameter_hash) combined with
+        // catching DataIntegrityViolationException here and returning the existing entity.
+        String parameterJson = parameter.toJson();
+        String parameterHash = HashUtils.get32BytesSha256Hash(parameterJson);
+        T existingEntity = findExistingOngoingJob(jobProperties.getId(), parameterHash).orElse(null);
+        if (existingEntity != null)
+        {
+            log.info("This job is already processing: {}", existingEntity);
+            return existingEntity;
+        }
+
         T resilientJobEntity = supplyEntity();
         resilientJobEntity.setCreationTimestamp(OffsetDateTime.now());
         resilientJobEntity.setStatus(ResilientJobStatus.CREATED);
         resilientJobEntity.setProcessorType(jobProperties.getId());
         resilientJobEntity.setParameterVersion(parameter.getVersion());
-        resilientJobEntity.setParameters(parameter.toJson());
+        resilientJobEntity.setParameters(parameterJson);
+        resilientJobEntity.setParameterHash(parameterHash);
         resilientJobEntity.setRetryCount(0L);
+        resilientJobEntity.setOperationId(UUID.randomUUID());
 
         return this.repo.save(resilientJobEntity);
     }
 
 
-    @Override
-    @Transactional
-    public int terminatePermanentlyFailingEntities(ProcessorType processorType, Duration timeout)
+    private Optional<T> findExistingOngoingJob(Long processorType, String parameterHash)
     {
-        return this.repo.terminatePermanentlyFailingEntities(
-                processorType.getProcessorId(),
-                OffsetDateTime.now().minusSeconds(timeout.getSeconds()),
+        return this.repo.findByStatusInAndProcessorTypeAndParameterHash(
                 EnumSet.of(ResilientJobStatus.CREATED, ResilientJobStatus.IN_PROGRESS),
-                ResilientJobStatus.ERROR);
+                processorType,
+                parameterHash
+        );
     }
 
 
@@ -96,11 +118,14 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
                 OffsetDateTime.now(),
                 pageRequest
         );
-        this.repo.updateStatusAndProcessingStartedTimestamp(
-                entities.stream().map(i -> i.getId()).toList(),
-                ResilientJobStatus.IN_PROGRESS,
-                OffsetDateTime.now()
-        );
+        if (!entities.isEmpty())
+        {
+            this.repo.updateStatusAndProcessingStartedTimestamp(
+                    entities.stream().map(i -> i.getId()).toList(),
+                    ResilientJobStatus.IN_PROGRESS,
+                    OffsetDateTime.now()
+            );
+        }
         return entities;
     }
 
@@ -111,7 +136,7 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
     {
         // com.microsoft.sqlserver.jdbc.SQLServerException: The incoming request has too many parameters. The server supports a maximum of 2100 parameters. Reduce the number of parameters and resend the request
         return Lists.partition(ids, MAX_CRITERIA_IN_QUERIES).stream()
-                .mapToInt(idList -> this.repo.updateStatusWhere(ids, ResilientJobStatus.CREATED, ResilientJobStatus.IN_PROGRESS))
+                .mapToInt(idList -> this.repo.updateStatusWhere(idList, ResilientJobStatus.CREATED, ResilientJobStatus.IN_PROGRESS))
                 .sum();
     }
 
@@ -129,5 +154,16 @@ public abstract class AbstractResilientJobEntityServiceImpl<T extends AbstractRe
     public void saveError(Long id, ResilientJobStatus resilientJobStatus, OffsetDateTime nextRetryTimestamp, Exception e)
     {
         this.repo.updateStatusAndError(id, resilientJobStatus, nextRetryTimestamp, StackTracer.toString(e));
+    }
+
+
+    /**
+     * Önálló tranzakció: a lépés mellékhatása után a haladás biztosan megmarad.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Override
+    public void persistSagaContext(Long id, String contextJson, int contextVersion, String lastStep)
+    {
+        this.repo.updateSaga(id, contextJson, contextVersion, lastStep);
     }
 }

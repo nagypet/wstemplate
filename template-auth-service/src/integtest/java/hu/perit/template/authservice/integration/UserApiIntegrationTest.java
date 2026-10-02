@@ -29,7 +29,11 @@ import hu.perit.spvitamin.spring.feign.AuthClient;
 import hu.perit.spvitamin.spring.feignclients.ForwardingAuthRequestInterceptor;
 import hu.perit.spvitamin.spring.feignclients.SimpleFeignClientBuilder;
 import hu.perit.template.authservice.api.TemplateAuthServiceClient;
-import hu.perit.template.authservice.model.*;
+import hu.perit.template.authservice.model.CreateUserParams;
+import hu.perit.template.authservice.model.ResponseUri;
+import hu.perit.template.authservice.model.UpdateUserParams;
+import hu.perit.template.authservice.model.UserDTO;
+import hu.perit.template.authservice.model.UserDTOFiltered;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.junit.jupiter.api.Assertions;
@@ -80,10 +84,8 @@ public class UserApiIntegrationTest
                             localUserProperties.getLocaluser().get("admin").getPassword()))
                     .build(AuthClient.class, SysConfig.getServerProperties().getServiceUrl());
 
-            AuthorizationToken authenticate = authClient.authenticate(null);
-            String jwt = authenticate.getJwt();
             this.templateAuthServiceClient = SimpleFeignClientBuilder.newInstance()
-                    .requestInterceptor(new ForwardingAuthRequestInterceptor("Bearer " + jwt))
+                    .requestInterceptor(new ForwardingAuthRequestInterceptor(() -> "Bearer " + getJwtToken(authClient)))
                     .build(TemplateAuthServiceClient.class, SysConfig.getServerProperties().getServiceUrl());
         }
         catch (RuntimeException e)
@@ -91,6 +93,13 @@ public class UserApiIntegrationTest
             log.error(StackTracer.toString(e));
             fail(e.toString());
         }
+    }
+
+
+    private static String getJwtToken(AuthClient authClient)
+    {
+        AuthorizationToken authenticate = authClient.authenticate(null);
+        return authenticate.getJwt();
     }
 
 

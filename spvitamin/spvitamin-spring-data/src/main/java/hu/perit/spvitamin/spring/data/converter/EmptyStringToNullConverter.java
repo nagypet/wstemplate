@@ -14,31 +14,25 @@
  * limitations under the License.
  */
 
-.upload-drop-zone {
-  position: relative;
-  height: 200px;
-  width: 100%;
-  border:  1px dashed lightgray;
-  border-radius: 5px;
-  padding: 60px 0 0 0;
-  margin: 0;
-  text-align: center;
+package hu.perit.spvitamin.spring.data.converter;
 
-  input {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    cursor: pointer;
-    opacity: 0;
-    top: 0;
-    left: 0;
-  }
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+import org.apache.commons.lang3.StringUtils;
 
-  .upload-drop-zone-text {
-    color: lightgray;
-  }
-}
+@Converter
+public class EmptyStringToNullConverter implements AttributeConverter<String, String>
+{
+    @Override
+    public String convertToDatabaseColumn(String attribute)
+    {
+        return StringUtils.isBlank(attribute) ? null : attribute;
+    }
 
-.upload-item-container {
-  margin-bottom: 20px;
+
+    @Override
+    public String convertToEntityAttribute(String dbData)
+    {
+        return dbData;
+    }
 }

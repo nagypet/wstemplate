@@ -19,7 +19,6 @@ package hu.perit.template.authservice.auth;
 import hu.perit.spvitamin.spring.config.EnableSpvitaminOAuth2Idp;
 import hu.perit.spvitamin.spring.security.auth.SimpleHttpSecurityBuilder;
 import hu.perit.spvitamin.spring.security.authprovider.localuserprovider.EnableLocalUserAuthProvider;
-import hu.perit.spvitamin.spring.security.ldap.LdapAuthenticationProviderConfigurer;
 import hu.perit.spvitamin.spring.security.oauth2.CustomOAuth2SuccessHandler;
 import hu.perit.template.authservice.rest.api.TemplateAuthServiceControllerApi;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +48,6 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig
 {
     private final DbAuthenticationProvider dbAuthenticationProvider;
-    private final LdapAuthenticationProviderConfigurer ldapAuthenticationProviderConfigurer;
 
 
     @Bean
@@ -79,7 +77,6 @@ public class WebSecurityConfig
                 .configureAuthorizatonServer();
 
         http.authenticationProvider(this.dbAuthenticationProvider);
-        this.ldapAuthenticationProviderConfigurer.configure(http);
 
         return http.build();
     }
