@@ -15,7 +15,7 @@
  */
 
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {NgForOf, NgIf} from '@angular/common';
+
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmationDialogComponent} from '../../dialogs/confirmation-dialog/confirmation-dialog.component';
 import {CertInfo, KeystoreEntry} from '../../../core/model/keystore';
@@ -25,10 +25,7 @@ import {CertInfo, KeystoreEntry} from '../../../core/model/keystore';
     selector: 'app-keystore',
     templateUrl: './keystore.component.html',
     styleUrls: ['./keystore.component.scss'],
-    imports: [
-        NgForOf,
-        NgIf
-    ]
+    imports: []
 })
 export class KeystoreComponent implements OnInit, OnChanges
 {

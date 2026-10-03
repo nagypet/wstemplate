@@ -46,7 +46,7 @@ export class AppComponent
   }
 
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   onWindowResize(): void
   {
     this.deviceTypeService.calculateDeviceType();

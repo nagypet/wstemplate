@@ -16,7 +16,7 @@
 
 /* tslint:disable:one-line */
 import {Component, OnInit} from '@angular/core';
-import {NgForOf, NgIf} from '@angular/common';
+
 import {MatButtonModule} from '@angular/material/button';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatCardModule} from '@angular/material/card';
@@ -33,12 +33,10 @@ import {Subscription} from "rxjs";
     templateUrl: './settings.component.html',
     styleUrls: ['./settings.component.scss'],
     imports: [
-        NgForOf,
-        NgIf,
-        MatButtonModule,
-        MatTooltip,
-        MatCardModule
-    ]
+    MatButtonModule,
+    MatTooltip,
+    MatCardModule
+]
 })
 export class SettingsComponent implements OnInit
 {
