@@ -22,14 +22,13 @@ import {CertInfo, KeystoreEntry} from '../../../core/model/keystore';
 
 
 @Component({
-  selector: 'app-keystore',
-  templateUrl: './keystore.component.html',
-  styleUrls: ['./keystore.component.scss'],
-  imports: [
-    NgForOf,
-    NgIf
-  ],
-  standalone: true
+    selector: 'app-keystore',
+    templateUrl: './keystore.component.html',
+    styleUrls: ['./keystore.component.scss'],
+    imports: [
+        NgForOf,
+        NgIf
+    ]
 })
 export class KeystoreComponent implements OnInit, OnChanges
 {

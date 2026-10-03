@@ -29,17 +29,16 @@ import {Subscription} from "rxjs";
 
 
 @Component({
-  selector: 'app-settings',
-  templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.scss'],
-  imports: [
-    NgForOf,
-    NgIf,
-    MatButtonModule,
-    MatTooltip,
-    MatCardModule
-  ],
-  standalone: true
+    selector: 'app-settings',
+    templateUrl: './settings.component.html',
+    styleUrls: ['./settings.component.scss'],
+    imports: [
+        NgForOf,
+        NgIf,
+        MatButtonModule,
+        MatTooltip,
+        MatCardModule
+    ]
 })
 export class SettingsComponent implements OnInit
 {
